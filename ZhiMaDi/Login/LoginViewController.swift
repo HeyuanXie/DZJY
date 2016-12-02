@@ -20,6 +20,9 @@ class LoginViewController: UIViewController , ZMDInterceptorNavigationBarHiddenP
     
     @IBOutlet weak var rightBar: UIBarButtonItem!
     
+    //MARK:登陆成功后的回调,需要在前一个页面有操作就赋值
+    var loginSucceed : (() -> Void)!
+    
     override func awakeFromNib() {
         self.view.bringSubviewToFront(self.thirdView)
     }
@@ -160,8 +163,10 @@ class LoginViewController: UIViewController , ZMDInterceptorNavigationBarHiddenP
             QNNetworkTool.loginAjax(usrN, Password: ps, completion: { (success, error, dictionary) -> Void in
                 if success! {
                     saveAccountAndPassword(usrN, password: ps)
-                    let vc = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController()
-                    ZMDTool.enterRootViewController(vc!)
+                    if self.loginSucceed != nil {
+                        self.loginSucceed()
+                    }
+                    self.back()
                 } else {
                     ZMDTool.showErrorPromptView(nil, error: error, errorMsg: "失败")
                 }
@@ -203,10 +208,6 @@ class LoginViewController: UIViewController , ZMDInterceptorNavigationBarHiddenP
             return false
         }
         return true
-    }
-    override func back() {
-        let vc = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController()
-        ZMDTool.enterRootViewController(vc!)
     }
 }
 // MARK: - 获取验证码UI 显示的超时时间

@@ -156,13 +156,11 @@ class MineHomeViewController: UIViewController,UITableViewDataSource, UITableVie
     
     override func viewDidLoad() {
         super.viewDidLoad()
-//        if !g_isLogin {
-//            ZMDTool.enterLoginViewController()
-//        }
         
         self.btn = UIButton(frame: self.view.bounds)
         self.btn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
-            ZMDTool.enterLoginViewController()
+            let vc = LoginViewController.CreateFromLoginStoryboard() as! LoginViewController
+            self.pushToViewController(vc, animated: true, hideBottom: true)
             return RACSignal.empty()
         })
         self.view.addSubview(self.btn)

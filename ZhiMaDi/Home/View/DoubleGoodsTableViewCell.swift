@@ -132,3 +132,28 @@ class DoubleGoodsTableViewCell: UITableViewCell {
         
     }
 }
+
+//MARK: 首页doubleGoodCell
+class HomeDoubleGoodCell : UITableViewCell {
+    @IBOutlet weak var leftView : UIView!
+    @IBOutlet weak var rightView : UIView!
+    
+    override func awakeFromNib() {
+        self.rightView.addSubview(ZMDTool.getLine(CGRect(x: 0, y: 0, width: 0.5, height: 98*kScreenWidth/375), backgroundColor: defaultLineColor))
+    }
+    
+    
+}
+
+//MARK: 首页multiGoodCell
+class HomeMultiGoodCell : UITableViewCell {
+    @IBOutlet weak var leftView : UIView!
+    @IBOutlet weak var centerView : UIView!
+    @IBOutlet weak var rightView : UIView!
+    
+    override func awakeFromNib() {
+        self.frame = CGRect(x: 0, y: 0, width: kScreenWidth, height: 110*kScreenWidth/375)
+        self.centerView.addSubview(ZMDTool.getLine(CGRect(x: 0, y: 0, width: 0.5, height: 110*kScreenWidth/375), backgroundColor: defaultLineColor))
+        self.rightView.addSubview(ZMDTool.getLine(CGRect(x: 0, y: 0, width: 0.5, height: 110*kScreenWidth/375), backgroundColor: defaultLineColor))
+    }
+}

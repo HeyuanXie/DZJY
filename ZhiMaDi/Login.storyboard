@@ -8,7 +8,7 @@
         <!--帐户登录-->
         <scene sceneID="KQr-fA-49m">
             <objects>
-                <viewController id="ndF-P1-mWi" customClass="LoginViewController" customModule="ZhiMaDi" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="LoginViewController" id="ndF-P1-mWi" customClass="LoginViewController" customModule="ZhiMaDi" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="vt2-eK-Mgk"/>
                         <viewControllerLayoutGuide type="bottom" id="d88-ox-UrN"/>

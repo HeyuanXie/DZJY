@@ -109,11 +109,11 @@ class HomeBuyGoodsDetailViewController: UIViewController,UITableViewDataSource,U
         let cellType = self.goodsCellTypes[section]
         switch cellType {
         case .HomeContentTypeDistribution :
-            return 13
+            return 11*kScreenWidth/375
         case .HomeContentTypeIntroductionHead :
-            return 13
+            return 11*kScreenWidth/375
         case .HomeContentTypeSeller :
-            return g_isLogin! ? 0 : 36
+            return g_isLogin! ? 0 : 34*kScreenWidth/375
         default :
             return 0
         }
@@ -137,7 +137,7 @@ class HomeBuyGoodsDetailViewController: UIViewController,UITableViewDataSource,U
         case .HomeContentTypeIntroductionHead :
             return 54
         case .HomeContentTypeIntroductionDetail :
-            return 214
+            return 214*kScreenWidth/375
         }
     }
     
@@ -162,12 +162,16 @@ class HomeBuyGoodsDetailViewController: UIViewController,UITableViewDataSource,U
     func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let cellType = self.goodsCellTypes[section]
         if cellType == .HomeContentTypeSeller && !g_isLogin {
-            let view = UIView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 34))
-            view.backgroundColor = RGB(253,146,216,1.0)
+            let view = UIView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 34*kScreenWidth/375))
+            view.backgroundColor = RGB(253,246,216,1.0)
             let label = ZMDTool.getLabel(view.bounds, text: "点击登录,查看详细联系方式", fontSize: 14)
-            label.attributedText = label.text?.AttributedMutableText(["点击登陆"], colors: [appThemeColorNew])
+            label.textAlignment = .Center
+            label.attributedText = label.text?.AttributedText("点击登录", color: appThemeColorNew)
             let btn = ZMDTool.getButton(view.bounds, textForNormal: "", fontSize: 0, backgroundColor: UIColor.clearColor(), blockForCli: { (sender) -> Void in
-                //...进入登陆页面
+                let vc = LoginViewController.CreateFromLoginStoryboard() as! LoginViewController
+//                self.presentViewController(vc, animated: true, completion: nil)
+                self.pushToViewController(vc, animated: true, hideBottom: true)
+//                ZMDTool.enterLoginViewController()
             })
             view.addSubview(label)
             view.addSubview(btn)
@@ -269,6 +273,7 @@ class HomeBuyGoodsDetailViewController: UIViewController,UITableViewDataSource,U
                 //...More
             })
             cell?.contentView.addSubview(label)
+            cell?.addLine()
             cell?.addSubview(btn)
         }
         
@@ -281,7 +286,7 @@ class HomeBuyGoodsDetailViewController: UIViewController,UITableViewDataSource,U
     func cellForSeller(tableView: UITableView,indexPath: NSIndexPath)-> UITableViewCell {
         let cellId = "sellerCell"
         let cell = tableView.dequeueReusableCellWithIdentifier(cellId) as! DZContentSellerCell
-//        DZContentSellerCell.configSellerCell(cell, seller: g_customer!)
+        //        DZContentSellerCell.configSellerCell(cell, seller: g_customer!)
         return cell
     }
     /// 产品说明头部cell
@@ -290,8 +295,16 @@ class HomeBuyGoodsDetailViewController: UIViewController,UITableViewDataSource,U
         var cell = tableView.dequeueReusableCellWithIdentifier(cellId)
         if cell == nil {
             cell = UITableViewCell(style: .Default, reuseIdentifier: cellId)
+            ZMDTool.configTableViewCellDefault(cell!)
             cell!.selectionStyle = .None
             cell!.contentView.backgroundColor = UIColor.whiteColor()
+            
+            let colorLbl = ZMDTool.getLine(CGRect(x: 12, y: 0, width: 5, height: 19), backgroundColor: appThemeColorNew)
+            colorLbl.set("cy", value: 54/2)
+            let textLbl = ZMDTool.getLabel(CGRect(x: CGRectGetMaxX(colorLbl.frame)+5, y: 0, width: 100, height: 20), text: "产品说明", fontSize: 15)
+            textLbl.set("cy", value: 54/2)
+            cell?.contentView.addSubview(colorLbl)
+            cell?.contentView.addSubview(textLbl)
         }
         return cell!
     }
@@ -303,6 +316,24 @@ class HomeBuyGoodsDetailViewController: UIViewController,UITableViewDataSource,U
             cell = UITableViewCell(style: .Default, reuseIdentifier: cellId)
             cell!.selectionStyle = .None
             cell!.contentView.backgroundColor = UIColor.whiteColor()
+            
+            let wkUserContentController = WKUserContentController()
+            let jScript = "var meta = document.createElement('meta'); meta.setAttribute('name', 'viewport'); meta.setAttribute('content', 'width=device-width'); document.getElementsByTagName('head')[0].appendChild(meta);"
+            let wkUScript = WKUserScript(source: jScript, injectionTime: .AtDocumentEnd, forMainFrameOnly: true)
+            wkUserContentController.addUserScript(wkUScript)
+            let wkWebConfig = WKWebViewConfiguration()
+            wkWebConfig.userContentController = wkUserContentController
+            
+            let webView = WKWebView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 214*kScreenWidth/375), configuration: wkWebConfig)
+            webView.scrollView.showsVerticalScrollIndicator = false
+            webView.scrollView.showsHorizontalScrollIndicator = false
+            webView.tag = 1000
+            cell?.contentView.addSubview(webView)
+        }
+        if let productDetail = self.productDetail {
+            let webView = cell?.contentView.viewWithTag(1000) as! WKWebView
+            let webUrl = kImageAddressMain + "/\(productDetail.Id.integerValue)"
+            webView.loadRequest(NSURLRequest(URL: NSURL(string: webUrl)!))
         }
         return cell!
     }
@@ -369,6 +400,11 @@ class HomeBuyGoodsDetailViewController: UIViewController,UITableViewDataSource,U
         self.countForShoppingCar.hidden = true
         ZMDTool.configViewLayerRound(self.countForShoppingCar)
         self.bottomV.backgroundColor = RGB(247,247,247,1)
+        let tableViewFooterView = UIView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 57*kScreenWidth/375))
+        tableViewFooterView.backgroundColor = RGB(239,240,241,1.0)
+        let label = ZMDTool.getLabel(CGRect(x: 0, y: 0, width: kScreenWidth, height: 57*kScreenWidth/375), text: "- 已经到底了 -", fontSize: 15, textColor: RGB(172,173,174,1.0), textAlignment: .Center)
+        tableViewFooterView.addSubview(label)
+        self.currentTableView.tableFooterView = tableViewFooterView
     }
     
     // MARK:配置navigationBar透明与否
@@ -519,6 +555,14 @@ class DZContentSellerCell : UITableViewCell {
     
     override func awakeFromNib() {
         self.frame = CGRect(x: 0, y: 0, width: kScreenWidth, height: 154*kScreenWidth/375)
+        let lblWidth = kScreenWidth - 154*kScreenWidth/375
+        let lblHeight = 154*kScreenWidth/(375*3)
+//        self.phoneLbl.addSubview(ZMDTool.getLine(CGRect(x: 0, y: lblHeight-0.5, width: lblWidth, height: 0.5), backgroundColor: defaultLineColor))
+//        self.qqLbl.addSubview(ZMDTool.getLine(CGRect(x: 0, y: lblHeight-0.5, width: lblWidth, height: 0.5), backgroundColor: defaultLineColor))
+        for i in 0..<2 {
+            self.addSubview(ZMDTool.getLine(CGRect(x: 0, y: CGFloat(i+1)*lblHeight, width: lblWidth, height: 0.5), backgroundColor: defaultLineColor))
+        }
+        self.headImg.addSubview(ZMDTool.getLine(CGRect(x: 0, y: 0, width: 0.5, height: 154*kScreenWidth/375), backgroundColor: defaultLineColor))
     }
     
     class func configSellerCell(cell:DZContentSellerCell,seller:ZMDCustomer) {

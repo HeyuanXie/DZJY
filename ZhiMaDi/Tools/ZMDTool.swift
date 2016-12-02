@@ -327,7 +327,7 @@ extension ZMDTool {
     }
     class func getLine(frame:CGRect,backgroundColor : UIColor = defaultLineColor) -> UIView {
         let line = UIView(frame: frame)
-        line.backgroundColor = defaultLineColor
+        line.backgroundColor = backgroundColor
         return line
     }
     class func getBtn (frame:CGRect) -> CustomBtn {

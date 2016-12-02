@@ -318,7 +318,16 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
         let btn = ZMDTool.getButton(CGRect(x: 12, y: 64, width: kScreenWidth - 24, height: 50), textForNormal: text, fontSize: 17,textColorForNormal:RGB(173,173,173,1), backgroundColor: UIColor.clearColor()) { (sender) -> Void in
             cleanPassword()
             g_customerId = nil
-            ZMDTool.enterLoginViewController()
+            if (sender as! UIButton).titleLabel?.text == "退出登陆" {
+                ZMDTool.showPromptView("退出登陆成功")
+                (sender as! UIButton).setTitle("登陆", forState: .Normal)
+            }else{
+                let vc = LoginViewController.CreateFromLoginStoryboard() as! LoginViewController
+                vc.loginSucceed = {()->Void in
+                    (sender as! UIButton).setTitle("退出登陆", forState: .Normal)
+                }
+                self.pushToViewController(vc, animated: true, hideBottom: true)
+            }
         }
         btn.center = footV.center
         ZMDTool.configViewLayerWithSize(btn, size: 20)

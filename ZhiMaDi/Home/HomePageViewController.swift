@@ -163,7 +163,7 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
     
     @IBOutlet weak var currentTableView: UITableView!
     
-    var userCenterData = [[UserCenterCellType.HomeContentTypeAd],[.HomeContentTypeMenu,.HomeContentTypeState],[.HomeContentTypeMiniAd],[.HomeContentTypeDoubleGood,.HomeContentTypeMulityGood,.HomeContentTypeRecommend],[.HomeContentTypeSupplyHead,.HomeContentTypeSupplyDetail,.HomeContentTypeSupplyFoot],[.HomeContentTypeFruitHead,.HomeContentTypeFruitSort,.HomeContentTypeFruitDetail]]
+    var userCenterData = [[UserCenterCellType.HomeContentTypeAd],[.HomeContentTypeMenu,.HomeContentTypeState],[.HomeContentTypeDoubleGood,.HomeContentTypeMulityGood,.HomeContentTypeRecommend],[.HomeContentTypeMiniAd],[.HomeContentTypeSupplyHead,.HomeContentTypeSupplyDetail,.HomeContentTypeSupplyFoot],[.HomeContentTypeFruitHead,.HomeContentTypeFruitSort,.HomeContentTypeFruitDetail]]
     
     var searchType = ["供应","求购","商品","店家"]
     
@@ -186,23 +186,24 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
     var navLine : UIView!
     override func viewDidLoad() {
         super.viewDidLoad()
-        //检测更新
-        if !APP_DIDLAUNCHED {
-            self.checkUpdate()
-        }
         // 让导航栏支持右滑返回功能
         ZMDTool.addInteractive(self.navigationController)
         self.updateUI()
         self.dataInit()
+        self.fetchData()
     }
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(true)
-        self.fetchData()
+        //检测更新
+        if APP_LAUNCHEDTIME == 1 {
+            self.checkUpdate()
+        }
+//        self.fetchData()
         self.navigationController?.setNavigationBarHidden(true, animated: false)
     }
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(true)
-        APP_DIDLAUNCHED = true
+        APP_LAUNCHEDTIME = APP_LAUNCHEDTIME + 1
         self.navigationController?.setNavigationBarHidden(false, animated: true)
     }
     override func didReceiveMemoryWarning() {
@@ -308,6 +309,12 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
     }
     
     //MARK: ***************代理方法*************
+    //MARK: 触摸代理
+    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        if self.advertisementAll == nil {
+            self.fetchData()
+        }
+    }
     //MARK: TextFieldDelegate
     func textFieldShouldReturn(textField: UITextField) -> Bool {
         self.view.endEditing(true)
@@ -472,10 +479,10 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
             ZMDTool.configTableViewCellDefault(cell!)
             cell!.contentView.backgroundColor = UIColor.whiteColor()
 
-            for var i=0;i<4;i++ {
+            for var i=0;i<self.menuType.count;i++ {
                 _ = 0
                 let btnHeight = kScreenWidth * 210 / 750
-                let width = kScreenWidth/4
+                let width = kScreenWidth/CGFloat(self.menuType.count)
                 let btn = UIButton(frame: CGRectMake(kScreenWidth/4*CGFloat(i), 0 ,width, btnHeight))
                 btn.tag = 10000 + i
                 btn.backgroundColor = UIColor.whiteColor()
@@ -494,13 +501,26 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
             }
         }
         
-        for var i=0;i<4;i++ {
+        for var i=0;i<5;i++ {
             let menuType = self.menuType[i]
             let btn = cell?.contentView.viewWithTag(10000 + i) as! UIButton
             let label = cell?.contentView.viewWithTag(10010 + i) as! UILabel
             let imgV = cell?.contentView.viewWithTag(10020 + i) as! UIImageView
             btn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
-                menuType.didSelect(self.navigationController!)
+                switch menuType {
+                case .kFeature :
+                    if let url = NSURL(string: "appJNNT://") {
+                        UIApplication.sharedApplication().openURL(url)
+                    }
+                    break
+                case .kECommerce :
+                    if let url = NSURL(string: "appJNNZ://") {
+                        UIApplication.sharedApplication().openURL(url)
+                    }
+                    break
+                default :
+                    menuType.didSelect(self.navigationController!)
+                }
                 return RACSignal.empty()
             })
             label.text = menuType.title
@@ -563,20 +583,19 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
     }
     ///商品DoubleGoodCell
     func cellForHomeDoubleGood(tableView: UITableView,IndexPath:NSIndexPath)-> UITableViewCell {
-        //cellHeight = 40
-        let cellId = "stateCell"
-        var cell = tableView.dequeueReusableCellWithIdentifier(cellId)
-        if cell == nil {
-            cell = UITableViewCell(style: .Default, reuseIdentifier: cellId)
-            ZMDTool.configTableViewCellDefault(cell!)
-            cell?.selectionStyle = .None
-            
-        }
-        return cell!
+        //cellHeight = 98
+        let cellId = "doubleGoodCell"
+        let cell = tableView.dequeueReusableCellWithIdentifier(cellId) as! HomeDoubleGoodCell
+        ZMDTool.configTableViewCellDefault(cell)
+        return cell
     }
     ///商品MulityGoodCell
     func cellForHomeMulityGood(tableView: UITableView,IndexPath:NSIndexPath)-> UITableViewCell {
-        return UITableViewCell()
+        //cellHeigth = 110
+        let cellId = "multiGoodCell"
+        let cell = tableView.dequeueReusableCellWithIdentifier(cellId) as! HomeMultiGoodCell
+        ZMDTool.configTableViewCellDefault(cell)
+        return cell
     }
     ///推荐 cell
     func cellForHomeRecommend(tableView: UITableView,indexPath: NSIndexPath)-> UITableViewCell {

@@ -16,7 +16,7 @@ let PATH_DOCUMENTS = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.D
 
 // MARK: - Application information
 /// App ID (必须与 iTunes Connect 上设置的一致)
-let APP_ID  = "1164015233" //"919849264"   
+let APP_ID  = "1182284278" //"919849264"
 /// App SKU码 (必须与 iTunes Connect 上设置的一致)
 let APP_SKU = "com.qoocc.QooccHealth"
 /// App Bundle Id
@@ -33,8 +33,8 @@ let APP_URL_IN_ITUNES_PREFIX = "https://itunes.apple.com/cn/app/id%@?ls=1&mt=8"
 let APP_URL_IN_ITUNES = String(format: APP_URL_IN_ITUNES_PREFIX, APP_ID)
 
 // MARK: - CheckUpdate
-/// APP 应用是否Launched
-var APP_DIDLAUNCHED = false
+/// APP 首页进入DidAppear方法的次数
+var APP_LAUNCHEDTIME = 0
 /// APP 详细信息地址
 let APP_URL_DETAIL = "http://itunes.apple.com/cn/lookup?id=\(APP_ID)"
 
