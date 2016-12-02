@@ -192,8 +192,9 @@ class PersonAuthenticationViewController: UIViewController ,UITableViewDataSourc
         rightLbl.textAlignment = .Center
         fotView.addSubview(rightLbl)
         
+        //MARK:下一步，请求实名认证接口
         let saveBtn = ZMDTool.getButton(CGRect(x: 12, y : 25+75+8+15+48, width: kScreenWidth - 24, height: 50), textForNormal: "下一步", fontSize: 20, textColorForNormal: UIColor.whiteColor(), backgroundColor: RGB(235,61,61,1.0)) { (sender) -> Void in
-            
+            ZMDTool.showPromptView("实名认证暂未开放")
         }
         ZMDTool.configViewLayerWithSize(saveBtn, size: 25)
         fotView.addSubview(saveBtn)

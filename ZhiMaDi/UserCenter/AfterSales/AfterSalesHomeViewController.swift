@@ -120,6 +120,8 @@ class AfterSalesHomeViewController: UIViewController,UITableViewDataSource, UITa
         self.currentTableView.separatorStyle = .None
         self.currentTableView.dataSource = self
         self.currentTableView.delegate = self
+        let headView = UIView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 16))
+        self.currentTableView.tableHeaderView = headView
         self.view.addSubview(self.currentTableView)
     }
 }

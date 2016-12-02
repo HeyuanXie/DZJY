@@ -7,10 +7,10 @@
 
 @interface CycleScrollView ()<UIScrollViewDelegate,UIPageViewControllerDelegate>
 @property (strong, nonatomic) UIScrollView *mainScrollView;
-@property (strong, nonatomic) UIPageControl *page;
 @property (assign, nonatomic) CGRect mainRect;/**< 当前视图尺寸 */
 @property (assign, nonatomic) NSInteger imgCount;/**< 图片个数 */
 @property (assign, nonatomic) BOOL hasUrlImg;/**< 图片数组是否是以url形式存储 */
+@property (strong, nonatomic) UIPageControl *page;      /*< UIPageController */
 @end
 
 @implementation CycleScrollView
@@ -42,7 +42,11 @@
 
 - (void)setPageController {
     _page = [[UIPageControl alloc]init];
-    _page.frame = CGRectMake(0, _mainRect.size.height - 20, _mainRect.size.width, 20);
+    if (self.isPageCenter) {
+        _page.frame =  CGRectMake(0, _mainRect.size.height - 20, _mainRect.size.width, 20);
+    }else {
+        _page.frame = CGRectMake(_mainRect.size.width-80, _mainRect.size.height-20, 80, 20);
+    }
     [self addSubview:_page];
     _page.numberOfPages = _imgCount;
     _page.currentPage = 0;

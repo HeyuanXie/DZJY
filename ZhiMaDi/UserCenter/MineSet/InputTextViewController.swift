@@ -7,15 +7,21 @@
 //
 
 import UIKit
+//个人昵称
 //  通用的单输出页面
 class InputTextViewController: UIViewController ,UITextViewDelegate,ZMDInterceptorProtocol {
     private var inputTextView: UITextView!
     var countLbl : UILabel!
     var text = ""                           // 初始文本
-    var maxLength = 0                       // 字数限制
+    var maxLength = 100                       // 昵称字数限制
     var finished : ((text:String)->Void)!
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(true)
+        self.tabBarController!.tabBar.hidden = true
+    }
     override func viewDidLoad() {
-        super.viewDidLoad()
+        super.viewDidLoad()        
         self.view.backgroundColor = defaultBackgroundGrayColor
         self.inputTextView = UITextView(frame: CGRectMake(0, 10, self.view.frame.width, 180))
         self.inputTextView.backgroundColor = UIColor.whiteColor()
@@ -39,13 +45,16 @@ class InputTextViewController: UIViewController ,UITextViewDelegate,ZMDIntercept
         let saveItem = UIBarButtonItem(title: "保存", style: UIBarButtonItemStyle.Done, target: nil, action: nil)
         saveItem.tintColor = appThemeColor
         saveItem.rac_command = RACCommand(signalBlock: { [weak self](input) -> RACSignal! in
-            if let _ = self {
-                self!.view.endEditing(true)
+            if let strongSelf = self {
+                strongSelf.view.endEditing(true)
+                if strongSelf.finished != nil {
+                    strongSelf.finished(text: strongSelf.inputTextView.text)
+                }
+                strongSelf.back()
             }
             return RACSignal.empty()
             })
-        self.navigationItem.rightBarButtonItem = saveItem
-        
+            self.navigationItem.rightBarButtonItem = saveItem
         // 键盘消失
         let tap = UITapGestureRecognizer()
         tap.rac_gestureSignal().subscribeNext { [weak self](tap) -> Void in
@@ -57,6 +66,7 @@ class InputTextViewController: UIViewController ,UITextViewDelegate,ZMDIntercept
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+    
     //MARK:- UItextViewdDelegate
     func textView(textView: UITextView, shouldChangeTextInRange range: NSRange, replacementText text: String) -> Bool {
         if text == "\n" {
@@ -67,7 +77,7 @@ class InputTextViewController: UIViewController ,UITextViewDelegate,ZMDIntercept
     }
     func textViewDidChange(textView: UITextView) {
         let mulStr = NSMutableString(string: textView.text)
-        self.countLbl.text = (self.maxLength - mulStr.length).description
+        self.countLbl.text = "\(self.maxLength - mulStr.length)/\(self.maxLength)"
         self.countLbl.textColor = UIColor.grayColor()
         if  self.maxLength - mulStr.length < 0 {
             self.countLbl.textColor = UIColor.redColor()
@@ -93,9 +103,6 @@ class InputTextViewController: UIViewController ,UITextViewDelegate,ZMDIntercept
         return true
     }
     override func back() {
-        if self.finished != nil {
-            self.finished(text: self.inputTextView.text)
-        }
         self.navigationController?.popViewControllerAnimated(true)
     }
 }

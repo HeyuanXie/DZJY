@@ -59,8 +59,12 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
             viewController.hidesBottomBarWhenPushed = true
             return viewController
         }
-        
+        //MARK:didSelect 选择跳转的VC
         func didSelect(navViewController:UINavigationController){
+            if self == Address && !g_isLogin {
+                ZMDTool.showPromptView("请您先登录!")
+                return
+            }
             navViewController.pushViewController(self.pushViewController, animated: true)
         }
     }
@@ -76,6 +80,9 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
     
     var userCenterData: [UserCenterCellType]!
     
+    var isMoreViewShow = true   //判断点击moreBtn时是否显示popView(首页、消息)
+    var isSaveImage = false
+//    var postHeadImage : ((imageData: NSData) -> Void)! //设置图像后将iamgeData传递给MineSetVC
     override func viewDidLoad() {
         super.viewDidLoad()
         self.dataInit()
@@ -121,28 +128,35 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
         let content = self.userCenterData[indexPath.section]
         cell.textLabel?.text = content.title
         switch content {
-        case .Head:
+        case .Head://选择图像
             cell.accessoryType = UITableViewCellAccessoryType.DisclosureIndicator
             if self.headerView == nil {
-                self.headerView = UIImageView(frame: CGRectMake(kScreenWidth - 60 - 38, 17, 60, 60))
+                self.headerView = UIImageView(frame: CGRectMake(kScreenWidth - 60 - 38, (85-60)/2, 60, 60))
                 self.headerView.layer.masksToBounds = true
                 self.headerView.layer.cornerRadius = self.headerView.frame.width/2
                 cell.contentView.addSubview(self.headerView)
             }
-
-            if let urlStr = g_customer?.Avatar?.AvatarUrl,url = NSURL(string: urlStr) {
-                self.headerView.image = UIImage(data: NSData(contentsOfURL: url)!)
+            //如果headerView.iamge == nil刷新，避免每次拖动table都从ulr取图片
+            if self.headerView.image == nil ,let urlStr = g_customer?.Avatar?.AvatarUrl,url = NSURL(string:urlStr) {
+                self.headerView.sd_setImageWithURL(url, placeholderImage: nil)
             }
         case .NickN:
             cell.accessoryType = UITableViewCellAccessoryType.DisclosureIndicator
             if self.nameLB == nil {
-                self.nameLB = UILabel(frame: CGRectMake(kScreenWidth - 100 - 38 , 0, 100, tableViewCellDefaultHeight))
+                self.nameLB = UILabel(frame: CGRectMake(kScreenWidth - 100 - 58, 0, 120, tableViewCellDefaultHeight))
                 self.nameLB.font = UIFont.systemFontOfSize(17)
                 self.nameLB.textAlignment = NSTextAlignment.Right
                 self.nameLB.textColor = defaultDetailTextColor
                 cell.contentView.addSubview(self.nameLB)
             }
-            self.nameLB.text = g_customer?.FirstName ?? ""
+            
+            self.nameLB.text = g_customer?.FirstName ?? ""      //目前FirstName为phonenumber，所以用下面的
+            if g_isLogin! {
+                self.nameLB.text  = getObjectFromUserDefaults("nickName") as? String
+            }else{
+                self.nameLB.text = " "
+            }
+            
         case .RealName:
             cell.accessoryType = UITableViewCellAccessoryType.DisclosureIndicator
             self.sexLB = UILabel(frame: CGRectMake(kScreenWidth - 100 - 38, 0,100, tableViewCellDefaultHeight))
@@ -174,6 +188,10 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
         if indexPath.section == 0 {
             switch type {
             case .Head :
+                if !g_isLogin {
+                    self.commonAlertShow(true, title: "提示:未登录!", message: "是否立即登录?", preferredStyle: UIAlertControllerStyle.Alert)
+                    return
+                }
                 let actionSheet = UIActionSheet(title: nil, delegate: nil, cancelButtonTitle: "取消", destructiveButtonTitle: nil)
                 actionSheet.addButtonWithTitle("从手机相册选择")
                 actionSheet.addButtonWithTitle("拍照")
@@ -196,7 +214,39 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
                 actionSheet.showInView(self.view)
             default: return
             }
-        } else {
+        } else if indexPath.section == self.userCenterData.count - 1 {
+            //计算缓存，计算完成菊花消失，显示alertView
+//            ZMDTool.showActivityView("请稍候")
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), { () -> Void in
+                //计算缓存
+                let size = self.fileSizeOfCache()
+                dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                    //在主线程显示cleanAlert
+                    let sizeString = String(format:"%.2f",size)
+                    let message = "已存有\(sizeString)M缓存，确定清理吗？"
+                    let cleanAlert = UIAlertController(title: "注意", message: message, preferredStyle: UIAlertControllerStyle.Alert)
+                    self.presentViewController(cleanAlert, animated: true, completion: nil)
+                    let action1 = UIAlertAction(title: "取消", style: UIAlertActionStyle.Cancel, handler: { (sender) -> Void in
+                    })
+                    let action2 = UIAlertAction(title: "确定", style: UIAlertActionStyle.Destructive, handler: { (sender) -> Void in
+                        //清理缓存
+                        self.clearCache()
+                        ZMDTool.showPromptView("清理完成")
+                    })
+                    cleanAlert.addAction(action1)
+                    cleanAlert.addAction(action2)
+                })
+            })
+        }else if indexPath.section == 1 {
+            //点击昵称
+            let inputTextViewController = InputTextViewController()
+            inputTextViewController.hidesBottomBarWhenPushed = true
+            inputTextViewController.finished = { (text) -> Void in
+                self.nameLB.text = text
+                saveObjectToUserDefaults("nickName", value: text)
+            }
+            self.navigationController?.pushViewController(inputTextViewController, animated: true)
+        }else {
             type.didSelect(self.navigationController!)
         }
     }
@@ -224,9 +274,8 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
          QNNetworkTool.uploadCustomerHead(imageData, fileName: "image.jpeg", customerId: NSString(string: "\(g_customerId!)")) { (succeed, dic, error) -> Void in
             ZMDTool.hiddenActivityView()
             if succeed {
-                if let urlStr = g_customer?.Avatar?.AvatarUrl,url = NSURL(string: urlStr) {
-                    self.headerView.image = UIImage(data: NSData(contentsOfURL: url)!)
-                }
+                self.headerView.image = UIImage(data: imageData)
+//                self.postHeadImage(imageData: imageData)
             }else {
                 ZMDTool.showPromptView( "上传失败,点击重试或者重新选择图片", nil)
             }
@@ -257,7 +306,7 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
     //MARK:- Private Method
     private func subViewInit(){
         self.title = "个人设置"
-        self.tableView = UITableView(frame: self.view.bounds, style: UITableViewStyle.Plain)
+        self.tableView = UITableView(frame: CGRectMake(0, 0, kScreenWidth, kScreenHeight - 64), style: UITableViewStyle.Plain)
         self.tableView.backgroundColor = RGB(245,245,245,1)
         self.tableView.separatorStyle = .None
         self.tableView.dataSource = self
@@ -265,18 +314,22 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
         self.view.addSubview(self.tableView)
         let footV = UIView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 64+50+20))
         footV.backgroundColor = UIColor.clearColor()
-        let btn = ZMDTool.getButton(CGRect(x: 12, y: 64, width: kScreenWidth - 24, height: 50), textForNormal: "退出登录", fontSize: 17,textColorForNormal:RGB(173,173,173,1), backgroundColor: UIColor.clearColor()) { (sender) -> Void in
+        let text = g_isLogin! ? "退出登陆" : "登陆"
+        let btn = ZMDTool.getButton(CGRect(x: 12, y: 64, width: kScreenWidth - 24, height: 50), textForNormal: text, fontSize: 17,textColorForNormal:RGB(173,173,173,1), backgroundColor: UIColor.clearColor()) { (sender) -> Void in
             cleanPassword()
+            g_customerId = nil
             ZMDTool.enterLoginViewController()
         }
+        btn.center = footV.center
         ZMDTool.configViewLayerWithSize(btn, size: 20)
         ZMDTool.configViewLayerFrameWithColor(btn, color: defaultTextColor)
         footV.addSubview(btn)
         self.tableView.tableFooterView = footV
     }
     private func dataInit(){
-        self.userCenterData = [UserCenterCellType.Head,UserCenterCellType.NickN , UserCenterCellType.Address, UserCenterCellType.ChangePs, UserCenterCellType.Clean]
+        self.userCenterData = [UserCenterCellType.Head,UserCenterCellType.NickN /*,UserCenterCellType.RealName*/, UserCenterCellType.Address, UserCenterCellType.ChangePs, UserCenterCellType.Clean]
     }
+    //MARK:创建moreView
     func moreViewUpdate() {
         if self.moreView == nil {
             let titles = ["消息":UIImage(named: "common_more_message"),"首页":UIImage(named: "common_more_home")]
@@ -286,11 +339,18 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
             for title in titles {
                 let btn = UIButton(frame: CGRect(x: 0, y: 48*i, width: 150, height: 48))
                 btn.backgroundColor = UIColor(white: 0, alpha: 0.5)
-                btn.tag = i
+                btn.tag = i + 100
                 btn.rac_signalForControlEvents(.TouchUpInside).subscribeNext({ (sender) -> Void in
-                    self.tabBarController?.hidesBottomBarWhenPushed = false
-                    self.navigationController?.popToRootViewControllerAnimated(true)
-                    self.tabBarController?.selectedIndex = 0
+                    let vc : UIViewController
+//                    if (sender as!UIButton).tag == 100{
+                    if title.0 == "消息"{
+                        vc = MsgHomeViewController()
+                        self.navigationController?.pushViewController(vc, animated: true)
+                    }else{
+//                        self.navigationController?.popToRootViewControllerAnimated(true)
+                        self.moreView.removeFromSuperview()
+                        self.tabBarController?.selectedIndex = 0
+                    }
                 })
                 let imgV = UIImageView(frame: CGRect(x: 10, y: 14, width: 20, height: 20))
                 imgV.image = title.1
@@ -307,15 +367,85 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
             self.moreView.addSubview(line)
         }
     }
-    //重写
+    
+    //MARK:重写（点击moreBtn）
     override func gotoMore() {
         let containView = UIButton(frame: self.view.bounds)
         containView.rac_signalForControlEvents(.TouchUpInside).subscribeNext { (sender) -> Void in
+            self.isMoreViewShow = true
             self.dismissPopupView(self.moreView)
             containView.removeFromSuperview()
         }
         self.view.addSubview(containView)
         self.moreViewUpdate()
-        self.presentPopupView(self.moreView, config: ZMDPopViewConfig())
+        if self.isMoreViewShow {
+            self.presentPopupView(self.moreView, config: ZMDPopViewConfig())
+        }else{
+            self.dismissPopupView(self.moreView)
+            containView.removeFromSuperview()
+        }
+        self.isMoreViewShow = !self.isMoreViewShow
     }
+    
+    //MARK:重写 -- alertDestructiveAction
+    override func alertDestructiveAction() {
+        ZMDTool.enterLoginViewController()
+    }
+    
+    
+    //MARK:清理缓存
+    //计算缓存大小
+    func fileSizeOfCache()-> Double {
+        // 取出cache文件夹目录 缓存文件都在这个目录下
+        let cachePath = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.CachesDirectory, NSSearchPathDomainMask.UserDomainMask, true).first
+        // 取出文件夹下所有文件数组
+        let fileArr = NSFileManager.defaultManager().subpathsAtPath(cachePath!)
+        //快速枚举出所有文件名 计算文件大小
+        var size = 0.00
+        for file in fileArr! {
+            // 把文件名拼接到路径中
+            let path = cachePath?.stringByAppendingString("/\(file)")
+            // 取出文件属性
+            let floder = try! NSFileManager.defaultManager().attributesOfItemAtPath(path!)
+            // 用元组取出文件大小属性
+            for (abc, bcd) in floder {
+                // 累加文件大小
+                if abc == NSFileSize {
+                    size += Double(bcd.integerValue)
+                }
+            }
+        }
+        size += Double(SDImageCache.sharedImageCache().getSize().hashValue)
+        let mm = size / 1024 / 1024
+        ZMDTool.hiddenActivityView()
+        return mm
+    }
+    
+    //清理缓存
+    func clearCache() {
+        // 取出cache文件夹目录 缓存文件都在这个目录下
+        let cachePath = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.CachesDirectory, NSSearchPathDomainMask.UserDomainMask, true).first
+        // 取出文件夹下所有文件数组
+        let fileArr = NSFileManager.defaultManager().subpathsAtPath(cachePath!)
+        // 遍历删除
+        for file in fileArr! {
+            let path = cachePath?.stringByAppendingString("/\(file)")
+            if NSFileManager.defaultManager().fileExistsAtPath(path!) {
+                
+                do {
+                    try NSFileManager.defaultManager().removeItemAtPath(path!)
+                } catch {
+                    
+                }
+            }
+            SDImageCache.sharedImageCache().clearDisk()
+        }
+    }
+    
+    
 }
+
+
+
+
+    

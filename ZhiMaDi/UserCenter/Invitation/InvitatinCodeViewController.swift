@@ -21,6 +21,9 @@ class InvitatinCodeViewController: UIViewController,QNShareViewDelegate,ZMDInter
     func qnShareView(view: ShareView) -> (image: UIImage, url: String, title: String?, description: String)? {
         return (UIImage(named: "Share_Icon")!, "http://www.baidu.com", self.title ?? "", "成为喜特用户，享有更多服务!")
     }
+    func present(alert: UIAlertController) -> Void {
+        self.presentViewController(alert, animated: false, completion: nil)
+    }
     //MARK: - Action
     @IBAction func saveBtnCli(sender: UIButton) {
         UIImageWriteToSavedPhotosAlbum(UIImage(named: "user_interview_QRcode")!, nil, nil, nil)

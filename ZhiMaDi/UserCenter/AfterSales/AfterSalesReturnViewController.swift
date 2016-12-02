@@ -47,7 +47,7 @@ class AfterSalesReturnViewController: UIViewController,UITableViewDataSource, UI
     var returnType : ReturnCellType!
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.updateData()
+        self.dataInit()
         self.subViewInit()
     }
     
@@ -92,7 +92,7 @@ class AfterSalesReturnViewController: UIViewController,UITableViewDataSource, UI
                 cell?.contentView.addSubview(ZMDTool.getLine(CGRect(x: 0, y: 55.5, width: kScreenWidth, height: 0.5)))
             }
             cell?.textLabel!.text = type.title
-            let lbl = ZMDTool.getLabel(CGRect(x: 117, y: 0, width: 100, height: 56), text: self.returnType.title, fontSize: 17)
+            let lbl = ZMDTool.getLabel(CGRect(x: 117, y: 0, width: 120, height: 56), text: self.returnType.title, fontSize: 17)
             cell?.contentView.addSubview(lbl)
             return cell!
         case .ReturnReason :
@@ -275,7 +275,7 @@ class AfterSalesReturnViewController: UIViewController,UITableViewDataSource, UI
         self.currentTableView.delegate = self
         self.view.addSubview(self.currentTableView)
         
-        let imgFootV = UIView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 120))
+        let imgFootV = UIView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 120+64))
         imgFootV.backgroundColor = UIColor.clearColor()
         let imgBtn = ZMDTool.getBtn(CGRect(x: 12, y: 24, width: 75, height: 75))
         imgBtn.setImage(UIImage(named: "common_add_pho"), forState: .Normal)
@@ -288,15 +288,16 @@ class AfterSalesReturnViewController: UIViewController,UITableViewDataSource, UI
         let lbl = ZMDTool.getLabel(CGRect(x: 12, y: 90 + 8, width: 75, height: 15), text: "上传图片", fontSize: 15,textColor: defaultDetailTextColor)
         lbl.textAlignment = .Center
         imgFootV.addSubview(lbl)
+        let submitBtn = ZMDTool.getButton(CGRect(x: 12, y: CGRectGetMaxY(lbl.frame)+12, width: kScreenWidth-12*2, height: 58), textForNormal: "提交申请", fontSize: 17, backgroundColor: defaultSelectColor) { (sender) -> Void in
+            ZMDTool.showPromptView("功能完善中")
+        }
+        ZMDTool.configViewLayer(submitBtn)
+        imgFootV.addSubview(submitBtn)
         self.currentTableView.tableFooterView = imgFootV
         
         self.view.addSubview(ZMDTool.getLine(CGRect(x: 0, y: self.view.bounds.height - 58-58-0.5, width: kScreenWidth, height: 0.5)))
-        let submitBtn = ZMDTool.getButton(CGRect(x: 0, y: self.view.bounds.height - 58-58, width: kScreenWidth, height: 58), textForNormal: "提交申请", fontSize: 17, backgroundColor:RGB(247,247,247,1)) { (sender) -> Void in
-            
-        }
-        self.view.addSubview(submitBtn)
     }
-    func updateData() {
+    func dataInit() {
         if self.returnType == ReturnCellType.ReturnGoods {
             self.celltype = [[CellType.ReturnType,.ReturnReason,.ReturnMoney],[.ReturnExplan]]
         } else if self.returnType == ReturnCellType.Refund {

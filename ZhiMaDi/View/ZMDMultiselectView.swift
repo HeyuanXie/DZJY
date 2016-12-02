@@ -7,7 +7,7 @@
 //
 
 import UIKit
-// 多个btn 流水展示
+// 多个btn 流水展示(气泡)
 class ZMDMultiselectView: UIView {
     var selectBtn : UIButton!
     var titles : [String]!
@@ -30,7 +30,7 @@ class ZMDMultiselectView: UIView {
                 (sender as! UIButton).selected = true
                 self.selectBtn = (sender as! UIButton)
                 self.finished(index: sender.tag)
-                // 我要干嘛   ..
+                // 我要干嘛   .。(点击气泡的响应)
             })
             btn.setBackgroundImage(UIImage.colorImage(RGB(240,240,240,1.0)), forState: .Normal)
             btn.setBackgroundImage(UIImage.colorImage(RGB(235,61,61,1.0)), forState: .Selected)

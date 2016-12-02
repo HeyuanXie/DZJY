@@ -18,9 +18,13 @@ class ZMDPublicInfo: NSObject {
     var Types:String!               //纸质发票",
     var Categorys:String!           //个人,企业",
     var Bodys:String!               //床上用品,家具,日用品,植物,装饰品"
-    
+    func getTypes() -> [String] {
+        var types = self.Types.componentsSeparatedByString(",")
+        types.insert("不开发票", atIndex: 0)
+        return types
+    }
     func getCategorys() -> [String]{
-        let categorys = self.Categorys.componentsSeparatedByString(",")
+        var categorys = self.Categorys.componentsSeparatedByString(",")
         return categorys
     }
     func getBodys() -> [String]{

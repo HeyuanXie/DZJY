@@ -16,7 +16,7 @@ let PATH_DOCUMENTS = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.D
 
 // MARK: - Application information
 /// App ID (必须与 iTunes Connect 上设置的一致)
-let APP_ID  = "919849264"
+let APP_ID  = "1164015233" //"919849264"   
 /// App SKU码 (必须与 iTunes Connect 上设置的一致)
 let APP_SKU = "com.qoocc.QooccHealth"
 /// App Bundle Id
@@ -32,6 +32,20 @@ let APP_URL_IN_ITUNES_PREFIX = "https://itunes.apple.com/cn/app/id%@?ls=1&mt=8"
 /// APP 下载地址（在iTunes中）
 let APP_URL_IN_ITUNES = String(format: APP_URL_IN_ITUNES_PREFIX, APP_ID)
 
+// MARK: - CheckUpdate
+/// APP 应用是否Launched
+var APP_DIDLAUNCHED = false
+/// APP 详细信息地址
+let APP_URL_DETAIL = "http://itunes.apple.com/cn/lookup?id=\(APP_ID)"
+
+// MARK: - XGPush
+/// 信鸽推送注册的设备Token
+var XG_DeviceToken : NSData?
+/// 信鸽推送AccessId
+let XG_AccessId = "2200241980"
+/// 信鸽推送AccessKey
+let XG_AccessKey = "IT5A2WNM296F"
+
 // MARK: - System
 /// 系统名称
 let SYSTEM_NAME: String = UIDevice.currentDevice().systemName
@@ -39,6 +53,8 @@ let SYSTEM_NAME: String = UIDevice.currentDevice().systemName
 let SYSTEM_VERSION: String = UIDevice.currentDevice().systemVersion
 /// 系统版本号 （浮点数）
 let SYSTEM_VERSION_FLOAT: Float = (SYSTEM_VERSION as NSString).floatValue
+/// APPDelegate
+let APP_DELEGATE = UIApplication.sharedApplication().delegate as! AppDelegate
 
 // MARK: - 屏幕高度 & 屏幕宽度 & 放大系数
 /// 屏幕高度
@@ -96,7 +112,7 @@ private func __topViewController(object: AnyObject!) -> UIViewController? {
     return nil
 }
 
-/// 版本比较(无法进行比较会返回nil)
+/// 版本比较(无法进行比较会返回nil)（version为本地版本）
 func compareVersion(version1: String, version2: String) -> NSComparisonResult? {
     let version1Array = version1.componentsSeparatedByString(".")
     let version2Array = version2.componentsSeparatedByString(".")
@@ -114,10 +130,11 @@ func compareVersion(version1: String, version2: String) -> NSComparisonResult? {
                 continue // 相同，则去判断下一个位置
             }
             else if iVersion1Sub > iVersion2Sub {
-                return NSComparisonResult.OrderedDescending
+                return NSComparisonResult.OrderedDescending     //基本不会有这种情况
             }
             else {
                 return NSComparisonResult.OrderedAscending
+                //本地比appStore小
             }
         }
         else { // 无法进行比较 version的格式错误

@@ -199,17 +199,23 @@ class CardVolumeHomeViewController: UIViewController,UITableViewDataSource, UITa
         }
     }
     //MARK: -  PrivateMethod
-    func updateUI() {
-        self.title = "卡券"
-        let lbl = ZMDTool.getLabel(CGRect(x: 0, y: 0, width: 95, height: 44), text: "已过期卡券", fontSize: 16)
-        let item = UIBarButtonItem(customView: lbl)
-        item.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
-            
+    func setNavigation() {
+        let rightItem = UIButton(frame: CGRectMake(0, 0, 60, 44))
+        rightItem.backgroundColor = UIColor.clearColor()
+        rightItem.setTitle("已过期卡券", forState: .Normal)
+        rightItem.titleLabel?.font = UIFont.systemFontOfSize(12)
+        rightItem.setTitleColor(defaultDetailTextColor, forState: .Normal)
+        rightItem.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
+            ZMDTool.showPromptView("功能尚未开放")
             return RACSignal.empty()
         })
-        item.customView?.tintColor = defaultDetailTextColor
-        self.navigationItem.rightBarButtonItem = item
+        let item = UIBarButtonItem(customView: rightItem)
         
+        item.customView?.tintColor = defaultTextColor
+//        self.navigationItem.rightBarButtonItem = item     //暂时隐藏
+    }
+    
+    func segmentView() {
         let menuTitle = ["消费券","会员卡"]
         let customJumpBtns = CustomJumpBtns(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 55),menuTitle: menuTitle)
         customJumpBtns.backgroundColor = UIColor.whiteColor()
@@ -219,29 +225,8 @@ class CardVolumeHomeViewController: UIViewController,UITableViewDataSource, UITa
             self.cardType = self.cardTypeAll[index]
             self.currentTableView.reloadData()
         }
-        
-        self.currentTableView = UITableView(frame: CGRect(x: 0, y: 55, width: kScreenWidth, height: self.view.bounds.size.height-64-58 - 55))
-        self.currentTableView.backgroundColor = tableViewdefaultBackgroundColor
-        self.currentTableView.separatorStyle = .None
-        self.currentTableView.dataSource = self
-        self.currentTableView.delegate = self
-        self.view.addSubview(self.currentTableView)
-        
-        self.view.addSubview(ZMDTool.getLine(CGRect(x: 0, y: self.view.bounds.height - 64-58-0.5, width: kScreenWidth, height: 0.5)))
-
-        let bottomeView = self.botttomeViewForManage()
-        bottomeView.alpha = 0.0
-        self.view.addSubview(bottomeView)
-        
-        manageBtn = ZMDTool.getButton(CGRect(x: 0, y: self.view.bounds.height - 64-58, width: kScreenWidth, height: 58), textForNormal: "批量管理", fontSize: 17, backgroundColor:RGB(247,247,247,1)) { ( sender) -> Void in
-            bottomeView.alpha = 1.0
-            (sender as! UIButton).alpha = 0.0
-            self.isManage = !self.isManage
-            self.currentTableView.reloadData()
-        }
-        self.view.addSubview(manageBtn)
-       
     }
+    
     func botttomeViewForManage() -> UIView{
         let manageView = UIView(frame: CGRect(x:0, y: self.view.bounds.height - 64-58, width: kScreenWidth, height: 58))
         manageView.backgroundColor = RGB(247,247,247,1)
@@ -279,12 +264,40 @@ class CardVolumeHomeViewController: UIViewController,UITableViewDataSource, UITa
         })
         btn.setImage(UIImage(named: "common_01unselected"), forState: .Normal)
         btn.setImage(UIImage(named: "common_02selected"), forState: .Selected)
-
+        
         btn.titleEdgeInsets = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 0)
         btn.imageEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right:0)
         manageView.addSubview(btn)
         return manageView
     }
+    
+    func updateUI() {
+        self.title = "卡券"
+        self.setNavigation()
+        self.segmentView()
+
+        self.currentTableView = UITableView(frame: CGRect(x: 0, y: 55, width: kScreenWidth, height: self.view.bounds.size.height-64-58 - 55))
+        self.currentTableView.backgroundColor = tableViewdefaultBackgroundColor
+        self.currentTableView.separatorStyle = .None
+        self.currentTableView.dataSource = self
+        self.currentTableView.delegate = self
+        self.view.addSubview(self.currentTableView)
+        
+        self.view.addSubview(ZMDTool.getLine(CGRect(x: 0, y: self.view.bounds.height - 64-58-0.5, width: kScreenWidth, height: 0.5)))
+
+        let bottomeView = self.botttomeViewForManage()
+        bottomeView.alpha = 0.0
+        self.view.addSubview(bottomeView)
+        
+        manageBtn = ZMDTool.getButton(CGRect(x: 0, y: self.view.bounds.height - 64-58, width: kScreenWidth, height: 58), textForNormal: "批量管理", fontSize: 17, backgroundColor:RGB(247,247,247,1)) { ( sender) -> Void in
+            bottomeView.alpha = 1.0
+            (sender as! UIButton).alpha = 0.0
+            self.isManage = !self.isManage
+            self.currentTableView.reloadData()
+        }
+        self.view.addSubview(manageBtn)
+    }
+    
     func updateData() {
         QNNetworkTool.fetchCustomerCoupons { (coupons, data, error) -> Void in
             if coupons != nil {
@@ -293,12 +306,13 @@ class CardVolumeHomeViewController: UIViewController,UITableViewDataSource, UITa
             }
         }
     }
+    
     func deleteCoupon(id:Int,indexPath:NSIndexPath) {
         QNNetworkTool.deleteCoupons(id) { (succeed, dictionary, error) -> Void in
             if succeed! {
                 if self.cardType == .Consumer {
                     self.coupons.removeObjectAtIndex(indexPath.section)
-                    self.currentTableView.deleteSections(NSIndexSet(index: indexPath.section), withRowAnimation: UITableViewRowAnimation.None)
+                    self.currentTableView.reloadData()
                 }
             } else {
                 ZMDTool.showErrorPromptView(nil, error: error, errorMsg: nil)

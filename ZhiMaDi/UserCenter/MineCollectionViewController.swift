@@ -11,13 +11,18 @@ import UIKit
 class MineCollectionViewController: UIViewController,UITableViewDataSource, UITableViewDelegate,ZMDInterceptorProtocol,ZMDInterceptorMoreProtocol {
     var currentTableView: UITableView!
     var data = NSMutableArray()
-    let goodses  = ["全部(5)","婴儿床","床垫","儿童椅","奶酪","七万"]
+    var goodses  = ["全部   ","种子","农产品","饮料/食品","物资"]
+    //let goodses = [全部(self.dataArr.count)，data中product的类型]
     override func viewDidLoad() {
         super.viewDidLoad()
         self.subViewInit()
         self.dataUpdate()
     }
     
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(true)
+        self.dataUpdate()
+    }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -37,9 +42,7 @@ class MineCollectionViewController: UIViewController,UITableViewDataSource, UITa
     }
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
         if indexPath.section == 0 {
-            if indexPath.section == 0 {
-                return  ZMDMultiselectView.getHeight(goodses)
-            }
+            return  ZMDMultiselectView.getHeight(goodses)
         }
         return 150
     }
@@ -60,7 +63,9 @@ class MineCollectionViewController: UIViewController,UITableViewDataSource, UITa
             let multiselectView = ZMDMultiselectView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: ZMDMultiselectView.getHeight(goodses)),titles: goodses)
             multiselectView.finished = { (index) ->Void in
                 let title = self.goodses[index]
-                // 我要干嘛   ..
+                // 我要干嘛   ..(点击气泡响应)
+                //根据气泡title刷新tableView
+                print(title)
             }
             cell?.contentView.addSubview(multiselectView)
             return cell!
@@ -73,6 +78,7 @@ class MineCollectionViewController: UIViewController,UITableViewDataSource, UITa
         var tag = 10000
         let imgV = cell?.viewWithTag(tag++) as! UIImageView
         let goodsLbl = cell?.viewWithTag(tag++) as! UILabel
+        let detailLbl = cell?.viewWithTag(tag++) as! UILabel
         let goodsPriceLbl = cell?.viewWithTag(tag++) as! UILabel
         let freightLbl = cell?.viewWithTag(tag++) as! UILabel
         let cancelBtn = cell?.viewWithTag(tag++) as! UIButton
@@ -82,10 +88,10 @@ class MineCollectionViewController: UIViewController,UITableViewDataSource, UITa
                 imgV.sd_setImageWithURL(NSURL(string: kImageAddressMain+imgUrl))
             }
             goodsLbl.text = item.ProductName
-            //        detailLbl.text = (item.AttributeInfo as NSString).stringByReplacingOccurrencesOfString("<br />", withString: " ")
-            goodsPriceLbl.text = item.SubTotal
-            //        goodsPriceLbl.attributedText = "495.0 594.0".AttributedText("594.0", color: RGB(235,61,61,1.0))
-            //        freightLbl.text = "运费 30"
+            detailLbl.text = (item.AttributeInfo as NSString).stringByReplacingOccurrencesOfString("<br />", withString: " ")
+//            goodsPriceLbl.text = item.SubTotal
+            goodsPriceLbl.attributedText = "\(item.SubTotal) 原价:\(item.UnitPrice)".AttributeText([item.SubTotal,"原价:\(item.UnitPrice)"], colors: [RGB(235,61,61,1),UIColor.lightGrayColor()], textSizes: [14,12])
+            freightLbl.text = "不包邮"
             cancelBtn.rac_signalForControlEvents(.TouchUpInside).subscribeNext { (sender) -> Void in
                 // 取消收藏
                 self.deleteCartItem("\(item.Id)")
@@ -98,14 +104,14 @@ class MineCollectionViewController: UIViewController,UITableViewDataSource, UITa
         if indexPath.section == 1 {
             let item = self.data[indexPath.row] as? ZMDShoppingItem
             let vc = HomeBuyGoodsDetailViewController.CreateFromMainStoryboard() as! HomeBuyGoodsDetailViewController
-            vc.productId = item?.Id.integerValue
+            vc.productId = item?.ProductId.integerValue
             self.navigationController?.pushViewController(vc, animated: true)
         }
     }
     //MARK: -  PrivateMethod
     private func subViewInit(){
         self.title = "收藏的商品"
-        self.currentTableView = UITableView(frame: self.view.bounds)
+        self.currentTableView = UITableView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: kScreenHeight - 64))
         self.currentTableView.backgroundColor = tableViewdefaultBackgroundColor
         self.currentTableView.separatorStyle = .None
         self.currentTableView.dataSource = self
@@ -116,6 +122,7 @@ class MineCollectionViewController: UIViewController,UITableViewDataSource, UITa
         QNNetworkTool.fetchShoppingCart(2){ (shoppingItems, dictionary, error) -> Void in
             if shoppingItems != nil {
                 self.data = NSMutableArray(array: shoppingItems!)
+                self.goodses[0] = "全部(\(self.data.count))"
                 self.currentTableView.reloadData()
             } else {
                 ZMDTool.showErrorPromptView(dictionary, error: error, errorMsg: nil)
@@ -128,9 +135,9 @@ class MineCollectionViewController: UIViewController,UITableViewDataSource, UITa
                 if succeed! {
                     self.data.removeAllObjects()
                     self.dataUpdate()
-                    ZMDTool.showPromptView("删除成功")
+                    ZMDTool.showPromptView("取消收藏成功")
                 } else {
-                    ZMDTool.showErrorPromptView(dictionary, error: error, errorMsg: "删除失败")
+                    ZMDTool.showErrorPromptView(dictionary, error: error, errorMsg: "取消收藏失败")
                 }
             })
         }
@@ -154,6 +161,10 @@ class CollectionGoodsCell : UITableViewCell {
         let goodsLbl = ZMDTool.getLabel(CGRect(x: 12+125+10, y: 12, width: kScreenWidth - 12-125-10-12, height: 15), text: "", fontSize: 15)
         goodsLbl.tag = tag++
         self.contentView.addSubview(goodsLbl)
+        
+        let detailLbl = ZMDTool.getLabel(CGRect(x: 12+125+10, y: CGRectGetMaxY(goodsLbl.frame)+14, width: kScreenWidth-12-125-10-12, height: 150-12-14-14-15-12-15), text: "", fontSize: 15,textColor: RGB(235,61,61,1.0))
+        detailLbl.tag = tag++
+        self.contentView.addSubview(detailLbl)
         
         let goodsPriceLbl = ZMDTool.getLabel(CGRect(x: 12+125+10, y: 150-12-14-14-15, width: kScreenWidth - 12-125-10-12, height: 15), text: "", fontSize: 15,textColor: RGB(235,61,61,1.0))
         goodsPriceLbl.tag = tag++

@@ -9,13 +9,16 @@
 import UIKit
 // 查看物流信息
 class OrderLogisticsMsgViewController: UIViewController,UITableViewDataSource,UITableViewDelegate,ZMDInterceptorProtocol,ZMDInterceptorMoreProtocol {
-    var tableView : UITableView!
+    var currentTableView : UITableView!
+//    var msgData : NSArray!
+    var dataArray = NSMutableArray()
     
-    var msgData : NSArray!
+    var orderId : NSNumber!
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.title = "查看物流信息"
-        self.msgData = ["","","",""]
+        self.title = "订单跟踪"
+//        self.msgData = ["","","",""]
+        self.fetchData()
         self.updateUI()
     }
     
@@ -25,7 +28,7 @@ class OrderLogisticsMsgViewController: UIViewController,UITableViewDataSource,UI
     }
     //MARK:- UITableViewDataSource,UITableViewDelegate
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return section == 0 ? 2 : self.msgData.count + 1
+        return section == 0 ? 0 : self.dataArray.count + 1
     }
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         return 2
@@ -93,37 +96,42 @@ class OrderLogisticsMsgViewController: UIViewController,UITableViewDataSource,UI
             if indexPath.row == 1 {
                 let cellId = "MsgFirstCell"
                 var cell = tableView.dequeueReusableCellWithIdentifier(cellId)
+                let orderNote = self.dataArray[0] as! ZMDOrderNote
                 if cell == nil {
                     cell = UITableViewCell(style: .Subtitle, reuseIdentifier: cellId)
                     cell?.accessoryType = UITableViewCellAccessoryType.None
                     cell!.selectionStyle = .None
                     
                     ZMDTool.configTableViewCellDefault(cell!)
-                    cell?.addSubview(ZMDTool.getLine(CGRect(x: 90, y: 93.5, width: kScreenWidth-90, height: 0.5)))
+                    
+                    let imgV = UIImageView(frame: CGRect(x: 46-12, y: 14, width: 25, height: 25))
+                    imgV.image = UIImage(named: "pay_location")
+                    let line = ZMDTool.getLine(CGRect(x: 46, y: CGRectGetMaxY(imgV.frame), width: 0.5, height: 94-CGRectGetMaxY(imgV.frame)))
+                    let titleLbl = ZMDTool.getLabel(CGRect(x:90, y: 15 , width: kScreenWidth-90-12, height: 48), text: "", fontSize: 15)
+                    titleLbl.numberOfLines = 2
+                    titleLbl.text = orderNote.Note.stringByReplacingOccurrencesOfString("。", withString: "")
+                    let timeLbl = ZMDTool.getLabel(CGRect(x: 90, y:94-15-13 , width: kScreenWidth-90-12, height: 13), text: "", fontSize: 13)
+                    timeLbl.text = orderNote.CreatedOn.stringByReplacingOccurrencesOfString("T", withString: " ").componentsSeparatedByString(".").first
+                    
+                    cell?.addLine(hiddenLine: self.dataArray.count==1, leftOffset: 90, rightOffset: 0)
+                    cell?.contentView.addSubview(imgV)
+                    cell?.contentView.addSubview(line)
+                    cell?.contentView.addSubview(titleLbl)
+                    cell?.contentView.addSubview(timeLbl)
                 }
-                let imgV = UIImageView(frame: CGRect(x: 46-12, y: 14, width: 25, height: 25))
-                imgV.image = UIImage(named: "pay_location")
-                cell?.contentView.addSubview(imgV)
-                let line = ZMDTool.getLine(CGRect(x: 46, y: CGRectGetMaxY(imgV.frame), width: 0.5, height: 94-CGRectGetMaxY(imgV.frame)))
-                cell?.contentView.addSubview(line)
-                
-                let titleLbl = ZMDTool.getLabel(CGRect(x:90, y: 15 , width: kScreenWidth-90-12, height: 48), text: "广东省 已\n签收人：杰", fontSize: 15)
-                titleLbl.numberOfLines = 2
-                cell?.contentView.addSubview(titleLbl)
-                let timeLbl = ZMDTool.getLabel(CGRect(x: 90, y:94-15-13 , width: kScreenWidth-90-12, height: 13), text: "2015-7-3 09:23:22", fontSize: 13)
-                cell?.contentView.addSubview(timeLbl)
-                
                 return cell!
             } else {
                 let cellId = "MsgCell"
                 var cell = tableView.dequeueReusableCellWithIdentifier(cellId)
+                let orderNote = self.dataArray[indexPath.row-1] as! ZMDOrderNote
                 if cell == nil {
                     cell = UITableViewCell(style: .Subtitle, reuseIdentifier: cellId)
                     cell?.accessoryType = UITableViewCellAccessoryType.None
                     cell!.selectionStyle = .None
                     
                     ZMDTool.configTableViewCellDefault(cell!)
-                    cell?.addSubview(ZMDTool.getLine(CGRect(x: 90, y: 69.5, width: kScreenWidth-90, height: 0.5)))
+                    cell?.addLine(hiddenLine: self.dataArray.count==indexPath.row, leftOffset: 90, rightOffset: 0)
+                    
                     let line = ZMDTool.getLine(CGRect(x: 46, y: 0, width: 0.5, height:70))
                     cell?.contentView.addSubview(line)
                     
@@ -131,13 +139,16 @@ class OrderLogisticsMsgViewController: UIViewController,UITableViewDataSource,UI
                     ZMDTool.configViewLayerRound(blackPointV)
                     blackPointV.backgroundColor = RGB(194,194,194,1)
                     cell?.contentView.addSubview(blackPointV)
+                    
+                    let titleLbl = ZMDTool.getLabel(CGRect(x:90, y: 15 , width: kScreenWidth-90-12, height: 15), text: "广东省 配送中", fontSize: 15,textColor: defaultDetailTextColor)
+                    titleLbl.text = orderNote.Note.stringByReplacingOccurrencesOfString("。", withString: "")
+                    titleLbl.tag = 10001
+                    cell?.contentView.addSubview(titleLbl)
+                    let timeLbl = ZMDTool.getLabel(CGRect(x: 90, y:70-15-13 , width: kScreenWidth-90-12, height: 13), text: "2015-7-3 09:23:22", fontSize: 13,textColor: defaultDetailTextColor)
+                    timeLbl.text = orderNote.CreatedOn.stringByReplacingOccurrencesOfString("T", withString: " ").componentsSeparatedByString(".").first
+                    timeLbl.tag = 10002
+                    cell?.contentView.addSubview(timeLbl)
                 }
-                
-                let titleLbl = ZMDTool.getLabel(CGRect(x:90, y: 15 , width: kScreenWidth-90-12, height: 15), text: "广东省 配送中", fontSize: 15,textColor: defaultDetailTextColor)
-                cell?.contentView.addSubview(titleLbl)
-                let timeLbl = ZMDTool.getLabel(CGRect(x: 90, y:70-15-13 , width: kScreenWidth-90-12, height: 13), text: "2015-7-3 09:23:22", fontSize: 13,textColor: defaultDetailTextColor)
-                cell?.contentView.addSubview(timeLbl)
-                
                 return cell!
             }
         } else {
@@ -151,21 +162,31 @@ class OrderLogisticsMsgViewController: UIViewController,UITableViewDataSource,UI
                 ZMDTool.configTableViewCellDefault(cell!)
                 cell?.addSubview(ZMDTool.getLine(CGRect(x: 0, y: 55.5, width: kScreenWidth, height: 0.5)))
             }
-            cell?.textLabel!.text = "物流跟踪"
+            cell?.textLabel!.text = "订单跟踪"
             return cell!
         }
     }
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        let homeBuyListViewController = HomeBuyListViewController.CreateFromMainStoryboard() as! HomeBuyListViewController
-        self.navigationController?.pushViewController(homeBuyListViewController, animated: true)
+//        let homeBuyListViewController = HomeBuyListViewController.CreateFromMainStoryboard() as! HomeBuyListViewController
+//        self.navigationController?.pushViewController(homeBuyListViewController, animated: true)
     }
     //MARK: -  PrivateMethod
+    func fetchData() {
+        QNNetworkTool.orderDetail(self.orderId.integerValue/*self.orderId*/) { (succeed, dictionary, error) -> Void in
+            if let dic = dictionary {
+                let notes = ZMDOrderNote.mj_objectArrayWithKeyValuesArray(dic["OrderNotes"])
+                self.dataArray.addObjectsFromArray(notes as [AnyObject])
+                self.currentTableView.reloadData()
+            }
+        }
+    }
+    
     func updateUI() {
-        tableView = UITableView(frame: self.view.bounds)
-        tableView.backgroundColor = tableViewdefaultBackgroundColor
-        tableView.delegate = self
-        tableView.dataSource = self
-        tableView.separatorStyle = UITableViewCellSeparatorStyle.None
-        self.view.addSubview(tableView)
+        currentTableView = UITableView(frame: self.view.bounds)
+        currentTableView.backgroundColor = tableViewdefaultBackgroundColor
+        currentTableView.delegate = self
+        currentTableView.dataSource = self
+        currentTableView.separatorStyle = UITableViewCellSeparatorStyle.None
+        self.view.addSubview(currentTableView)
     }
 }

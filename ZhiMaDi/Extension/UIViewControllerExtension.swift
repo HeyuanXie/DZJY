@@ -83,3 +83,55 @@ extension UIViewController {
         self.navigationItem.rightBarButtonItem = item
     }
 }
+
+//MARK: 为UIViewController 提供一个alertView弹出
+//如果haveCancleBtn==false,则只需要用确定作为cancleBtn，并且不做任何操作a
+extension UIViewController {
+    public func commonAlertShow(haveCancleBtn:Bool,btnTitle1: String = "确定",btnTitle2: String = "取消", title: String, message: String, preferredStyle: UIAlertControllerStyle){
+        let alert = UIAlertController(title: title, message: message, preferredStyle: preferredStyle)
+        if haveCancleBtn {
+            let action1 = UIAlertAction(title: btnTitle1, style: UIAlertActionStyle.Destructive, handler: { (UIAlertAction) -> Void in
+                self.alertDestructiveAction()
+            })
+            let action2 = UIAlertAction(title: btnTitle2, style: UIAlertActionStyle.Cancel, handler: nil)
+            alert.addAction(action1)
+            alert.addAction(action2)
+        }else{
+            let action = UIAlertAction(title: btnTitle1, style: UIAlertActionStyle.Default, handler: {(UIAlertAction) -> Void in
+                self.alertCancelAction()
+            })
+            alert.addAction(action)
+        }
+        self.presentViewController(alert, animated: true, completion: nil)
+    }
+    
+    //点击commonAlert确定按钮执行的方法
+    public func alertDestructiveAction() {
+        print("alert确定")
+    }
+    public func alertCancelAction() {
+        print("alert取消")
+    }
+}
+
+//MARK: 导航控制器Push
+extension UIViewController {
+    public func pushToViewController(vc:UIViewController,animated:Bool,hideBottom:Bool){
+        vc.hidesBottomBarWhenPushed = true
+        self.navigationController?.pushViewController(vc, animated: animated)
+    }
+}
+
+//MARK: 经常出现的UI
+extension UIViewController {
+    func addBottomBtn(title:String = "保存",blockForCli : ((AnyObject!) -> Void)!) {
+        let saveBtn = ZMDTool.getButton(CGRect.zero, textForNormal: title, fontSize: 16, textColorForNormal: UIColor.whiteColor(), backgroundColor: appThemeColor,blockForCli: blockForCli)
+        self.view.addSubview(saveBtn)
+        saveBtn.snp_makeConstraints { (make) -> Void in
+            make.left.equalTo(0)
+            make.right.equalTo(0)
+            make.bottom.equalTo(0)
+            make.height.equalTo(50)
+        }
+    }
+}

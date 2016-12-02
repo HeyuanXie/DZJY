@@ -32,6 +32,7 @@ class ZMDAdvertisementAll : NSObject {
     var offer: [ZMDAdvertisement]?
     var guess: [ZMDAdvertisement]?
     var topic: [ZMDAdvertisement]?
+    
     override static func mj_objectClassInArray() -> [NSObject : AnyObject]! {
         return ["top":ZMDAdvertisement.classForCoder(),"icon":ZMDAdvertisement.classForCoder(),"offer":ZMDAdvertisement.classForCoder(),"guess":ZMDAdvertisement.classForCoder(),"topic":ZMDAdvertisement.classForCoder()]
     }

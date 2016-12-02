@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="9531" systemVersion="15A2301" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9529"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="StoreHeaderView" customModule="ZhiMaDi" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="48"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="P7T-2P-eYs">
+                    <rect key="frame" x="0.0" y="0.0" width="48" height="48"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="48" id="bGN-HN-fCJ"/>
+                        <constraint firstAttribute="width" constant="48" id="rh3-Tb-HR0"/>
+                    </constraints>
+                    <state key="normal" image="common_01unselected.png"/>
+                </button>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="店家名称" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7y2-57-Zw6">
+                    <rect key="frame" x="78" y="9" width="206" height="30"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="30" id="gDz-Qj-kFe"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="H1l-Pc-7VS">
+                    <rect key="frame" x="300" y="14" width="20" height="20"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="20" id="0G7-Zw-lg2"/>
+                        <constraint firstAttribute="width" constant="20" id="JKL-0L-bz2"/>
+                    </constraints>
+                    <state key="normal" image="common_forward.png"/>
+                </button>
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="common_shop.png" translatesAutoresizingMaskIntoConstraints="NO" id="ujF-33-hek">
+                    <rect key="frame" x="48" y="14" width="20" height="20"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="20" id="iS6-aV-Gaa"/>
+                        <constraint firstAttribute="width" constant="20" id="vGd-yA-1nT"/>
+                    </constraints>
+                </imageView>
+            </subviews>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstItem="7y2-57-Zw6" firstAttribute="leading" secondItem="ujF-33-hek" secondAttribute="trailing" constant="10" id="2VU-Oo-Ly8"/>
+                <constraint firstAttribute="bottom" secondItem="ujF-33-hek" secondAttribute="bottom" constant="14" id="3kD-Oo-FUG"/>
+                <constraint firstItem="H1l-Pc-7VS" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="14" id="7FH-o5-Wll"/>
+                <constraint firstAttribute="trailing" secondItem="H1l-Pc-7VS" secondAttribute="trailing" id="Eel-J5-rgp"/>
+                <constraint firstItem="7y2-57-Zw6" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="9" id="Fbo-X1-c2u"/>
+                <constraint firstItem="P7T-2P-eYs" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="NQc-n6-im4"/>
+                <constraint firstAttribute="bottom" secondItem="7y2-57-Zw6" secondAttribute="bottom" constant="9" id="RCd-2T-OPj"/>
+                <constraint firstItem="P7T-2P-eYs" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="WpS-bM-oIv"/>
+                <constraint firstAttribute="bottom" secondItem="H1l-Pc-7VS" secondAttribute="bottom" constant="14" id="czf-MA-nOP"/>
+                <constraint firstAttribute="bottom" secondItem="P7T-2P-eYs" secondAttribute="bottom" id="f4f-CW-w38"/>
+                <constraint firstItem="ujF-33-hek" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="14" id="h1E-xm-fuv"/>
+                <constraint firstAttribute="trailing" secondItem="7y2-57-Zw6" secondAttribute="trailing" constant="36" id="ldP-Qm-uiT"/>
+                <constraint firstItem="ujF-33-hek" firstAttribute="leading" secondItem="P7T-2P-eYs" secondAttribute="trailing" id="nvf-NS-hgc"/>
+            </constraints>
+            <nil key="simulatedStatusBarMetrics"/>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <connections>
+                <outlet property="detailBtn" destination="H1l-Pc-7VS" id="AhJ-tY-GFt"/>
+                <outlet property="imgView" destination="ujF-33-hek" id="ofr-Dr-z2x"/>
+                <outlet property="storeBtn" destination="P7T-2P-eYs" id="Ave-P6-LT1"/>
+                <outlet property="storeNameLabel" destination="7y2-57-Zw6" id="OSV-SS-f7D"/>
+            </connections>
+            <point key="canvasLocation" x="263" y="213"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="common_01unselected.png" width="20" height="20"/>
+        <image name="common_forward.png" width="9" height="15"/>
+        <image name="common_shop.png" width="20" height="25"/>
+    </resources>
+</document>

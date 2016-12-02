@@ -13,6 +13,7 @@ import UIKit.UIColor
 // MARK: - 颜色
 /// App主色    
 let appThemeColor = UIColor(red: 237/255.0, green: 191/255.0, blue: 28/255.0, alpha: 1.0)
+let appThemeColorNew = RGB(253,124,76,1.0)
 //从深到浅
 // MARK: 导航栏
 /// 导航栏文本颜色
@@ -50,6 +51,10 @@ let defaultButtonTextSize = defaultSysFontWithSize(13)
 let defaultSysFontWithSize = { (size : CGFloat) -> UIFont in
     UIFont.systemFontOfSize(size)
 }
+
+//灰色不可按button背景色
+let grayButtonBackgroundColor = UIColor(red: 215/255, green: 215/255, blue: 215/255, alpha: 1)
+
 let RGB = { (r : CGFloat,g: CGFloat,b: CGFloat,a: CGFloat) -> UIColor in
     return UIColor(red: r/255, green: g/255, blue: b/255, alpha: a)
 }

@@ -53,6 +53,9 @@ class InvitationShareHomeViewController:UIViewController,UITableViewDataSource, 
     func qnShareView(view: ShareView) -> (image: UIImage, url: String, title: String?, description: String)? {
         return (UIImage(named: "Share_Icon")!, "http://www.baidu.com", self.title ?? "", "成为喜特用户，享有更多服务!")
     }
+    func present(alert: UIAlertController) -> Void {
+        self.presentViewController(alert, animated: false, completion: nil)
+    }
     //MARK:- UITableViewDataSource,UITableViewDelegate
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 1

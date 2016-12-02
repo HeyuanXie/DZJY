@@ -7,8 +7,10 @@
 //
 
 import UIKit
+import ReactiveCocoa
+
 //我的  首页
-class MineHomeViewController: UIViewController,UITableViewDataSource, UITableViewDelegate {
+class MineHomeViewController: UIViewController,UITableViewDataSource, UITableViewDelegate,ZMDInterceptorProtocol {
 
     enum UserCenterCellType{
         case UserHead
@@ -23,7 +25,8 @@ class MineHomeViewController: UIViewController,UITableViewDataSource, UITableVie
         case UserVipClub
         case UserCommission
         case UserInvitation
-        
+
+        case UserAddress
         case UserHelp
         case UserMore
         
@@ -58,6 +61,8 @@ class MineHomeViewController: UIViewController,UITableViewDataSource, UITableVie
             case UserInvitation :
                 return "邀请好友注册"
                 
+            case .UserAddress :
+                return "管理收货地址"
             case UserHelp :
                 return "帮助与反馈"
             case UserMore :
@@ -83,7 +88,9 @@ class MineHomeViewController: UIViewController,UITableViewDataSource, UITableVie
                 return UIImage(named: "user_earn")
             case UserInvitation :
                 return UIImage(named: "user_share")
-
+                
+            case .UserAddress :
+                return UIImage(named: "user_address")
             case UserHelp :
                 return UIImage(named: "user_help")
             default :
@@ -98,6 +105,7 @@ class MineHomeViewController: UIViewController,UITableViewDataSource, UITableVie
                 viewController = MyOrderViewController.CreateFromMainStoryboard() as! MyOrderViewController
             case UserMyOrderMenu:
                 viewController = UIViewController()
+                
             case UserWallet:
                 viewController = WalletHomeViewController.CreateFromMainStoryboard() as! WalletHomeViewController
             case UserBankCard:
@@ -115,6 +123,10 @@ class MineHomeViewController: UIViewController,UITableViewDataSource, UITableVie
                 viewController = UIViewController()
             case UserInvitation:
                 viewController = InvitationShareHomeViewController()
+                
+            case .UserAddress:
+                viewController = AddressViewController.CreateFromMainStoryboard() as! AddressViewController
+                (viewController as! AddressViewController).canSelect = false
             case .UserMore :
                 viewController = MineBrowseRecordViewController.CreateFromMainStoryboard() as! MineBrowseRecordViewController
             case UserHelp:
@@ -134,12 +146,27 @@ class MineHomeViewController: UIViewController,UITableViewDataSource, UITableVie
     @IBOutlet weak var currentTableView: UITableView!
     var userCenterData: [[UserCenterCellType]]!
     
+    var isTabBarVC = true
+    var isSaveImage = false
+    
+    var headImageData : NSData!
+    var btn :UIButton!
+    
+    var orderNumberDic:NSMutableDictionary!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        if !g_isLogin {
+//        if !g_isLogin {
+//            ZMDTool.enterLoginViewController()
+//        }
+        
+        self.btn = UIButton(frame: self.view.bounds)
+        self.btn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
             ZMDTool.enterLoginViewController()
-        }
+            return RACSignal.empty()
+        })
+        self.view.addSubview(self.btn)
+        
         // 让导航栏支持右滑返回功能
         ZMDTool.addInteractive(self.navigationController)
         self.dataInit()
@@ -147,10 +174,12 @@ class MineHomeViewController: UIViewController,UITableViewDataSource, UITableVie
     }
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(true)
-        self.currentTableView.reloadData()
-//        if !g_isLogin {
-//            ZMDTool.enterLoginViewController()
-//        }
+        if g_isLogin! {
+            self.btn.userInteractionEnabled = false
+        }else{
+            self.btn.userInteractionEnabled = true
+        }
+        self.dataInit()
     }
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(true)
@@ -167,6 +196,9 @@ class MineHomeViewController: UIViewController,UITableViewDataSource, UITableVie
         return self.userCenterData.count
     }
     func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        if section == 0 {
+            return 0
+        }
         return  16
     }
     func tableView(tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
@@ -193,32 +225,56 @@ class MineHomeViewController: UIViewController,UITableViewDataSource, UITableVie
         case .UserHead:
             let cellId = "HeadCell"
             let cell = tableView.dequeueReusableCellWithIdentifier(cellId)
+            //设置背景图和用户图像(圆形)
+            if let backgroundV = cell?.viewWithTag(10000) as? UIImageView {
+                ZMDTool.configViewLayer(backgroundV)
+                if let urlStr = g_customer?.Avatar?.AvatarUrl,url = NSURL(string: urlStr){
+                    backgroundV.sd_setImageWithURL(url, placeholderImage: nil)
+                }
+                cell?.sendSubviewToBack(backgroundV)
+            }
+            
             if let personImgV = cell!.viewWithTag(10001) as? UIImageView{
                 ZMDTool.configViewLayerWithSize(personImgV, size: 42)
                 if let urlStr = g_customer?.Avatar?.AvatarUrl,url = NSURL(string: urlStr) {
-                    personImgV.image = UIImage(data: NSData(contentsOfURL: url)!)
+                    personImgV.sd_setImageWithURL(url, placeholderImage: nil)
                 }
             }
+            //设置用户名Label.text
             if let usrNameLbl = cell?.viewWithTag(10002) as? UILabel {
                 usrNameLbl.text = g_customer?.FirstName ?? ""
+                usrNameLbl.textColor = UIColor.whiteColor()
+                if g_isLogin! {
+                    usrNameLbl.text = getObjectFromUserDefaults("nickName") as? String
+                }else{
+                    usrNameLbl.text = "登陆 | 注册"
+                    usrNameLbl.font = UIFont.boldSystemFontOfSize(17)
+                }
             }
-            let followBtn = cell?.viewWithTag(10003) as! UIButton
-            followBtn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
+            
+            //收藏的商品
+            let collectionBtn = cell?.viewWithTag(10003) as! UIButton
+            collectionBtn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
                 let vc = MineCollectionViewController()
                 vc.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(vc, animated: true)
                 return RACSignal.empty()
             })
-//            let collectionBtn = cell?.viewWithTag(10004) as! UIButton
-//            collectionBtn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
-//                let vc = MineFollowViewController()
-//                self.navigationController?.pushViewController(vc, animated: true)
-//                return RACSignal.empty()
-//            })
+            
+            //关注的店铺
+            let followBtn = cell?.viewWithTag(10004) as! UIButton
+            followBtn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
+                
+                ZMDTool.showPromptView("功能暂未开放")
+                return RACSignal.empty()
+            })
             return cell!
         case .UserMyOrder :
             let cellId = "MyOrderCell"
             let cell = tableView.dequeueReusableCellWithIdentifier(cellId)
+            if let dic = self.orderNumberDic,total = dic["Total"] {
+                (cell?.viewWithTag(1000) as!UILabel).attributedText = "我的订单 (\(total))".AttributedText("\(total)", color: defaultSelectColor)
+            }
             return cell!
         case .UserMyOrderMenu :
             let cellId = "MyOrderMenuCell"
@@ -231,16 +287,56 @@ class MineHomeViewController: UIViewController,UITableViewDataSource, UITableVie
                 
                 let menuTitle = ["0\n待付款","0\n待发货","0\n待收货","0\n待评价","0\n退货/售后"]
                 var i = 0
+                var tag = 10000
                 for title  in menuTitle {
                     let width = kScreenWidth/5,height = CGFloat(55)
                     let x = CGFloat(i) * width
-                    i++
                     let btn = ZMDTool.getButton(CGRect(x: x, y: 0, width: width, height: height), textForNormal: title, fontSize: 14, backgroundColor: UIColor.clearColor(), blockForCli: { (sender) -> Void in
-                        
+                        //点击订单目录(待付款。。。。)
+                        let index = Int(x/width)+1  //“+1”是跳过前面的 “全部”btn
+                        if index == 5 {
+                            //售后
+                            let vc = MyOrderViewController.CreateFromMainStoryboard() as! MyOrderViewController
+                            vc.orderStatuId = 0
+                            vc.orderStatusIndex = 0
+                            vc.isAfterSale = true
+                            self.pushToViewController(vc, animated: true, hideBottom: true)
+                        }else{
+                            let vc = MyOrderViewController.CreateFromMainStoryboard() as! MyOrderViewController
+                            vc.orderStatusIndex = index
+                            vc.orderStatuId = index
+                            vc.hidesBottomBarWhenPushed = true
+                            self.navigationController?.pushViewController(vc, animated: true)
+                            let customButtons = vc.view.viewWithTag(200) as! CustomJumpBtns
+                            let btn = customButtons.viewWithTag(1000+index) as! UIButton
+                            if index != 0 {
+                                (customButtons.viewWithTag(1000) as!UIButton).selected = false
+                            }
+                            customButtons.selectBtn = btn
+                            customButtons.setSelectedBtn(btn:customButtons.selectBtn)
+                        }
                     })
+                    btn.tag = tag++
                     btn.titleLabel?.numberOfLines = 2
                     btn.titleLabel?.textAlignment = .Center
+                    let line = ZMDTool.getLine(CGRect(x: CGRectGetMaxX(btn.frame), y: 30, width: 1, height: 15), backgroundColor: defaultLineColor)
+                    cell?.contentView.addSubview(line)
                     cell?.contentView.addSubview(btn)
+                    i++
+                }
+            }
+            
+            var tag = 10000
+            if let orderNumber = self.orderNumberDic,waitPay = orderNumber["WaitPay"],waitDelivery = orderNumber["WaitDelivery"],waitReceivce = orderNumber["WaitReceivce"],waitReview = orderNumber["WaitReview"],afterSale = orderNumber["AfterSale"],complete = orderNumber["Complete"] {
+                /*let numbers = [waitPay,waitDelivery,waitReceivce,complete,afterSale]
+                let status = ["待付款","待发货","待收货","已完成","退货/售后"]*/
+                let numbers = [waitPay,waitDelivery,waitReceivce,waitReview,afterSale]
+                let status = ["待付款","待发货","待收货","待评价","退货/售后"]
+                for index in 0..<numbers.count {
+                    let title = "\(numbers[index])\n\(status[index])"
+                    let button = cell?.contentView.viewWithTag(tag++) as! UIButton
+                    button.setTitle(title, forState: .Normal)
+//                    button.titleLabel?.attributedText = title.AttributedText("\(numbers[index])", color: defaultSelectColor)
                 }
             }
             return cell!
@@ -283,7 +379,10 @@ class MineHomeViewController: UIViewController,UITableViewDataSource, UITableVie
         case .UserHead :
             break
         case .UserMyOrder:
-            cellType.didSelect(self.navigationController!)
+            let vc = MyOrderViewController.CreateFromMainStoryboard() as! MyOrderViewController
+            vc.orderStatusIndex = 0
+            vc.hidesBottomBarWhenPushed = true
+            self.navigationController?.pushViewController(vc, animated: true)
             break
         default:
             cellType.didSelect(self.navigationController!)
@@ -304,9 +403,27 @@ class MineHomeViewController: UIViewController,UITableViewDataSource, UITableVie
             return RACSignal.empty()
         })
         self.navigationItem.rightBarButtonItem = rightItem
+        
+        /*if !self.isTabBarVC {
+            let leftItem = UIBarButtonItem(image: UIImage(named: "common_return_black"), style: .Plain, target: self, action: "back")
+            self.navigationItem.leftBarButtonItem = leftItem
+        }*/
     }
+    
     private func dataInit(){
-        //.UserWallet,.UserBankCard,.UserMyCrowdFunding   [.UserMyStore,.UserVipClub,.UserCommission,.UserInvitation], [.UserMore]
-        self.userCenterData = [[.UserHead,.UserMyOrder,.UserMyOrderMenu], [.UserCardVolume],[.UserHelp],]
+        //目前功能
+        self.userCenterData = [[.UserHead,.UserMyOrder,.UserMyOrderMenu], [.UserCardVolume],[.UserAddress],[.UserHelp],]
+        //全部功能
+        //        self.userCenterData = [[.UserHead,.UserMyOrder,.UserMyOrderMenu],[.UserWallet,.UserCardVolume,.UserMyCrowdFunding],[.UserMyStore,.UserVipClub,.UserCommission,.UserInvitation],[.UserHelp],[.UserMore]]
+        
+        if g_isLogin! {
+            QNNetworkTool.fetchOrder(0, orderNo: "", pageIndex: 0, pageSize: 12) { (orders ,dic, Error) -> Void in
+                if let dictionary = dic, dict = dictionary["CustomerOrderStatusModel"] {
+                    self.orderNumberDic = NSMutableDictionary(dictionary: dict as! [NSObject : AnyObject])
+                    self.currentTableView.reloadData()
+                }
+            }
+        }
     }
 }
+

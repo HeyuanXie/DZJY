@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>葫芦堡</string>
+	<string>疆南农批大宗交易</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -28,7 +28,6 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>wxc59280c42692603a</string>
-				<string></string>
 			</array>
 		</dict>
 		<dict>
@@ -36,7 +35,31 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>alisdkforHLB</string>
+				<string>alisdkforJNNT</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>wb568898243</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>QQ05FB8B52</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>tencent100371282</string>
 			</array>
 		</dict>
 	</array>
@@ -46,6 +69,7 @@
 	<dict/>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
+		<string>alisdkforHLB</string>
 		<string>wechat</string>
 		<string>weixin</string>
 		<string>sinaweibo</string>
@@ -54,12 +78,32 @@
 		<string>sinaweibohdsso</string>
 		<string>weibosdk</string>
 		<string>weibosdk2.5</string>
+		<string>mqqapi</string>
+		<string>mqq</string>
 		<string>mqqOpensdkSSoLogin</string>
+		<string>mqqconnect</string>
+		<string>mqqopensdkdataline</string>
+		<string>mqqopensdkgrouptribeshare</string>
+		<string>mqqopensdkfriend</string>
+		<string>mqqopensdkapi</string>
 		<string>mqqopensdkapiV2</string>
 		<string>mqqopensdkapiV3</string>
+		<string>mqzoneopensdk</string>
+		<string>wtloginmqq</string>
 		<string>wtloginmqq2</string>
-		<string>mqq</string>
-		<string>mqqapi</string>
+		<string>mqqwap</string>
+		<string>mqzone</string>
+		<string>mqzonev2</string>
+		<string>mqzongshare</string>
+		<string>mqzonewx</string>
+		<string>mqzoneopenssdkapiV2</string>
+		<string>mqzoneopenssdkapi19</string>
+		<string>mqzoneopenssdkapi</string>
+		<string>mqzoneopenssdk</string>
+		<string>mqqbrowser</string>
+		<string>mqqzone</string>
+		<string>alipay</string>
+		<string>alipayshare</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
@@ -72,8 +116,6 @@
 	<array>
 		<string>remote-notification</string>
 	</array>
-	<key>UIMainStoryboardFile</key>
-	<string>Login</string>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
 		<string>armv7</string>

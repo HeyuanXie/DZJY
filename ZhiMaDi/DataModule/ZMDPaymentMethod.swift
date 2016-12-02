@@ -9,7 +9,7 @@
 import UIKit
 // 支付方式
 class ZMDPaymentMethod: NSObject {
-    var PaymentMethodSystemName : String!
+    var PaymentMethodSystemName : String!   //
     var Name : String!
     var Description : String?
     var ImageUrl : String!

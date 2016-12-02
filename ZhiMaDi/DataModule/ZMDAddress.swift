@@ -18,6 +18,6 @@ class ZMDAddress: NSObject {
     var PhoneNumber:String!      //13685685685,
     var IsDefault:NSNumber!        //false,
     var AreaCode:String?         //110101001,
-    var Id:NSNumber?               //1
-    var FaxNumber:String?
+    var Id:NSNumber!               //1
+    var FaxNumber:String?       // 邮编
 }

@@ -101,6 +101,7 @@ class LoginWithCodeViewController: UIViewController , ZMDInterceptorNavigationBa
         self.getVerificationBtn = btn
         
         
+        //这里是在LoginViewController拓展中定义的类方法，用于获取验证码
         LoginViewController.waitingAuthCode(self.getVerificationBtn, start: false)
         self.getVerificationBtn.rac_signalForControlEvents(.TouchUpInside).subscribeNext { [weak self](sender) -> Void in
             if let strongSelf = self {
@@ -165,16 +166,16 @@ class LoginWithCodeViewController: UIViewController , ZMDInterceptorNavigationBa
     // 判断输入的合法性
     private func checkAccountPassWord() -> Bool {
         if (self.accountTextField.text?.characters.count == 0 && self.verificationTextField.text?.characters.count == 0) {
-            ZMDTool.showPromptView("请输入账号与密码")
+            ZMDTool.showPromptView("请输入手机号和验证码")
             self.accountTextField.becomeFirstResponder()
             return false
         }else if(self.accountTextField.text?.characters.count == 0) {
-            ZMDTool.showPromptView("请输入账号")
+            ZMDTool.showPromptView("请输入手机号")
             self.verificationTextField.becomeFirstResponder()
             return false
             
         }else if (self.verificationTextField.text?.characters.count == 0){
-            ZMDTool.showPromptView("请输入密码")
+            ZMDTool.showPromptView("请输入验证码")
             self.accountTextField.becomeFirstResponder()
             return false
         }

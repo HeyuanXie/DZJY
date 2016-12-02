@@ -43,9 +43,9 @@ class PhotoBroswerViewController: MWPhotoBrowser{
     override func viewDidLoad() {
         super.viewDidLoad()
         let button:UIButton = UIButton(frame: CGRectMake(0, 0, 40, 40))
-        button.setImage(UIImage(named: "btn_delete1"), forState: .Normal)
+        button.setImage(UIImage(named: "btn_delete1")?.imageWithRenderingMode(.AlwaysOriginal), forState: .Normal)
         button.titleLabel?.font = UIFont.systemFontOfSize(14)
-        button.setTitleColor(navigationTextColor, forState: UIControlState.Normal)
+        button.setTitleColor(UIColor.whiteColor(), forState: .Normal)
         button.backgroundColor = UIColor.clearColor()
         button.rac_command = RACCommand(signalBlock: { [weak self](input) -> RACSignal! in
             if let strongSelf = self {
@@ -72,9 +72,9 @@ class PhotoBroswerViewController: MWPhotoBrowser{
             });
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: button)
         self.navigationItem.rightBarButtonItem?.customView?.hidden = isDelete
-        self.navigationController?.navigationBar.barTintColor = navigationBackgroundColor
-        self.navigationController?.navigationBar.tintColor = navigationTextColor
-        self.navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: navigationTextColor, NSFontAttributeName: navigationTextFont]
+        self.navigationController?.navigationBar.barTintColor = UIColor.whiteColor()//navigationBackgroundColor
+        self.navigationController?.navigationBar.tintColor = defaultTextColor//navigationTextColor
+        self.navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: defaultTextColor, NSFontAttributeName: navigationTextFont]
         self.configBroswer()
     }
     

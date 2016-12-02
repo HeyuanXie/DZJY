@@ -124,7 +124,7 @@ class WalletRechargeViewController: UIViewController,UITableViewDataSource, UITa
         let view = UIView(frame: CGRect(x: 0, y: self.view.bounds.height - 300, width: kScreenWidth, height: 50+60+56))
         view.backgroundColor = UIColor.whiteColor()
         
-        let topLbl = ZMDTool.getLabel(CGRect(x: 0, y: 0, width: kScreenWidth, height: 50), text: "选择提现方式", fontSize: 16)
+        let topLbl = ZMDTool.getLabel(CGRect(x: 0, y: 0, width: kScreenWidth, height: 50), text: "选择充值方式", fontSize: 16)
         topLbl.textAlignment = .Center
         view.addSubview(topLbl)
         

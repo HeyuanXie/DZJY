@@ -8,15 +8,21 @@
 
 import UIKit
 // 登录
-class LoginViewController: UIViewController , ZMDInterceptorNavigationBarHiddenProtocol, UITextFieldDelegate{
+class LoginViewController: UIViewController , ZMDInterceptorNavigationBarHiddenProtocol,UITextFieldDelegate, ShareSDKThirdLoginHelperDelegate{
 
     @IBOutlet weak var accountTextField: UITextField!
     @IBOutlet weak var verificationTextField: UITextField!
     @IBOutlet weak var thirdView: UIView!
     @IBOutlet weak var otherLoginBtn: UIButton!
     @IBOutlet weak var loginBtn: UIButton!
+    @IBOutlet weak var thirdLabel: UILabel!
+    @IBOutlet weak var invisiable: UIButton!
     
     @IBOutlet weak var rightBar: UIBarButtonItem!
+    
+    override func awakeFromNib() {
+        self.view.bringSubviewToFront(self.thirdView)
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,16 +39,33 @@ class LoginViewController: UIViewController , ZMDInterceptorNavigationBarHiddenP
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
-    // MARK: UITextFieldDelegate
+    
+    //MARK: shareThirdLoginHelperDelegate
+    func loginWithName(nickName: String!, andPassWord password: String!, andIcon icon: String!) {
+        //利用传过来的用户信息注册登陆
+//        QNNetworkTool.registerAndLogin(<#T##mobile: String##String#>, code: <#T##String#>, psw: <#T##String#>, completion: <#T##(success: Bool!, error: NSError?, dictionary: NSDictionary?) -> Void#>)
+
+        /*
+        let alert = UIAlertController(title: "用户信息", message: "nickName:\(nickName) password:\(password)", preferredStyle: UIAlertControllerStyle.Alert)
+        let alertAction = UIAlertAction(title: "确定", style: UIAlertActionStyle.Destructive) { (UIAlertAction) -> Void in
+            alert.removeFromParentViewController()
+        }
+        alert.addAction(alertAction)
+        self.presentViewController(alert, animated: true, completion: nil)
+        */
+    }
+
+    //MARK: UITextFieldDelegate
     func textFieldShouldReturn(textField: UITextField) -> Bool {
         if textField.returnKeyType == .Next {
             self.verificationTextField.becomeFirstResponder()
-        }
-        else if textField.returnKeyType == .Done {
+        }else{
+            self.view.endEditing(true)
             self.login()
         }
-        return false
+        return true
     }
+    
     
     // @IBAction
     // MARK: 登录
@@ -63,13 +86,24 @@ class LoginViewController: UIViewController , ZMDInterceptorNavigationBarHiddenP
         self.accountTextField.leftView = accountImageView
         self.accountTextField.leftViewMode =  UITextFieldViewMode.Always
         self.accountTextField.text = g_Account
+        self.accountTextField.returnKeyType = .Next
+        self.accountTextField.delegate = self
         
         let passwordImageView = UIImageView(frame: CGRectMake(10, 0, 40, 20))
         passwordImageView.contentMode = UIViewContentMode.ScaleAspectFit
         passwordImageView.image = UIImage(named: "login_password")
         self.verificationTextField.leftView = passwordImageView
         self.verificationTextField.leftViewMode =  UITextFieldViewMode.Always
+        self.verificationTextField.secureTextEntry = true
+        self.verificationTextField.returnKeyType = .Done
+        self.verificationTextField.delegate = self
         
+        self.invisiable.setImage(UIImage(named: "login_visible"), forState: .Selected)
+        self.invisiable.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
+            (sender as! UIButton).selected = !(sender as! UIButton).selected
+            self.verificationTextField.secureTextEntry = !(sender as! UIButton).selected
+            return RACSignal.empty()
+        })
         ZMDTool.configViewLayerWithSize(self.loginBtn, size: 25)
         
         // 键盘消失
@@ -77,7 +111,17 @@ class LoginViewController: UIViewController , ZMDInterceptorNavigationBarHiddenP
         tap.rac_gestureSignal().subscribeNext { [weak self](tap) -> Void in
             self?.view.endEditing(true)
         }
+    
         self.view.addGestureRecognizer(tap)
+        
+        let xhyThirdView = UIView(frame:self.thirdView.frame)
+        self.view.addSubview(xhyThirdView)
+        let xhyThirdLabel = UILabel(frame: self.thirdLabel.frame)
+        xhyThirdLabel.textAlignment = .Center
+        xhyThirdLabel.center.x = self.view.center.x
+        xhyThirdLabel.textColor = defaultTextColor
+        xhyThirdLabel.text = "第三方登陆"
+        self.view.addSubview(xhyThirdLabel)
         
         let thirdTitle = ["微信","微博","QQ"]
         let thirdImage = ["common_share_wechat","common_share_weibo","common_share_qq"]
@@ -86,18 +130,30 @@ class LoginViewController: UIViewController , ZMDInterceptorNavigationBarHiddenP
             //105 50 50 
             let width = CGFloat(50),height = CGFloat(75)
             let x = 25+width*i + 50*i
+            //ZMDTool.getBtn得到图和文字垂直的自定义btn
             let btn = ZMDTool.getBtn(CGRect(x: x, y: 0, width: width, height: height))
             btn.setImage(UIImage(named:thirdImage[Int(i)]), forState: .Normal)
             btn.setTitle(title, forState: .Normal)
             btn.setTitleColor(defaultTextColor, forState: .Normal)
             btn.titleLabel?.font = defaultSysFontWithSize(15)
-            self.thirdView.addSubview(btn)
+            btn.tag = 100 + Int(i)
+            xhyThirdView.addSubview(btn)
+            if btn.tag == 101 {
+                btn.center.x = self.view.center.x
+            }
+            if btn.tag == 102 {
+                let secondBtn = xhyThirdView.viewWithTag(101) as! UIButton
+                btn.frame = CGRect(x: CGRectGetMaxX(secondBtn.frame) + CGRectGetMinX(secondBtn.frame) - 25 - width, y: 0, width: width, height: height)
+            }
             btn.rac_signalForControlEvents(UIControlEvents.TouchUpInside).subscribeNext({ (sender) -> Void in
-                    ShareSDKThirdLoginHelper().login()
+                let thirdLoginHelper = ShareSDKThirdLoginHelper() 
+                thirdLoginHelper.delegate = self
+                ShareSDKThirdLoginHelper().loginWithIndex(sender.tag - 100)
             })
             i++
         }
     }
+    
     func login() {
         if !self.checkAccountPassWord() {return}
         if let usrN = self.accountTextField.text, let ps = self.verificationTextField.text {
@@ -135,11 +191,15 @@ class LoginViewController: UIViewController , ZMDInterceptorNavigationBarHiddenP
             return false
         }else if(self.accountTextField.text?.characters.count == 0) {
             ZMDTool.showPromptView("请输入账号")
-            self.verificationTextField.becomeFirstResponder()
+//            改
+//            self.verificationTextField.becomeFirstResponder()
+            self.accountTextField.becomeFirstResponder()
             return false
         }else if (self.verificationTextField.text?.characters.count == 0){
             ZMDTool.showPromptView("请输入密码")
-            self.accountTextField.becomeFirstResponder()
+//            改
+//            self.accountTextField.becomeFirstResponder()
+            self.verificationTextField.becomeFirstResponder()
             return false
         }
         return true
@@ -206,5 +266,4 @@ extension LoginViewController {
         }
     }
 }
-
 

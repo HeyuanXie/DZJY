@@ -98,6 +98,9 @@ class MineFollowViewController: UIViewController,UITableViewDataSource, UITableV
         return cell!
     }
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        let vc = StoreShowHomeViewController.CreateFromMainStoryboard() as! StoreShowHomeViewController
+        vc.hidesBottomBarWhenPushed = true
+        self.navigationController?.pushViewController(vc, animated: true)
     }
     //MARK: -  PrivateMethod
     private func subViewInit(){

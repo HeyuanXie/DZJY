@@ -122,7 +122,11 @@ class DiscountCardViewController: UIViewController,UITableViewDataSource, UITabl
         QNNetworkTool.fetchCustomerCouponsForOrder { (coupons, dictionary, error) -> Void in
             if coupons != nil {
                 self.coupons = coupons!
-                self.currentTableView.reloadData()
+                if self.coupons.count == 0 {
+                    ZMDTool.showPromptView("暂时没有可用的优惠券!")
+                } else {
+                    self.currentTableView.reloadData()
+                }
             }
         }
     }

@@ -8,6 +8,18 @@
 
 #import <Foundation/Foundation.h>
 
+@protocol ShareSDKThirdLoginHelperDelegate <NSObject>
+
+-(void)loginWithName:(NSString*)nickName andPassWord:(NSString*)password andIcon:(NSString*)icon;
+
+
+@end
+
 @interface ShareSDKThirdLoginHelper : NSObject
-- (void)login;
+
+@property(nonatomic,assign)id<ShareSDKThirdLoginHelperDelegate>delegate;
+
+
+-(void)loginWithIndex:(NSInteger)index;
+
 @end

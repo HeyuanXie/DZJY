@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import ReactiveCocoa
 // 店铺首页
 class StoreShowHomeViewController: UIViewController, ZMDInterceptorProtocol,ZMDInterceptorMoreProtocol, UITableViewDataSource, UITableViewDelegate,UISearchBarDelegate {
     enum StoreHomeCellType {
@@ -36,6 +37,8 @@ class StoreShowHomeViewController: UIViewController, ZMDInterceptorProtocol,ZMDI
             switch section {
             case 2 :
                 return 46
+            case 0 :
+                return 0
             default :
                 return 16
             }
@@ -44,11 +47,11 @@ class StoreShowHomeViewController: UIViewController, ZMDInterceptorProtocol,ZMDI
             switch section {
             case 2 :
                 let headView = UIView(frame: CGRectMake(0, 0, kScreenWidth, 10))
-                headView.backgroundColor = UIColor.clearColor()
+                headView.backgroundColor = tableViewdefaultBackgroundColor
                 let line = UIView(frame: CGRect(x: 12, y: 14, width: 5, height: 20))
                 line.backgroundColor = RGB(235,61,61,1.0)
                 headView.addSubview(line)
-                let titleLbl = ZMDTool.getLabel(CGRect(x: CGRectGetMaxX(line.frame)+10, y: 15, width: 70, height: 15), text: "人气推荐", fontSize: 15)
+                let titleLbl = ZMDTool.getLabel(CGRect(x: CGRectGetMaxX(line.frame)+10, y: 15, width: 70, height: 15), text: "本店热卖", fontSize: 15)
                 headView.addSubview(titleLbl)
                 let hotLbl = ZMDTool.getLabel(CGRect(x: CGRectGetMaxX(titleLbl.frame), y: 16, width: 32, height: 16), text: "HOT", fontSize: 10,textColor: UIColor.whiteColor(),textAlignment: .Center)
                 hotLbl.backgroundColor = RGB(235,61,61,1.0)
@@ -61,19 +64,33 @@ class StoreShowHomeViewController: UIViewController, ZMDInterceptorProtocol,ZMDI
             }
         }
     }
+    
     @IBOutlet weak var currentTableView: UITableView!
-    var celltypes = [[StoreHomeCellType.Head,.Notice,.Discount],[.Coupon],[.Recommend]]
+    
+    let kServerAddress = "http://www.xjnongte.com"
+    
+    var isNoticeDetail = false  //noticeCell是否全部显示
+    var storeId:NSNumber!
+    var celltypes = [[StoreHomeCellType.Head/*,.Notice*//*,.Discount*/],/*[.Coupon],*/[.Recommend,.Recommend]]
     let kTagPageControl = 10001
     let kTagScrollView = 10002
+    
+    var indexSkip = 0
+    var productsArray = NSMutableArray()
+    var storeDetail:ZMDStoreDetail!
+    var availableCategories = NSArray() //临时用
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.dataInit()
         self.currentTableView.backgroundColor = tableViewdefaultBackgroundColor
+        self.currentTableView.bounces = false
+        
+        self.dataInit()
+        self.requestData()
         self.setupNewNavigation()
     }
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(true)
-        self.currentTableView.reloadData()
+//        self.currentTableView.reloadData()
     }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -82,6 +99,9 @@ class StoreShowHomeViewController: UIViewController, ZMDInterceptorProtocol,ZMDI
     
     //MARK:- UITableViewDataSource,UITableViewDelegate
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if self.celltypes[section].first == .Recommend {
+            return self.productsArray.count/2 + self.productsArray.count%2
+        }
         return  self.celltypes[section].count
     }
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
@@ -91,31 +111,92 @@ class StoreShowHomeViewController: UIViewController, ZMDInterceptorProtocol,ZMDI
        return StoreHomeCellType.Other.heightForSection(section)
     }
     func tableView(tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        return 0
+        if section == 1 {
+            return 0.5
+        }else{
+            return 0
+        }
     }
     func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         return StoreHomeCellType.Other.viewForSection(section)
     }
+    func tableView(tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        let view = UIView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 0.5))
+        view.backgroundColor = defaultLineColor
+        return view
+    }
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+        if self.isNoticeDetail && indexPath.section == 0 && indexPath.row == 1 {
+            return 60
+        }
+        if self.celltypes[indexPath.section].first == .Recommend{
+            return 325
+        }
         return self.celltypes[indexPath.section][indexPath.row].height
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let celltype = self.celltypes[indexPath.section][indexPath.row]
+        var celltype:StoreHomeCellType
+        if self.celltypes[indexPath.section].first == .Recommend {
+            celltype = .Recommend
+        }else{
+            celltype = self.celltypes[indexPath.section][indexPath.row]
+        }
         switch celltype {
         case .Head :
             let cellId = "HeadCell"
             var cell = tableView.dequeueReusableCellWithIdentifier(cellId)
+            ZMDTool.configTableViewCellDefault(cell!)
+            cell?.selectionStyle = .None
             var tag = 10001
-            let imgBg = cell?.viewWithTag(tag++) as! UIImageView
-            let storeLbl = cell?.viewWithTag(tag++) as! UILabel
-            let detailLbl = cell?.viewWithTag(tag++) as! UILabel
+            let imgBg = cell?.viewWithTag(tag++) as! UIImageView    //店铺背景图
+            let storeLbl = cell?.viewWithTag(tag++) as! UILabel     //店铺名称
+            let detailLbl = cell?.viewWithTag(tag++) as! UILabel    //主营
             let followBtn = cell?.viewWithTag(tag++) as! UIButton
-            imgBg.image = UIImage.colorImage(RGB(72,72,69,1))
-            ZMDTool.configViewLayerWithSize(followBtn, size: 18)
+            let imgHead = cell?.viewWithTag(tag++) as! UIImageView
+            cell?.contentView.sendSubviewToBack(imgBg)
+            ZMDTool.configViewLayerRound(imgHead)
+//            imgBg.image = UIImage.colorImage(RGB(72,72,69,1))
+            imgBg.image = UIImage(named: "store_home_bg")
+            imgBg.userInteractionEnabled = false
+            ZMDTool.configViewLayerWithSize(followBtn, size: 17)
+            
+            if self.storeDetail != nil {
+                if let urlStr = self.storeDetail.PictureUrl,url = NSURL(string: kServerAddress + urlStr){
+                    imgHead.sd_setImageWithURL(url, placeholderImage: nil)
+                }
+                if let text = self.storeDetail.Name {
+                    storeLbl.text = text
+                }
+                if let text = self.storeDetail.Host {
+                    detailLbl.text = text
+                }
+            }
+
+            followBtn.imageEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 12)
+            followBtn.setImage(UIImage(named: "user_pingfen_selected.png"), forState: .Selected)
+            followBtn.setTitle("已关注", forState: .Selected)
+            //关注btn临时
             followBtn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
+                let btn = sender as!UIButton
+                btn.selected = !btn.selected
+                btn.titleLabel?.font = btn.selected ? UIFont.systemFontOfSize(14) : UIFont.systemFontOfSize(17)
+                btn.titleEdgeInsets = btn.selected ? UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 8) : UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
                 return RACSignal.empty()
             })
+            //关注btn
+            /*followBtn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
+                QNNetworkTool.collectStores(self.storeId.integerValue,collect:!(sender as!UIButton).selected, completion: { (succeed, error, dictionary) -> Void in
+                    if succeed! {
+                        (sender as! UIButton).selected = !(sender as! UIButton).selected
+                        (sender as!UIButton).selected == true ? ZMDTool.showPromptView("关注成功") : ZMDTool.showPromptView("已取消关注")
+                    }else{
+                        (sender as!UIButton).selected == true ? ZMDTool.showPromptView("取消关注失败") : ZMDTool.showPromptView("关注失败")
+                    }
+                })
+                print("关注店铺\((sender as! UIButton).selected)")
+                return RACSignal.empty()
+            })*/
             return cell!
         case .Notice :
             let cellId = "NoticeCell"
@@ -126,21 +207,43 @@ class StoreShowHomeViewController: UIViewController, ZMDInterceptorProtocol,ZMDI
                 cell!.selectionStyle = .None
                 
                 ZMDTool.configTableViewCellDefault(cell!)
+                let icon = UIImageView(frame: CGRect(x: 11, y: 15, width: 16, height: 14))
+                icon.image = UIImage(named: "store_notice")
+                cell?.contentView.addSubview(icon)
+                
                 let lbl = ZMDTool.getLabel(CGRect(x: 36, y: 0, width: kScreenWidth-36-44, height: 46), text: "", fontSize: 14)
                 lbl.tag = 10001
                 cell?.contentView.addSubview(lbl)
+                
+                let detailLbl = ZMDTool.getLabel(CGRect(x: 36, y: 0, width: kScreenWidth-36-44, height: 60), text: "", fontSize: 14)
+                detailLbl.tag = 10002
+                cell?.contentView.addSubview(detailLbl)
+                detailLbl.numberOfLines = 0
+                detailLbl.hidden = true
+                if self.isNoticeDetail {
+                    lbl.hidden = true
+                    detailLbl.hidden = false
+                }
                 //下部弹窗
-                let downBtn = UIButton(frame: CGRect(x: kScreenWidth - 44, y: 0, width: 44, height: 46))
+                let downBtn = UIButton(frame: CGRect(x: kScreenWidth - 44, y: 0, width: 44, height: 45))
                 downBtn.backgroundColor = UIColor.whiteColor()
-                downBtn.setImage(UIImage(named: "home_down"), forState: .Normal)
-                downBtn.setImage(UIImage(named: "home_up"), forState: .Selected)
-                downBtn.rac_signalForControlEvents(.TouchUpInside).subscribeNext({ (sender) -> Void in
+                let imageName = self.isNoticeDetail ? "home_up" : "home_down"
+                downBtn.setImage(UIImage(named: imageName), forState: .Normal)
+                downBtn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
+                    (sender as!UIButton).selected = !(sender as!UIButton).selected
+                    
+                    self.isNoticeDetail = !self.isNoticeDetail
+                    self.currentTableView.reloadRowsAtIndexPaths([NSIndexPath(forRow: 1, inSection: 0)], withRowAnimation: UITableViewRowAnimation.None)
+                    return RACSignal.empty()
                 })
+
                 cell?.contentView.addSubview(downBtn)
-                cell?.contentView.addSubview(ZMDTool.getLine(CGRect(x: 0, y: 44.5, width: kScreenWidth, height: 0.5)))
             }
             let lbl = cell?.viewWithTag(10001) as! UILabel
-            lbl.text = "店铺公告："
+            lbl.text = "店铺公告:1、满2000减20,满1000免；垃圾上单；分类及案例；解放啦睡觉了；放假啦；数据的垃圾多死"
+            let detailLbl = cell?.viewWithTag(10002) as! UILabel
+            detailLbl.text = lbl.text
+            //通过detailLbl.text计算出自适应的高度，返回给一个全局变量，设置heightForRow
             return cell!
         case .Discount :
             //
@@ -176,6 +279,24 @@ class StoreShowHomeViewController: UIViewController, ZMDInterceptorProtocol,ZMDI
             let cellId = "DoubleGoodsCell"
             let cell = tableView.dequeueReusableCellWithIdentifier(cellId) as! DoubleGoodsTableViewCell
             cell.goodsImgVLeft.image = UIImage(named: "home_banner02")
+            cell.goodsImgVRight.image = UIImage(named: "home_banner04")
+            cell.selectionStyle = .None
+            let productL = self.productsArray[indexPath.row*2] as! ZMDProduct
+            if indexPath.section*2+1 <= self.productsArray.count-1 {
+                let productR = self.productsArray[indexPath.row*2 + 1] as! ZMDProduct
+                cell.rightBtn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
+                    self.pushDetailVC(productR)
+                    return RACSignal.empty()
+                })
+                DoubleGoodsTableViewCell.configCell(cell, product: productL, productR: productR)
+            }else{
+                DoubleGoodsTableViewCell.configCell(cell, product: productL, productR: nil)
+            }
+            
+            cell.leftBtn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
+                self.pushDetailVC(productL)
+                return RACSignal.empty()
+            })
             return cell
             
         default :
@@ -183,23 +304,77 @@ class StoreShowHomeViewController: UIViewController, ZMDInterceptorProtocol,ZMDI
         }
     }
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        
+
     }
+    
     //MARK: - UISearchBarDelegate
     func searchBarSearchButtonClicked(searchBar: UISearchBar)  {
         self.view.endEditing(true)
         let homeBuyListViewController = HomeBuyListViewController.CreateFromMainStoryboard() as! HomeBuyListViewController
-        self.navigationController?.pushViewController(homeBuyListViewController, animated: true)
+        homeBuyListViewController.isStore = true
+        homeBuyListViewController.hideSearch = true
+        homeBuyListViewController.storeId = self.storeId
+        homeBuyListViewController.titleForFilter = searchBar.text ?? ""
+        self.navigationController?.pushViewController(homeBuyListViewController, animated: false)
+        //移除灰色背景
+        self.view.viewWithTag(1000)?.removeFromSuperview()
     }
-    //MARK: - Action
-    @IBAction func goodsSortBtnCli(sender: UIButton) {
-        let vc = StoreShowGoodsSortViewController()
+    
+    func searchBarTextDidBeginEditing(searchBar: UISearchBar) {
+        let btn = UIButton(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: kScreenHeight))
+        self.view.addSubview(btn)
+        btn.tag = 1000
+        btn.backgroundColor = defaultGrayColor
+        btn.alpha = 0.2
+        btn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
+            //移除灰色背景btn
+            self.view.viewWithTag(1000)!.removeFromSuperview()
+            searchBar.resignFirstResponder()
+            return RACSignal.empty()
+        })
+    }
+
+    //MARK: IBAction
+    //进入购物车
+    @IBAction func enterShoppingCar(sender: UIButton) {
+        let vc = ShoppingCartViewController.CreateFromMainStoryboard() as! ShoppingCartViewController
         self.navigationController?.pushViewController(vc, animated: true)
     }
+    //店铺首页
+    @IBAction func storeHomeBtnCli(sender: UIButton) {
+        self.currentTableView.contentOffset = CGPoint(x: 0, y: 0)
+    }
+    //商品分类
+    @IBAction func goodsSortBtnCli(sender: UIButton) {
+        let vc = StoreShowGoodsSortViewController()
+        vc.storeId = self.storeId.integerValue
+        vc.categories = self.availableCategories//临时用
+        self.navigationController?.pushViewController(vc, animated: true)
+    }
+    //联系卖家
+    @IBAction func sellerBtnCli(sender: UIButton) {
+        self.commonAlertShow(true,title: "注意:", message: "卖家联系方式为:15377679415,是否现在联系?", preferredStyle: .Alert)
+    }
+    //MARK: - alertDestructiveAction重写
+    override func alertDestructiveAction() {
+        let phone = "15377679415"
+//        UIApplication.sharedApplication().openURL(NSURL(string: "tel://+\(phone)")!)  //method1
+         
+/*        //method2
+        let str = "tel:"+phone
+        let vc = MyWebViewController()
+        vc.webUrl = str
+        self.navigationController?.pushViewController(vc, animated: true)
+*/
+        let str = "telprompt://"+phone    //method3
+        UIApplication.sharedApplication().openURL(NSURL(string: str)!)
+    }
+    
     //MARK: -  PrivateMethod
     func setupNewNavigation() {
         let searchView = UIView(frame: CGRectMake(0, 0, kScreenWidth - 120, 44))
         let searchBar = UISearchBar(frame: CGRectMake(0, 4, kScreenWidth - 120, 36))
+        searchBar.tag = 1000
         searchBar.backgroundImage = UIImage.imageWithColor(UIColor.clearColor(), size: searchBar.bounds.size)
         searchBar.placeholder = "搜索店铺商品"
         searchBar.layer.borderColor = UIColor.grayColor().CGColor
@@ -210,7 +385,25 @@ class StoreShowHomeViewController: UIViewController, ZMDInterceptorProtocol,ZMDI
         searchView.addSubview(searchBar)
         self.navigationItem.titleView = searchView
     }
+    
     func dataInit() {
+        
+    }
+    
+    //MARK: requestData
+    func requestData() {
+        QNNetworkTool.fetchStoreHomePages(12, pageNumber: self.indexSkip, StoreId: self.storeId.integerValue, orderBy: 0, Q: "",isNew: false) { (store, products, categories, error, dictionary) -> Void in
+            if store != nil {
+                self.storeDetail = store
+            }
+            if let products = products {
+                self.productsArray.addObjectsFromArray(products as [AnyObject])
+            }
+            if let categories = categories {
+                self.availableCategories = categories
+            }
+            self.currentTableView.reloadData()
+        }
     }
     func scrollView(y:CGFloat,cell:UITableViewCell) {
         let scrollView = UIScrollView(frame: CGRect(x: 0, y:12, width: kScreenWidth, height: 60))
@@ -248,5 +441,11 @@ class StoreShowHomeViewController: UIViewController, ZMDInterceptorProtocol,ZMDI
         view.addSubview(detailLbl)
         return view
     }
-
+    
+    func pushDetailVC(product:ZMDProduct){
+        let vc = HomeBuyGoodsDetailViewController.CreateFromMainStoryboard() as! HomeBuyGoodsDetailViewController
+        vc.productId = product.Id.integerValue
+        vc.hidesBottomBarWhenPushed = true
+        self.navigationController?.pushViewController(vc, animated: true)
+    }
 }

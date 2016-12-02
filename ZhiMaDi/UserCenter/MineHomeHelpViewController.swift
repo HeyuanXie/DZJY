@@ -22,6 +22,7 @@ class MineHomeHelpViewController: UIViewController,UIActionSheetDelegate,UIImage
     var logisticsScoreRigthLbl : UILabel!
     var photos : NSMutableArray = NSMutableArray()
     
+    var isTabBarVC = true
     override func viewDidLoad() {
         super.viewDidLoad()
         self.updateUI()
@@ -45,8 +46,13 @@ class MineHomeHelpViewController: UIViewController,UIActionSheetDelegate,UIImage
             self.countLbl.text = "\(count - mulStr.length)"
         }
         checkText(200)
+        
+        let submitBtn = self.view.viewWithTag(1000) as!UIButton
+        submitBtn.backgroundColor = mulStr.length == 0 ? RGB(215,215,215,1) : defaultSelectColor
+        submitBtn.userInteractionEnabled = mulStr.length == 0 ? false : true
         return true
     }
+    
     //MARK: UIImagePickerControllerDelegate
     func imagePickerController(picker: UIImagePickerController, didFinishPickingImage image: UIImage!, editingInfo: [NSObject : AnyObject]!) {
         let size = CGSizeMake(image.size.width, image.size.height)
@@ -76,23 +82,23 @@ class MineHomeHelpViewController: UIViewController,UIActionSheetDelegate,UIImage
     }
     //MARK: -  PrivateMethod
     func updateUI() {
-        self.title = "意见反馈"
+        self.title = "帮助与反馈"
         self.picker.delegate = self
-        let headViewBg = UIView(frame: CGRect(x: 12, y: 15, width: kScreenWidth-24, height: 270))
+        let headViewBg = UIView(frame: CGRect(x: 12, y: 15, width: kScreenWidth-24, height: 250))
         headViewBg.backgroundColor = UIColor.whiteColor()
         ZMDTool.configViewLayer(headViewBg)
         ZMDTool.configViewLayerFrame(headViewBg)
         self.view.addSubview(headViewBg)
-        self.scoreTextField = ZMDTool.getTextField(CGRect(x: 16, y: 15, width: CGRectGetWidth(headViewBg.frame), height: 150), placeholder: "感谢您的宝贵意见", fontSize: 17)
+        self.scoreTextField = ZMDTool.getTextField(CGRect(x: 16, y: 15, width: CGRectGetWidth(headViewBg.frame), height: 130), placeholder: "感谢您的宝贵意见", fontSize: 17)
         self.scoreTextField.contentVerticalAlignment = .Top //方向
         self.scoreTextField.delegate = self
         headViewBg.addSubview(self.scoreTextField)
         
-        photoView = UIView(frame: CGRect(x: 0, y: 150, width: kScreenWidth-24, height: 116))
+        photoView = UIView(frame: CGRect(x: 0, y: 130, width: kScreenWidth-24, height: 116))
         photoView.backgroundColor = UIColor.clearColor()
         headViewBg.addSubview(photoView)
         
-        countLbl = ZMDTool.getLabel(CGRect(x: kScreenWidth-24-12-30, y: 270-12-15, width: 30, height: 15), text: "200", fontSize: 15,textColor: defaultDetailTextColor,textAlignment: .Right)
+        countLbl = ZMDTool.getLabel(CGRect(x: kScreenWidth-24-12-30, y: 250-12-15, width: 30, height: 15), text: "200", fontSize: 15,textColor: defaultDetailTextColor,textAlignment: .Right)
         headViewBg.addSubview(countLbl)
         self.configurePhotoBtn()
         
@@ -106,11 +112,25 @@ class MineHomeHelpViewController: UIViewController,UIActionSheetDelegate,UIImage
         self.contactTextField.backgroundColor = UIColor.clearColor()
         contactViewBg.addSubview(self.contactTextField)
         
-        let submitBtn = ZMDTool.getButton(CGRect(x: 12, y: CGRectGetMaxY(contactViewBg.frame) + 38 , width: kScreenWidth-24, height: 50), textForNormal: "提交", fontSize: 17,textColorForNormal: UIColor.whiteColor(), backgroundColor: RGB(215,215,215,1)) { (sender) -> Void in
+        let submitBtn = ZMDTool.getButton(CGRect(x: 12, y: CGRectGetMaxY(contactViewBg.frame) + 20 , width: kScreenWidth-24, height: 50), textForNormal: "提交", fontSize: 17,textColorForNormal: UIColor.whiteColor(), backgroundColor: RGB(215,215,215,1)) { (sender) -> Void in
+            //MARK: -提交意见
+            var message = " "
+            if let userName = g_customer?.FirstName {
+                message = "\"\(userName)\"您好,您的意见已提交成功!"
+                if let usrName = getObjectFromUserDefaults("nickName") as? String {
+                    message = "\"\(usrName)\"您好,您的意见已提交成功!"
+                }
+            }else{
+                message = "您的意见已提交成功,感谢您对我们的支持!"
+            }
+            self.commonAlertShow(false,title: "意见反馈", message: message, preferredStyle: UIAlertControllerStyle.Alert)
         }
+        submitBtn.tag = 1000
+        submitBtn.userInteractionEnabled = false
         ZMDTool.configViewLayerWithSize(submitBtn, size: 25)
         self.view.addSubview(submitBtn)
     }
+    
     func configurePhotoBtn(){
         for subView in self.photoView.subviews {
             subView.removeFromSuperview()
@@ -182,5 +202,9 @@ class MineHomeHelpViewController: UIViewController,UIActionSheetDelegate,UIImage
             self.pickBtn.frame = CGRectMake(8, 10, 75 , 75)
             self.pickBtn.hidden = false
         }
+    }
+    
+    override func alertCancelAction() {
+        self.back()
     }
 }

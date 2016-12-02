@@ -324,7 +324,8 @@ extension UIViewController {
             self.dismissPopupView(view)
             return RACSignal.empty()
         })
-        
+        //灰色背景btn的tag
+        bg.tag = 5000
         self.presentPopupViewForNav(bg,config: ZMDPopViewConfig())
         let config = ZMDPopViewConfig()
         config.dismissCompletion = { (view) ->Void in
@@ -333,5 +334,33 @@ extension UIViewController {
         config.showAnimation = showAnimation
         config.dismissAnimation = dismissAnimation
         self.presentPopupViewForNav(view,config: config)
+    }
+}
+
+//MARK:设置导航栏全透明
+extension UIViewController {
+    
+    /// NaviagtionBarTransparent
+    func navigationBartransparent(var superView:UIView) {
+        let navBackView : UIView!
+        var navLine : UIView!
+        let backString = SYSTEM_VERSION_FLOAT >= 10.0 ? "_UIBarBackground" : "_UINavigationBarBackground"
+        if superView.isKindOfClass(NSClassFromString(backString)!) {
+            for view in superView.subviews {
+                //移除分割线
+                if view.isKindOfClass(UIImageView.classForCoder()) {
+                    navLine = view
+                    navLine.hidden = true
+                }
+            }
+            navBackView = superView
+            navBackView.alpha = 0
+            navBackView.backgroundColor = navigationBackgroundColor
+        } else if superView.isKindOfClass(NSClassFromString("_UIBackdropView")!) {
+            superView.hidden = true
+        }
+        for view in superView.subviews {
+            self.navigationBartransparent(view)
+        }
     }
 }

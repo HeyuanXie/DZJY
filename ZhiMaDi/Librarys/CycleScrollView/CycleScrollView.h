@@ -19,6 +19,7 @@
 @property (assign,nonatomic) BOOL autoScroll;/**< 是否自动滚动播放图片,default is NO */
 @property (assign,nonatomic) float autoTime;/**< 滚动到下一张的间隔时间 */
 @property (assign,nonatomic) id<CycleScrollViewDelegate> delegate;
+@property (assign,nonatomic) BOOL isPageCenter;     /*< UIPageController是否位于中间位置 */
 
 //可选择的属性
 @property (nonatomic, strong) UIColor *pageControlCurrentPageIndicatorTintColor;/**< 当前页码颜色 */

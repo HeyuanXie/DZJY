@@ -173,6 +173,12 @@ extension ZMDTool: UIGestureRecognizerDelegate {
 }
 // MARK: - 页面切换相关
 extension ZMDTool {
+    ///隐藏底部自定义tabBar
+    class func hideBottomBarWhenPushed(hide:Bool = true) {
+        let app = UIApplication.sharedApplication().delegate as! AppDelegate
+        let tabBar = app.tabBar
+        tabBar.hyTabBarHidden(true, animated: true)
+    }
 
     /**
     转场动画过渡
@@ -217,8 +223,14 @@ extension ZMDTool {
         let vc = UIStoryboard(name: "Login", bundle: nil).instantiateInitialViewController()!
         ZMDTool.enterRootViewController(vc)
     }
+
     class func enterMyStoreViewController() {
         let vc = UIStoryboard(name: "Store", bundle: nil).instantiateInitialViewController()!
+        ZMDTool.enterRootViewController(vc)
+    }
+    
+    class func enterHomePageViewController() {
+        let vc = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController()!
         ZMDTool.enterRootViewController(vc)
     }
     
@@ -261,6 +273,17 @@ extension ZMDTool {
         textField.placeholder = placeholder
         return textField
     }
+    
+    class func getTextView(frame:CGRect,placeholder:String,fontSize:CGFloat,textColor:UIColor = defaultTextColor) -> UITextView {
+        let textView = UITextView(frame: frame)
+        textView.textColor = textColor
+        textView.font = defaultSysFontWithSize(fontSize)
+        let label = ZMDTool.getLabel(CGRect(x: 5, y: 5, width: frame.width, height: 20), text: placeholder, fontSize: fontSize, textColor: RGB(173,173,173,1.0), textAlignment: .Left)
+        textView.addSubview(label)
+        label.tag = 10000
+        return textView
+    }
+    
     class func getLabel(frame:CGRect,text:String,fontSize:CGFloat,textColor:UIColor = defaultTextColor,textAlignment : NSTextAlignment = .Left) -> UILabel {
         let label = UILabel(frame: frame)
         label.backgroundColor = UIColor.clearColor()
@@ -290,6 +313,7 @@ extension ZMDTool {
         }
         return btn
     }
+    
     class func getMutilButton (frame:CGRect,textForNormal:String,textColorForNormal:UIColor = defaultTextColor,textColorForSelect:UIColor = RGB(235,61,61,1.0),fontSize:CGFloat,backgroundColor:UIColor,blockForCli : ((AnyObject!) -> Void)!) -> UIButton{
         let btn = UIButton(frame: frame)
         btn.backgroundColor = backgroundColor
@@ -309,7 +333,12 @@ extension ZMDTool {
     class func getBtn (frame:CGRect) -> CustomBtn {
         return CustomBtn(frame: frame)
     }
+    //图文垂直btn
+    class func getVerticalBtn(frame:CGRect) -> CustomVerticalBtn {
+        return CustomVerticalBtn(frame: frame)
+    }
 }
+
 //自定义UIButton 用于图跟文字垂直
 class CustomBtn : UIButton {
     override func layoutSubviews() {
@@ -334,9 +363,33 @@ class CustomBtn : UIButton {
 // 图跟文字垂直
 class CustomVerticalBtn : UIButton {
     override func layoutSubviews() {
-        
+        let titleSize = self.titleLabel!.bounds.size
+        let imageSize = self.imageView!.bounds.size
+        let interval : CGFloat = 1.0
+        self.imageEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: titleSize.height+interval, right: -(titleSize.width+interval))
+        self.titleEdgeInsets = UIEdgeInsets(top: imageSize.height+interval, left: -(imageSize.width+interval), bottom: 0, right: 0)
     }
 }
+
+
+extension ZMDTool {
+    //画左下三角
+    class func drawLeftLowerTriangle(rect:CGRect) {
+        //设置背景色
+        UIColor.clearColor().set()
+        UIRectFill(rect)
+        let context = UIGraphicsGetCurrentContext()   //拿到当前画板
+        CGContextBeginPath(context)     //标记
+        CGContextMoveToPoint(context, rect.origin.x, rect.origin.y) //设置起点
+        CGContextAddLineToPoint(context, rect.origin.x+rect.size.width, rect.origin.y)
+        CGContextAddLineToPoint(context, rect.origin.x, rect.origin.y+rect.size.height)
+        CGContextClosePath(context)
+        RGB(253,124,76,1.0).setFill()   //设置填充色
+        UIColor.clearColor().setStroke()    //设置边框色
+        CGContextDrawPath(context, .FillStroke)
+    }
+}
+
 // test
 // map faltmap
 class ZMDHaijie {

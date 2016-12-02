@@ -50,3 +50,11 @@ func cleanAccount(){
     removeObjectAtUserDefaults(kKeyAccount)
 }
 
+func hideHYTabBar(hidden: Bool, animated: Bool, viewController: UIViewController?) {
+    let app = UIApplication.sharedApplication().delegate as! AppDelegate
+    if viewController != nil {
+        viewController!.hidesBottomBarWhenPushed = true
+    }
+    app.tabBar.hyTabBarHidden(hidden, animated: animated)
+}
+

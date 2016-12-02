@@ -77,7 +77,7 @@ class BankCardAuthenticationViewController: UIViewController,UITableViewDataSour
         let footV = UIView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 50))
         footV.backgroundColor = UIColor.clearColor()
         let footBtn = ZMDTool.getButton(CGRect(x: kScreenWidth - 12 - size.width, y: 15, width: size.width, height: 16), textForNormal: title, fontSize: 16, textColorForNormal: RGB(235,61,61,1.0), backgroundColor: UIColor.clearColor()) { (sender) -> Void in
-            
+            ZMDTool.showPromptView("添加银行卡未开放")
         }
         footV.addSubview(footBtn)
         let line = UIView(frame: CGRect(x: kScreenWidth - 12 - size.width, y: 31, width: size.width, height: 1))

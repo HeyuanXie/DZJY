@@ -16,9 +16,12 @@ class ZMDProduct: NSObject {
     var Sku  : String?                  // 商品货号
     var ShowSku : NSNumber?             //
     var Sold : String!                  // 已售
+    var DeliveryTimeName : String!      //配送时间
     var IsFreeShipping : NSNumber? = 0  // 免邮
     var ProductPrice : ZMDProductPrice?
     var DefaultPictureModel : ZMDPictureModel?
+
+    var Store : ZMDStoreDetail!
 
     override static func mj_objectClassInArray() -> [NSObject : AnyObject]! {
         return ["ProductPrice":ZMDProductPrice.classForCoder(),"DefaultPictureModel":ZMDPictureModel.classForCoder()]
@@ -31,7 +34,7 @@ class ZMDProductPrice : NSObject {
 }
 class ZMDPictureModel : NSObject {
     var PictureId : String! = ""
-    var ImageUrl : String? = ""         // 原价
+    var ImageUrl : String? = ""         
     var FullSizeImageUrl : String? = ""
 }
 class ZMDProductForOrderDetail: NSObject {

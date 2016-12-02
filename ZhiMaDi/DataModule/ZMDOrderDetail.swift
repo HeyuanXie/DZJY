@@ -35,3 +35,19 @@ class ZMDOrderDetailOrderItemsProduct: NSObject {
 class ZMDOrderDetailOrderItemsProductPictureId: NSObject {
     var PictureId : NSNumber!
 }
+
+//第二种方式请求   订单详情
+class ZMDOrderDetail2: NSObject {
+    var OrderNumber : String! //订单号
+    var OrderTotal : String! //"¥5,630.00"
+    var OrderStatus:String! //“待处理”
+    var OrderStatusId : NSNumber!   //0
+    var PaymentStatusId : NSNumber!     //0
+    var ShippingStatusId : NSNumber!    //0
+    var Store:ZMDStoreDetail!
+    var Order:ZMDOrder2!
+    
+    override static func mj_objectClassInArray() -> [NSObject : AnyObject]! {
+        return ["Store":ZMDStoreDetail.classForCoder(),"Order":ZMDOrder2.classForCoder()]
+    }
+}

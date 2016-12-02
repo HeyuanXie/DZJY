@@ -127,9 +127,15 @@ class CrowdfundDetailViewController: UIViewController,UITableViewDataSource,UITa
             case .ProjectExplain:
                 return self.projectExplainCellType[section].count
             default :
-                return 0
+                if section == 0{
+                    return 1
+                } else {
+                    //commentView
+                    return 3
+                }
             }
         }
+        //第一个table中除了回报section是两行，其他全是一行
         let cellType = self.cellTypes[section]
         switch cellType {
         case .ContentTypeReturn :
@@ -146,9 +152,10 @@ class CrowdfundDetailViewController: UIViewController,UITableViewDataSource,UITa
             case .ProjectExplain:
                 return self.projectExplainCellType.count
             default :
-                return 0
+                return 2
             }
         }
+        
         return self.cellTypes.count
     }
     func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
@@ -182,7 +189,8 @@ class CrowdfundDetailViewController: UIViewController,UITableViewDataSource,UITa
                 let projectCellType = self.projectExplainCellType[indexPath.section][indexPath.row]
                 return projectCellType.height
             default :
-                return 0
+                //60为nextMenu，140为commentView
+                return indexPath.section == 0 ? 60 : 140
             }
         }
         
@@ -196,15 +204,18 @@ class CrowdfundDetailViewController: UIViewController,UITableViewDataSource,UITa
     }
 
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        //第二个table
         if tableView == self.secondTableView {
             switch self.secondTableViewCellType {
             case .Supporter :
+                //支持者
                 if indexPath.section == 0 {
                     return cellForHomeNextMenu(tableView, indexPath: indexPath)
                 } else {
                     return cellSupportForSecond(tableView, indexPath: indexPath)
                 }
             case .ProjectExplain :
+                //项目说明
                 let projectCellType = self.projectExplainCellType[indexPath.section][indexPath.row]
                 switch projectCellType {
                 case .ContentTypeNextMenu :
@@ -216,10 +227,19 @@ class CrowdfundDetailViewController: UIViewController,UITableViewDataSource,UITa
                 default :
                     return cellProjectOtherForSecond(tableView, indexPath: indexPath)
                 }
+            case .ImageTextExplain :
+                //图文详情
+                if indexPath.section == 0 {
+                    return cellForHomeNextMenu(tableView, indexPath: indexPath)
+                } else {
+                    return cellImageTextForSecond(tableView, indexPath: indexPath)
+                }
             default :
-                return cellSupportForSecond(tableView, indexPath: indexPath)
+                break
             }
         }
+        
+        //第一个table
         let cellType = self.cellTypes[indexPath.section]
         switch cellType {
         case .ContentTypeAd :
@@ -229,9 +249,9 @@ class CrowdfundDetailViewController: UIViewController,UITableViewDataSource,UITa
         case .ontentTypeStore :
             return cellForHomeStore(tableView, indexPath: indexPath)
         case .ContentTypeLottery :
-            return cellForHomeDistribution(tableView, indexPath: indexPath)
+            return cellForHomeDistribution(tableView, indexPath: indexPath,isLottery: true)
         case .ContentTypeReturn :
-            return cellForHomeDistribution(tableView, indexPath: indexPath)
+            return cellForHomeDistribution(tableView, indexPath: indexPath,isLottery: false)
         case .ContentTypeNextMenu :
             return cellForHomeNextMenu(tableView, indexPath: indexPath)
         }
@@ -240,6 +260,7 @@ class CrowdfundDetailViewController: UIViewController,UITableViewDataSource,UITa
         let cellType = self.cellTypes[indexPath.section]
         switch cellType {
         case .ContentTypeReturn :
+            //回报
             let vc = CrowdfundReturnViewController()
             self.navigationController?.pushViewController(vc, animated: true)
         default :
@@ -250,8 +271,12 @@ class CrowdfundDetailViewController: UIViewController,UITableViewDataSource,UITa
     func qnShareView(view: ShareView) -> (image: UIImage, url: String, title: String?, description: String)? {
         return (UIImage(named: "Share_Icon")!, "http://www.baidu.com", self.title ?? "", "成为喜特用户，享有更多服务!")
     }
+    func present(alert: UIAlertController) -> Void {
+        self.presentViewController(alert, animated: false, completion: nil)
+    }
     //MARK: -  PrivateMethod
     //MARK: -  SecondTableView      cell
+    //支持者
     func cellSupportForSecond(tableView: UITableView,indexPath: NSIndexPath)-> UITableViewCell {
         let cellId = "SupportCell"
         var cell = tableView.dequeueReusableCellWithIdentifier(cellId)
@@ -273,6 +298,7 @@ class CrowdfundDetailViewController: UIViewController,UITableViewDataSource,UITa
         leftLbl.text = "1.0\n\(QNFormatTool.dateString02(NSDate()))"
         return cell!
     }
+    
     //MARK: - 工程进度
     func cellProjectScheduleForSecond(tableView: UITableView,indexPath: NSIndexPath)-> UITableViewCell {
         let cellId = "ScheduleCell"
@@ -293,7 +319,7 @@ class CrowdfundDetailViewController: UIViewController,UITableViewDataSource,UITa
             cell?.contentView.addSubview(reachLbl)
             cell?.contentView.addSubview(ZMDTool.getLine(CGRect(x: 0, y: 143.5, width: kScreenWidth, height: 0.5)))
             
-            let view = CircleScaleCustomView(frame: CGRect(x: kScreenWidth - 36 - 100, y: 25, width: 100, height: 100),percentage: 0.9)
+            let view = CircleScaleCustomView(frame: CGRect(x: kScreenWidth - 36 - 100, y: 25, width: 100, height: 100),percentage: 0.5)
             view.clipsToBounds = true
             view.backgroundColor = UIColor.clearColor()
             cell?.contentView.addSubview(view)
@@ -309,6 +335,7 @@ class CrowdfundDetailViewController: UIViewController,UITableViewDataSource,UITa
         
         return cell!
     }
+    //secondtable中的其他cell
     func cellProjectOtherForSecond(tableView: UITableView,indexPath: NSIndexPath)-> UITableViewCell {
         let cellId = "ScheduleCell"
         var cell = tableView.dequeueReusableCellWithIdentifier(cellId)
@@ -339,6 +366,7 @@ class CrowdfundDetailViewController: UIViewController,UITableViewDataSource,UITa
         cell?.textLabel?.text = title
         return cell!
     }
+    //风险说明cell
     func cellProjectExplainForSecond(tableView: UITableView,indexPath: NSIndexPath)-> UITableViewCell {
         let cellId = "ExplainCell"
         var cell = tableView.dequeueReusableCellWithIdentifier(cellId)
@@ -352,7 +380,9 @@ class CrowdfundDetailViewController: UIViewController,UITableViewDataSource,UITa
         cell?.detailTextLabel?.text = "内容"
         return cell!
     }
-    func cellForSecond(tableView: UITableView,indexPath: NSIndexPath)-> UITableViewCell {
+    
+    //图文详情commentView
+    func cellImageTextForSecond(tableView: UITableView,indexPath: NSIndexPath)-> UITableViewCell {
         let cellId = "testCell"
         var cell = tableView.dequeueReusableCellWithIdentifier(cellId)
         if cell == nil {
@@ -420,8 +450,8 @@ class CrowdfundDetailViewController: UIViewController,UITableViewDataSource,UITa
         }
         return cell!
     }
-    //MARK:
-    func cellForHomeDistribution(tableView: UITableView,indexPath: NSIndexPath)-> UITableViewCell {
+    //MARK:抽奖和回报cell(通过isLottery判断)
+    func cellForHomeDistribution(tableView: UITableView,indexPath: NSIndexPath,isLottery: Bool)-> UITableViewCell {
         let cellId = "DistributionCell"
         var cell = tableView.dequeueReusableCellWithIdentifier(cellId)
         if cell == nil {
@@ -432,8 +462,11 @@ class CrowdfundDetailViewController: UIViewController,UITableViewDataSource,UITa
             ZMDTool.configTableViewCellDefault(cell!)
         }
         cell?.textLabel?.textColor = RGB(66,221,210,1)
-        cell?.textLabel?.text = "1.0"
+        cell?.textLabel?.text = "¥1.0"
         let detailLbl = ZMDTool.getLabel(CGRect(x: kScreenWidth-38-200, y: 0, width: 200, height: 55), text: "抽奖", fontSize: 17, textColor: defaultDetailTextColor, textAlignment: .Right)
+        if !isLottery {
+            detailLbl.text = "回报\(indexPath.row+1)"
+        }
         cell!.contentView.addSubview(detailLbl)
         return cell!
     }
@@ -461,6 +494,7 @@ class CrowdfundDetailViewController: UIViewController,UITableViewDataSource,UITa
         }
         return cell!
     }
+    
     func createFilterMenu() -> UIView{
         let titles = ["图文详情","支持者","项目说明"]
         let view = UIView(frame: CGRectMake(0 , 0, kScreenWidth, 60))
@@ -474,7 +508,7 @@ class CrowdfundDetailViewController: UIViewController,UITableViewDataSource,UITa
             btn.titleLabel?.font = UIFont.systemFontOfSize(17)
             btn.tag = 1000 + i
             view.addSubview(btn)
-            
+            //点击btn时切换secondTable的cell类型
             btn.rac_signalForControlEvents(.TouchUpInside).subscribeNext({ (sender) -> Void in
                 let index = sender.tag - 1000
                 self.secondTableViewCellType = [SecondTableViewCellType.ImageTextExplain,.Supporter,.ProjectExplain][index]
@@ -493,7 +527,7 @@ class CrowdfundDetailViewController: UIViewController,UITableViewDataSource,UITa
     private func dataInit(){
         self.supportersData = [[""],[""],[""],[""]]
         self.projectExplainCellType = ProjectExplainCellType().projectCellType
-        self.cellTypes = [.ContentTypeAd,.ContentTypeDetail,.ontentTypeStore,.ContentTypeLottery,.ContentTypeReturn]
+        self.cellTypes = [.ContentTypeAd,.ContentTypeDetail,.ontentTypeStore,.ContentTypeLottery,.ContentTypeReturn,.ContentTypeNextMenu]
     }
     func footerRefresh(){
         UIView.animateWithDuration(0.38, animations: { () -> Void in
@@ -523,11 +557,14 @@ class CrowdfundDetailViewController: UIViewController,UITableViewDataSource,UITa
         collectBtn.setImage(UIImage(named: "product_collect_03"), forState: .Normal)
         collectBtn.setImage(UIImage(named: "product_collect_04"), forState: .Selected)
         collectBtn.rac_signalForControlEvents(.TouchUpInside).subscribeNext { (sender) -> Void in
+            //众筹的收藏
         }
         rightView.addSubview(collectBtn)
         let shareBtn = UIButton(frame: CGRect(x: 22 + 14, y: 0, width: 22, height: 22))
         shareBtn.setImage(UIImage(named: "product_share_02"), forState: .Normal)
         shareBtn.rac_signalForControlEvents(.TouchUpInside).subscribeNext { (sender) -> Void in
+            //众筹分享
+            
         }
         rightView.addSubview(shareBtn)
         
@@ -554,6 +591,7 @@ class CrowdfundDetailViewController: UIViewController,UITableViewDataSource,UITa
         self.configSecondTableView()
         self.configeBottomView()
     }
+    
     func configSecondTableView() {
         // 顶部刷新
         let header = MJRefreshNormalHeader()
@@ -565,15 +603,18 @@ class CrowdfundDetailViewController: UIViewController,UITableViewDataSource,UITa
         self.view.addSubview(secondTableView)
         self.secondTableView.mj_header = header
     }
+    
     func configeBottomView() {
         self.bottomV = UIView(frame: CGRect(x: 0, y: kScreenHeight - 64 - 56, width: kScreenWidth, height: 56))
         self.bottomV.backgroundColor = RGB(247,247,247,1)
         self.view.addSubview(self.bottomV)
         let consultationBtn = ZMDTool.getButton(CGRect(x: 0, y: 0, width: 100, height: 56), textForNormal: "咨询", fontSize: 17, backgroundColor: UIColor.clearColor()) { (sender) -> Void in
+            //咨询
         }
         consultationBtn.setImage(UIImage(named: "product_chat"), forState: .Normal)
         self.bottomV.addSubview(consultationBtn)
         let supportBtn = ZMDTool.getButton(CGRect(x: kScreenWidth - 110-12, y: 10, width: 110, height: 36), textForNormal: "去支持", fontSize: 17,textColorForNormal:UIColor.whiteColor(), backgroundColor: RGB(66,221,211,1)) { (sender) -> Void in
+            //支持
         }
         ZMDTool.configViewLayerWithSize(supportBtn, size: 18)
         self.bottomV.addSubview(supportBtn)

@@ -10,7 +10,7 @@ import UIKit
 import TYAttributedLabel
 import MJRefresh
 //租赁详请
-class HomeLeaseDetailViewController:UIViewController,UITableViewDataSource,UITableViewDelegate,ZMDInterceptorProtocol,ZMDInterceptorNavigationBarShowProtocol,QNShareViewDelegate {
+class HomeLeaseDetailViewController:UIViewController,UITableViewDataSource,UITableViewDelegate,ZMDInterceptorProtocol,ZMDInterceptorNavigationBarShowProtocol,QNShareViewDelegate,LeasePackageViewDelegate {
     enum GoodsCellType{
         case HomeContentTypeAd                      /* 广告显示页 */
         case HomeContentTypeDetail                   /* 菜单参数栏目 */
@@ -23,6 +23,15 @@ class HomeLeaseDetailViewController:UIViewController,UITableViewDataSource,UITab
         }
     }
     
+    enum SecondTableCellType{
+        case TypeImageText
+        case TypeRemark
+        case TypeReccomend
+        init(){
+            self = TypeImageText
+        }
+    }
+    
     @IBOutlet weak var currentTableView: UITableView!
     var secondTableView: UITableView!
     var countForBounghtLbl : UIButton!               // 购买数量Lbl
@@ -30,6 +39,7 @@ class HomeLeaseDetailViewController:UIViewController,UITableViewDataSource,UITab
     
     var countForBounght = 0                         // 购买数量
     var goodsCellTypes: [GoodsCellType]!
+    var secondCellType = SecondTableCellType.TypeImageText
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -89,7 +99,7 @@ class HomeLeaseDetailViewController:UIViewController,UITableViewDataSource,UITab
     }
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
         if tableView == self.secondTableView {
-            return 325
+            return indexPath.section == 0 ? 60 : 325
         }
         
         let cellType = self.goodsCellTypes[indexPath.section]
@@ -111,7 +121,19 @@ class HomeLeaseDetailViewController:UIViewController,UITableViewDataSource,UITab
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         if tableView == self.secondTableView {
-            return cellForSecond(tableView, indexPath: indexPath)
+            switch secondCellType{
+            case .TypeImageText:
+                break
+            case .TypeRemark:
+                break
+            default:
+                break
+            }
+            if indexPath.section == 0 {
+                return cellForHomeNextMenu(tableView, indexPath: indexPath)
+            } else {
+                return cellForSecond(tableView, indexPath: indexPath)
+            }
         }
         
         let cellType = self.goodsCellTypes[indexPath.section]
@@ -135,6 +157,7 @@ class HomeLeaseDetailViewController:UIViewController,UITableViewDataSource,UITab
         switch cellType {
         case .HomeContentTypePackage :
             self.packageViewShow()
+            
             break
         default :
             break
@@ -144,8 +167,17 @@ class HomeLeaseDetailViewController:UIViewController,UITableViewDataSource,UITab
     func qnShareView(view: ShareView) -> (image: UIImage, url: String, title: String?, description: String)? {
         return (UIImage(named: "Share_Icon")!, "http://www.baidu.com", self.title ?? "", "成为喜特用户，享有更多服务!")
     }
+    func present(alert: UIAlertController) -> Void {
+        self.presentViewController(alert, animated: false, completion: nil)
+    }
+    //MARK: LeasePackageViewDelegate
+    func removeBackgroundBtn() {
+        //拿到灰色背景btn
+        let btn = self.navigationController?.view.viewWithTag(5000) as! UIButton
+        self.dismissPopupView(btn)
+    }
     //MARK: -  PrivateMethod
-    //MARK: 广告 cell
+    //MARK:
     func cellForSecond(tableView: UITableView,indexPath: NSIndexPath)-> UITableViewCell {
         let cellId = "testCell"
         var cell = tableView.dequeueReusableCellWithIdentifier(cellId)
@@ -211,6 +243,7 @@ class HomeLeaseDetailViewController:UIViewController,UITableViewDataSource,UITab
             
             let sizeTmp = "已选 套餐A/半年/1件".sizeWithFont(defaultSysFontWithSize(16), maxWidth: 300)
             let selectLbl = UILabel(frame: CGRect(x: kScreenWidth - (sizeTmp.width + 38) , y: 0, width: sizeTmp.width, height: 60))
+            selectLbl.tag = 200
             selectLbl.font = defaultSysFontWithSize(16)
             selectLbl.textAlignment = .Center
             selectLbl.text = "已选 套餐A/半年/1件"
@@ -335,8 +368,9 @@ class HomeLeaseDetailViewController:UIViewController,UITableViewDataSource,UITab
             cell = UITableViewCell(style: .Default, reuseIdentifier: cellId)
             cell!.selectionStyle = .None
             cell!.contentView.backgroundColor = UIColor.whiteColor()
+            
+            cell?.addSubview(self.createFilterMenu())
         }
-        cell?.addSubview(self.createFilterMenu())
         return cell!
     }
     func createFilterMenu() -> UIView{
@@ -411,7 +445,7 @@ class HomeLeaseDetailViewController:UIViewController,UITableViewDataSource,UITab
         var i = 0
         let colorsBg = [UIColor.clearColor(),UIColor.clearColor(),RGB(232,61,60,1)]
         for title in titles {
-            let bottomBtn = UIButton(frame: CGRect(x: kScreenWidth/3 * CGFloat(i) + 18, y: 12, width: kScreenWidth/3 - 36, height: 34))
+            let bottomBtn = UIButton(frame: CGRect(x: kScreenWidth/3 * CGFloat(i), y: 12, width: (kScreenWidth - 36)/3, height: 34))
             bottomBtn.setTitle(title, forState: .Normal)
             bottomBtn.titleLabel?.font = defaultSysFontWithSize(17)
             bottomBtn.backgroundColor = colorsBg[i]
@@ -429,9 +463,11 @@ class HomeLeaseDetailViewController:UIViewController,UITableViewDataSource,UITab
             bottomBtn.rac_signalForControlEvents(.TouchUpInside).subscribeNext({ [weak self](sender) -> Void in
                 if let StrongSelf = self {
                     if (sender as! UIButton).titleLabel!.text == titles[0] {
+                        //咨询
                     } else if (sender as! UIButton).titleLabel?.text == titles[1] {
                         StrongSelf.contractViewShow()
                     } else if (sender as! UIButton).titleLabel?.text == titles[2] {
+                        //租赁
                     }
                 }
                 })
@@ -460,6 +496,15 @@ class HomeLeaseDetailViewController:UIViewController,UITableViewDataSource,UITab
     }
     func packageViewShow() {
         let contractView = LeasePackageView.leasePackageView()
+        contractView.delegate = self
+        contractView.finished = {(package:String, term:String, count:Int) -> Void in
+            let cell = self.currentTableView.cellForRowAtIndexPath(NSIndexPath(forRow: 0, inSection: 2))
+            let label = cell?.viewWithTag(200) as! UILabel
+            
+            label.text = "已选 \(package)/\(term)/\(count)件"
+            let sizeTmp = label.text!.sizeWithFont(defaultSysFontWithSize(16), maxWidth: 300)
+            label.frame = CGRect(x: kScreenWidth - (sizeTmp.width + 38) , y: 0, width: sizeTmp.width, height: 60)
+        }
         contractView.frame = CGRect(x: 86, y: 0, width: kScreenWidth - 86, height: kScreenHeight)
         self.viewShowWithBgForNav(contractView,showAnimation: .SlideInFromRight,dismissAnimation: .SlideOutToRight)
     }

@@ -72,6 +72,7 @@ extension String{
         }
         return attText
     }
+    
     func AttributedStringWithImage(image:UIImage,size:CGSize) -> NSAttributedString{
         let attch = NSTextAttachment()
         attch.image = image

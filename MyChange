@@ -1,0 +1,41 @@
+
+
+#######
+Did
+#######
+1. LoginViewController.swift中：
+    (1) 输入合法性判断，对于textField第一响应者改变
+2. QNNetworkTool:
+    (1) 未登录时查看购物车crash，应该跳转到登陆页面(*****此时登陆成功要直接进入购物车页面)
+    (2) 验证码登陆，获取按钮时间不显示，reason:获取手机验证码，判断是否成功时，服务器返回的dict中key为success，不是Success
+3. LoginWithCodeViewController:
+    (1) 输入框placeHolder修改，以及手机号验证时对应提示修改
+4. HomeBuyListViewController:
+    (1) 点击rightBarItem，进入搜索页面
+5. HomeBuyGoodsSearchViewController:
+    (1) 点击气泡，传递titleForFilter到HomeBuyListViewController，更新UI
+    (2) 点击历史记录，跳转到商品列表页面
+6. HomePageViewController:
+    (1) 头部菜单ScrollView
+
+
+#######
+Will
+#######
+1. 在iPhone4.0上注册页和找回密码页键盘弹起
+***2. 在HomeBuyGoodsSearchViewController中，点击热搜上的btn，进入HomeBuyListViewController
+***3. HomeBuyGoodsSearchViewController中的搜索历史（单个清除，全部清除）
+4. 商品列表页面，商品收藏
+5. 商品列表页面，横竖排切换时Menu的状态
+6. 点击menu时，不用重新createMenu,直接改变btn的selected，然后reloadData
+7. GoodsDetailVC中，rightItem收藏按钮 接口：
+    carttype:1 添加购物车    carttype:2 收藏
+8. 我的卡券 -> 批量管理
+9. home..DetailVC 给self.isCollected 添加观察，实时改变导航栏
+
+图像上传、第三方登录、支付
+
+#######
+unknown
+#######
+homeBuyGoodsDetailVC -> datainit -> fetchCollects

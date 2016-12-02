@@ -9,6 +9,7 @@
 import UIKit
 
 extension UITableView {
+    //添加尾部视图
     func addFootBtn(btnText : String,blockForCli : ((AnyObject!) -> Void)!) {
         let footView = UIView(frame: CGRectMake(0, 0, kScreenWidth, 110))
         footView.backgroundColor = UIColor.clearColor()
@@ -17,4 +18,29 @@ extension UITableView {
         footView.addSubview(btn)
         self.tableFooterView = footView
     }
+}
+
+extension UITableViewCell {
+    /**cell添加分割线*/
+    func addLine(hiddenLine isHidden:Bool = false,leftOffset:CGFloat = 0,rightOffset : CGFloat = 0) {
+        var customLine = self.viewWithTag(100011)
+        if customLine == nil {
+            let line = ZMDTool.getLine(CGRect.zero)
+            line.tag = 100011
+            self.contentView.addSubview(line)
+            line.snp_makeConstraints(closure: { (make) -> Void in
+                if rightOffset == 0 {
+                    make.width.equalTo(kScreenWidth - leftOffset)
+                } else {
+                    make.right.equalTo(self.contentView).offset(rightOffset)
+                }
+                make.bottom.equalTo(self.contentView).offset(0)
+                make.height.equalTo(0.5)
+                make.left.equalTo(leftOffset)
+            })
+            customLine = line
+        }
+        customLine!.hidden = isHidden
+    }
+
 }

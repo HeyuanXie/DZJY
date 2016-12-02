@@ -64,6 +64,8 @@ class ResisterViewController: UIViewController, UITextFieldDelegate,ZMDIntercept
     
     //MARK: - PrivateMethod
     func updateUI() {
+        //默认统一协议
+        self.agreeBtn.selected = true
         // 进一步配置账号和密码输入UI
         let TmpV1 = UIImageView(frame: CGRectMake(10, 0, 12, 20))
         self.accountTextField.leftViewMode =  UITextFieldViewMode.Always

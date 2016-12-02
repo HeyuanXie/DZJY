@@ -126,11 +126,12 @@ class CrowdfundReturnViewController: UIViewController,UITableViewDataSource,UITa
                 cell?.accessoryType = UITableViewCellAccessoryType.None
                 cell!.selectionStyle = .None
                 ZMDTool.configTableViewCellDefault(cell!)
+                
+                let lbl =  ZMDTool.getLabel(CGRect(x: 12, y: 20, width: 200, height: 17), text: "备注：", fontSize: 17)
+                cell?.contentView.addSubview(lbl)
+                markTextField = ZMDTool.getTextField(CGRect(x: 12, y: CGRectGetMaxY(lbl.frame)+6, width: kScreenWidth-12, height: 60), placeholder: "给项目人发起留言", fontSize: 17)
+                cell?.contentView.addSubview(markTextField)
             }
-            let lbl =  ZMDTool.getLabel(CGRect(x: 12, y: 20, width: 200, height: 17), text: "备注：", fontSize: 17)
-            cell?.contentView.addSubview(lbl)
-            markTextField = ZMDTool.getTextField(CGRect(x: 12, y: CGRectGetMaxY(lbl.frame)+6, width: kScreenWidth-12, height: 60), placeholder: "给项目人发起留言", fontSize: 17)
-            cell?.contentView.addSubview(markTextField)
             return cell!
         case .Address :
             let cellId = "AddressCell"
@@ -140,10 +141,11 @@ class CrowdfundReturnViewController: UIViewController,UITableViewDataSource,UITa
                 cell?.accessoryType = UITableViewCellAccessoryType.DisclosureIndicator
                 cell!.selectionStyle = .None
                 ZMDTool.configTableViewCellDefault(cell!)
+                
+                cell?.imageView?.image = UIImage(named: "pay_select_adress")
+                let numLbl = ZMDTool.getLabel(CGRect(x: 46, y: 0, width: 300, height: 55), text: "选择收获地址", fontSize: 17)
+                cell?.contentView.addSubview(numLbl)
             }
-            cell?.imageView?.image = UIImage(named: "pay_select_adress")
-            let numLbl = ZMDTool.getLabel(CGRect(x: 46, y: 0, width: 300, height: 55), text: "选择收获地址", fontSize: 17)
-            cell?.contentView.addSubview(numLbl)
             return cell!
         default :
             let cellId = "OtherCell"
@@ -179,6 +181,9 @@ class CrowdfundReturnViewController: UIViewController,UITableViewDataSource,UITa
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         let cellType = self.celltypes[indexPath.section][indexPath.row]
         switch cellType{
+        case .Return :
+            //选择收货地址
+            break
         default:
             break
         }

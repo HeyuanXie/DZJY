@@ -106,6 +106,13 @@ class ZMDInterceptor : NSObject {
                             IQKeyboardManager.sharedManager().disabledInViewControllerClasses()
                         }
                         
+                        // 设置tabBar隐藏
+                        if viewController is HomePageViewController || viewController is SortViewController2 || viewController is ShoppingCartViewController || viewController is MineHomeViewController {
+                            APP_DELEGATE.tabBar.hyTabBarHidden(false, animated: true)
+                        }else{
+                            APP_DELEGATE.tabBar.hyTabBarHidden(true, animated: true)
+                        }
+        
                         // 修改导航栏&状态栏的样式
                         viewController.navigationController?.navigationBar.translucent = false // 关闭透明度效果
 //                        UIApplication.sharedApplication().statusBarHidden = false
@@ -113,7 +120,8 @@ class ZMDInterceptor : NSObject {
                         if viewController is HomePageViewController {
                             UIApplication.sharedApplication().statusBarStyle = .Default
                             //填充色
-                            viewController.navigationController?.navigationBar.barTintColor = UIColor(red: 14/255, green: 48/255, blue: 141/255, alpha: 1.0)
+//                            viewController.navigationController?.navigationBar.barTintColor = UIColor(red: 14/255, green: 48/255, blue: 141/255, alpha: 1.0)    //蓝色
+                            viewController.navigationController?.navigationBar.barTintColor = UIColor.blackColor()  //黑色
                         } else {
                             // 设置统一的背景色
                             viewController.view.backgroundColor = UIColor.whiteColor()

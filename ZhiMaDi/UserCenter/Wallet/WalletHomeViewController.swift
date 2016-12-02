@@ -54,6 +54,7 @@ class WalletHomeViewController: UIViewController,UITableViewDataSource, UITableV
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         switch indexPath.section {
         case 0 :
+            //账户余额、查看账单
             let cellId = "headCell"
             var cell = tableView.dequeueReusableCellWithIdentifier(cellId)
             if cell == nil {
@@ -65,6 +66,7 @@ class WalletHomeViewController: UIViewController,UITableViewDataSource, UITableV
             }
             return cell!
         case 1 :
+            //充值、提现
             let cellId = "rechargeCell"
             var cell = tableView.dequeueReusableCellWithIdentifier(cellId)
             if cell == nil {
@@ -77,15 +79,16 @@ class WalletHomeViewController: UIViewController,UITableViewDataSource, UITableV
             let caseBtn = cell?.viewWithTag(10001) as! UIButton
             let rechargeBtn = cell?.viewWithTag(10002) as! UIButton
             caseBtn.rac_signalForControlEvents(.TouchUpInside).subscribeNext({ (sender) -> Void in
-                let vc = WalletCaseViewController()
+                let vc = WalletRechargeViewController()
                 self.navigationController?.pushViewController(vc, animated: true)
             })
             rechargeBtn.rac_signalForControlEvents(.TouchUpInside).subscribeNext({ (sender) -> Void in
-                let vc = WalletRechargeViewController()
+                let vc = WalletCaseViewController()
                 self.navigationController?.pushViewController(vc, animated: true)
             })
             return cell!
         case 2 :
+            //收入
             let cellId = "frozeCell"
             var cell = tableView.dequeueReusableCellWithIdentifier(cellId)
             if cell == nil {
@@ -97,6 +100,7 @@ class WalletHomeViewController: UIViewController,UITableViewDataSource, UITableV
             }
             return cell!
         default :
+            
             let cellId = "cell"
             var cell = tableView.dequeueReusableCellWithIdentifier(cellId)
             if cell == nil {

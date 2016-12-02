@@ -13,10 +13,17 @@ class AddressEditOrAddViewController: UIViewController,UITableViewDataSource,UIT
     var usrNameTextFidld : UITextField!,phoneTextFidld : UITextField!,codeTextFidld : UITextField!,addressTextFidld : UITextField!
     var areaLbl : UILabel! // 所在地区
     var swithBtn : UISwitch!
-    var isAdd : Bool = true
-    let titles = ["收件人 : ","手机号码 : ","所在地区 : ","邮政编码 : ","街道地址 : ","设为默认地址 : "]
+    var isAdd : Bool = true //默认为添加地址
+    let titles = ["收件人 : ","手机号码 : ","收货地址 : "/*,"邮政编码 : "*/,"详细地址 : ","设为默认地址 : "]
+
+    let titles2 = ["选择配送方式:","快递送货上门","收件人 : ","手机号码 : ","收货地址 : ","邮政编码 : ","详细地址 : ","设为默认地址 : "]
+    let titles3 = ["选择配送方式:","快递送货上门","收件人 : ","手机号码 : ","选择区域 : ","邮政编码 : ","选择网点 : ","设为默认地址 : "]
     var addressId = ""
     var address : ZMDAddress!
+    
+    var isToHome : Bool = true
+    var peiSongView :UIView!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.subViewInit()
@@ -35,7 +42,17 @@ class AddressEditOrAddViewController: UIViewController,UITableViewDataSource,UIT
         return titles.count
     }
     func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 1
+        /* 农资if section == 2 {
+            return 10
+        } else {
+            return 1
+        }*/
+        //农产品
+        if section == 0 {
+            return 10
+        }else{
+            return 1
+        }
     }
     func tableView(tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         return 0
@@ -43,10 +60,51 @@ class AddressEditOrAddViewController: UIViewController,UITableViewDataSource,UIT
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
         return 56
     }
-    
+    func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        if section == 2 {
+            let view = UIView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 10))
+            return view
+        }else{
+            return nil
+        }
+    }
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        switch indexPath.section {
-        case 0 :
+        let title = self.titles[indexPath.section]
+        switch title {
+        case "选择配送方式:" :
+            let cellId = "cell\(indexPath.section)"
+            var cell = tableView.dequeueReusableCellWithIdentifier(cellId)
+            if cell == nil {
+                cell = UITableViewCell(style: .Subtitle, reuseIdentifier: cellId)
+                cell?.accessoryType = UITableViewCellAccessoryType.None
+                cell!.selectionStyle = .None
+                cell?.backgroundColor = tableViewdefaultBackgroundColor
+            }
+            cell?.textLabel?.text = self.titles[indexPath.section]
+            cell?.textLabel?.textColor = UIColor.darkGrayColor()
+            return cell!
+        case "快递送货上门" :
+            let cellId = "cell\(indexPath.section)"
+            var cell = tableView.dequeueReusableCellWithIdentifier(cellId)
+            if cell == nil {
+                cell = UITableViewCell(style: .Subtitle, reuseIdentifier: cellId)
+                cell?.accessoryType = UITableViewCellAccessoryType.None
+                cell!.selectionStyle = .None
+                
+                ZMDTool.configTableViewCellDefault(cell!)
+            }
+            cell?.textLabel?.text = self.isToHome ? "快递送货上门" : "网点代收"
+            let btn = UIButton(frame: CGRect(x: kScreenWidth-40, y: 8, width: 40, height: 40))
+            btn.setImage(UIImage(named: "btn_Arrow_TurnDown1@2x"), forState: .Normal)
+            cell?.contentView.addSubview(btn)
+            btn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
+                //选择配送方式
+                self.createPeiSongView()
+                self.viewShowWithBg(self.peiSongView, showAnimation: ZMDPopupShowAnimation.SlideInFromTop, dismissAnimation: ZMDPopupDismissAnimation.SlideOutToTop)
+                return RACSignal.empty()
+            })
+            return cell!
+        case  "收件人 : ":
             let cellId = "cell\(indexPath.section)"
             var cell = tableView.dequeueReusableCellWithIdentifier(cellId)
             if cell == nil {
@@ -67,7 +125,7 @@ class AddressEditOrAddViewController: UIViewController,UITableViewDataSource,UIT
                 self.usrNameTextFidld.text = self.address.FirstName
             }
             return cell!
-        case 1 :
+        case "手机号码 : " :
             let cellId = "cell\(indexPath.section)"
             var cell = tableView.dequeueReusableCellWithIdentifier(cellId)
             if cell == nil {
@@ -88,7 +146,8 @@ class AddressEditOrAddViewController: UIViewController,UITableViewDataSource,UIT
                 self.phoneTextFidld.text = self.address.PhoneNumber
             }
             return cell!
-        case 2 :
+        case "收货地址 : ":
+            //收货地址（选择区域）
             let cellId = "cell\(indexPath.section)"
             var cell = tableView.dequeueReusableCellWithIdentifier(cellId)
             if cell == nil {
@@ -99,16 +158,21 @@ class AddressEditOrAddViewController: UIViewController,UITableViewDataSource,UIT
                 ZMDTool.configTableViewCellDefault(cell!)
             }
             cell?.textLabel?.text = self.titles[indexPath.section]
+//            cell?.textLabel?.text = self.isToHome ? "选择地址" : "选择区域"   //农资
+            
             let size = self.titles[indexPath.section].sizeWithFont(defaultSysFontWithSize(17), maxWidth: 320)
             if self.areaLbl == nil {
                 self.areaLbl = ZMDTool.getLabel( CGRect(x: 20 + size.width, y: 0, width: kScreenWidth - 20 - size.width - 12, height: 56), text: "", fontSize: 17)
+                areaLbl.text  = "省/市/区"
+                areaLbl.textColor = UIColor.lightGrayColor()
                 cell?.contentView.addSubview(self.areaLbl)
             }
             if self.address != nil {
                 self.areaLbl.text = self.address.Address1
             }
             return cell!
-        case 3 :
+        case "邮政编码 : " :
+            //邮政编码
             let cellId = "cell\(indexPath.section)"
             var cell = tableView.dequeueReusableCellWithIdentifier(cellId)
             if cell == nil {
@@ -129,7 +193,8 @@ class AddressEditOrAddViewController: UIViewController,UITableViewDataSource,UIT
                 self.codeTextFidld.text = self.address.FaxNumber ?? ""
             }
             return cell!
-        case 4 :
+        case "详细地址 : " :
+            //详细地址(选择网点)
             let cellId = "cell\(indexPath.section)"
             var cell = tableView.dequeueReusableCellWithIdentifier(cellId)
             if cell == nil {
@@ -140,17 +205,19 @@ class AddressEditOrAddViewController: UIViewController,UITableViewDataSource,UIT
                 ZMDTool.configTableViewCellDefault(cell!)
             }
             cell?.textLabel?.text = self.titles[indexPath.section]
+//            cell?.textLabel?.text = self.isToHome ? "详细地址" : "选择网点"   //农资
             let size = self.titles[indexPath.section].sizeWithFont(defaultSysFontWithSize(17), maxWidth: 320)
             if self.addressTextFidld == nil {
                 self.addressTextFidld = UITextField(frame: CGRect(x: 20 + size.width, y: 0, width: kScreenWidth - 20 - size.width - 12, height: 56))
                 self.addressTextFidld.font = defaultSysFontWithSize(17)
                 cell?.contentView.addSubview(self.addressTextFidld)
             }
+            self.addressTextFidld.placeholder = self.isToHome ? " " : "请选择代收网点"
             if self.address != nil {
                 self.addressTextFidld.text = self.address.Address2 ?? ""
             }
             return cell!
-        case 5 :
+        case "设为默认地址 : " :
             let cellId = "cell\(indexPath.section)"
             var cell = tableView.dequeueReusableCellWithIdentifier(cellId)
             if cell == nil {
@@ -177,7 +244,10 @@ class AddressEditOrAddViewController: UIViewController,UITableViewDataSource,UIT
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        if self.titles[indexPath.section] == "所在地区 : " {
+        let cell = tableView.cellForRowAtIndexPath(indexPath)
+        if cell?.reuseIdentifier == "cell\(2)" {
+//        if self.titles[indexPath.section] == "所在地区 : " {
+            self.view.endEditing(true)
             let areaView = ZMDAreaView(frame: CGRect(x: 0, y: kScreenHeight-400, width: kScreenWidth, height: 400))
             areaView.finished = { (address,addressId) ->Void in
                 self.areaLbl.text = address
@@ -190,9 +260,12 @@ class AddressEditOrAddViewController: UIViewController,UITableViewDataSource,UIT
     //MARK:- Private Method
     private func subViewInit(){
         if self.isAdd {
+            self.title = "添加收货地址"
+        } else {
             self.title = "编辑收货地址"
         }
         self.currentTableView = UITableView(frame: self.view.bounds)
+        self.currentTableView.frame = CGRect(x: 0, y: 0, width: kScreenWidth, height: kScreenHeight - 64)
         self.currentTableView.backgroundColor = tableViewdefaultBackgroundColor
         self.currentTableView.separatorStyle = .None
         self.currentTableView.dataSource = self
@@ -208,6 +281,7 @@ class AddressEditOrAddViewController: UIViewController,UITableViewDataSource,UIT
         fotView.addSubview(saveBtn)
         self.currentTableView.tableFooterView = fotView
     }
+    
     private func checkData() -> Bool {
         if usrNameTextFidld.text == nil || usrNameTextFidld.text == "" {
             ZMDTool.showPromptView("请输入姓名")
@@ -218,7 +292,8 @@ class AddressEditOrAddViewController: UIViewController,UITableViewDataSource,UIT
         } else if !phoneTextFidld.text!.checkStingIsPhoneNum() {
             ZMDTool.showPromptView("请输入有效手机号")
             return false
-        }  else if areaLbl.text == nil || areaLbl.text == "" {
+        }  else if areaLbl.text == nil || areaLbl.text == "省/市/区" || areaLbl.text == "" {
+            //nil和“省/市/区”以及 “”都是没有选择地区
             ZMDTool.showPromptView("请选择所在地区")
             return false
         } else if addressTextFidld.text == nil || addressTextFidld.text == "" {
@@ -227,6 +302,7 @@ class AddressEditOrAddViewController: UIViewController,UITableViewDataSource,UIT
         }
         return true
     }
+    
     func updateAddress() -> ZMDAddress{
         let address = self.isAdd ? ZMDAddress() : self.address
         address.FirstName = usrNameTextFidld.text
@@ -237,9 +313,10 @@ class AddressEditOrAddViewController: UIViewController,UITableViewDataSource,UIT
         address.IsDefault = self.swithBtn.on
         address.City = "市辖区"
         address.CountryId = 23
-        address.FaxNumber = self.codeTextFidld.text
+//        address.FaxNumber = self.codeTextFidld.text
         return address
     }
+    
     func addAddress() {
         if !self.checkData() {
             return
@@ -252,5 +329,33 @@ class AddressEditOrAddViewController: UIViewController,UITableViewDataSource,UIT
                 ZMDTool.showErrorPromptView(nil, error: nil, errorMsg: self.isAdd ? "添加不成功" : "保存不成功")
             }
         }
+    }
+    
+    //MARK:创建配送选择View
+    func createPeiSongView() {
+        self.peiSongView = UIView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 56*2 + 1))
+        self.peiSongView.backgroundColor = UIColor.whiteColor()
+        let peiSongTitle = ["快递送货上门","网点代收"]
+        var index = 0
+        for title in peiSongTitle {
+            let btn = UIButton(frame: CGRect(x: 0, y: CGFloat(index)*(56+1), width: kScreenWidth, height: 56))
+            btn.setTitle(title, forState: .Normal)
+            btn.setTitleColor(UIColor.darkGrayColor(), forState: .Normal)
+            peiSongView.addSubview(btn)
+            btn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
+                self.dismissPopupView(self.peiSongView)
+                self.peiSongView.removeFromSuperview()
+                if title == "快递送货上门" {
+                    self.isToHome = true
+                } else {
+                    self.isToHome = false
+                }
+                self.currentTableView.reloadData()
+                return RACSignal.empty()
+            })
+            index++
+        }
+        let line = ZMDTool.getLine(CGRect(x: 0, y: 56, width: kScreenWidth, height: 1), backgroundColor: defaultLineColor)
+        self.peiSongView.addSubview(line)
     }
 }

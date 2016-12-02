@@ -12,6 +12,8 @@ class CountView: UIView {
     var countForBounghtLbl : UIButton!
     var countForBounght : Int!
     var finished:((count:Int)->Void)!
+    
+    var theMaxNumber : Int!     //商品库存上限
     override init(frame:CGRect) {
         super.init(frame: frame)
     }
@@ -39,8 +41,16 @@ class CountView: UIView {
                     }
                 } else if (btn.tag - 1000) == 2 {
                     self.countForBounght = self.countForBounght + 1
+//                    self.countForBounght = self.countForBounght+1 > self.theMaxNumber ? self.countForBounght : self.countForBounght+1
                 }
                 self.countForBounghtLbl.setTitle("\(self.countForBounght)", forState: .Normal)
+                /*//隐藏库粗判断
+                if self.countForBounght == self.theMaxNumber  {
+                    ZMDTool.showActivityView(nil)
+                    ZMDTool.showPromptView("库存有限")
+                    ZMDTool.hiddenActivityView()
+                    return
+                }*/
                 self.finished(count: self.countForBounght)
             })
             i++

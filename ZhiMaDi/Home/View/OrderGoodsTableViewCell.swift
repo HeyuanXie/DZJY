@@ -32,7 +32,7 @@ class OrderGoodsTableViewCell: UITableViewCell {
     //订单详情
     func configCellForOrderDetail(product:ZMDProductForOrderDetail) {
         if let imgUrl = product.PictureUrl {
-            let url = "http://xw.ccw.cn"+imgUrl
+            let url = kImageAddressMain+imgUrl
             goodsImgV.sd_setImageWithURL(NSURL(string: url))
         }
         goodsNameLbl.text = product.ProductName
@@ -42,18 +42,19 @@ class OrderGoodsTableViewCell: UITableViewCell {
     }
     //确认订单
     func configCellForConfig(item:ZMDShoppingItem) {
-        if let imgUrl = item.DefaultPictureModel?.ImageUrl {
-            goodsImgV.sd_setImageWithURL(NSURL(string: imgUrl))
+        if let imgUrl = item.Picture?.ImageUrl {
+            goodsImgV.sd_setImageWithURL(NSURL(string: kImageAddressMain+imgUrl))
         }
-        goodsNameLbl.text = item.ProductName
+        goodsNameLbl.text = item.ProductName.componentsSeparatedByString("】").last
         detailLbl.text = (item.AttributeInfo as NSString).stringByReplacingOccurrencesOfString("<br />", withString: " ")
-        priceLbl.text = item.SubTotal
+        priceLbl.text = item.UnitPrice
+        priceLbl.textColor = defaultSelectColor
         quantityLbl.text = "x\(item.Quantity)"
     }
     // 我的订单
     func configCellWithDic(dic:NSDictionary) {
         if let product = dic["Product"] as? NSDictionary,let productPictures = product["ProductPictures"] as? NSArray,let pictureId = (productPictures[0] as! NSDictionary)["PictureId"],let name = product["Name"] {
-            goodsImgV.sd_setImageWithURL(NSURL(string: "http://xw.ccw.cn/picture/index/\(pictureId)"))
+            goodsImgV.sd_setImageWithURL(NSURL(string: kImageAddressMain + "/picture/index/\(pictureId)"))
             goodsNameLbl.text = "\(name)"
         }
         if let attributeDescription = dic["AttributeDescription"] as? String {
@@ -66,10 +67,11 @@ class OrderGoodsTableViewCell: UITableViewCell {
             quantityLbl.text = "x\(Quantity)"
         }
     }
-    func configCellForMyOrder(orderItem:ZMDOrderDetailOrderItems) {
+    
+    /*func configCellForMyOrder(orderItem:ZMDOrderDetailOrderItems) {
         if orderItem.Product.ProductPictures?.count != 0 {
             let pictureId = orderItem.Product.ProductPictures![0].PictureId
-            goodsImgV.sd_setImageWithURL(NSURL(string: "http://xw.ccw.cn/picture/index/\(pictureId)"))
+            goodsImgV.sd_setImageWithURL(NSURL(string:kImageAddressMain+"/picture/index/\(pictureId)"))
 
         }
         goodsNameLbl.text = orderItem.Product.Name
@@ -77,38 +79,65 @@ class OrderGoodsTableViewCell: UITableViewCell {
             detailLbl.text = (attributeDescription as NSString).stringByReplacingOccurrencesOfString("<br />", withString: " ")
         }
         if let UnitPriceInclTax = orderItem.UnitPriceInclTax {
-            priceLbl.text = UnitPriceInclTax
+            priceLbl.text = "¥\(String(format:"%.1f",(UnitPriceInclTax as NSString).doubleValue))"
         }
         if let Quantity = orderItem.Quantity {
             quantityLbl.text = "x\(Quantity)"
         }
+    }*/
+    func configCellForMyOrder(orderItem:ZMDOrderItem) {
+        goodsImgV.sd_setImageWithURL(NSURL(string: kImageAddressMain + orderItem.PictureUrl), placeholderImage: nil)
+        goodsNameLbl.text = orderItem.ProductName
+        if let attributeInfo = orderItem.AttributeInfo {
+            detailLbl.text = (attributeInfo as NSString).stringByReplacingOccurrencesOfString("<br />", withString: " ")
+        }
+        if let price = orderItem.UnitPrice {
+            priceLbl.text = price
+        }
+        if let Quantity = orderItem.Quantity {
+            quantityLbl.text = "x\(Quantity.integerValue)"
+        }
     }
-    func configCell(item:ZMDShoppingItem,scis:NSArray) {
+    
+    //config购物车中的cell
+    func configCellInShoppingCar(item:ZMDShoppingItem,scis:NSArray) {
         if let imgUrl = item.Picture?.ImageUrl {
             goodsImgV.sd_setImageWithURL(NSURL(string: kImageAddressMain+imgUrl))
         }
-        goodsNameLbl.text = item.ProductName
+        goodsNameLbl.text = item.ProductName.componentsSeparatedByString("】").last
+        //产品详情，颜色和尺码
         detailLbl.text = (item.AttributeInfo as NSString).stringByReplacingOccurrencesOfString("<br />", withString: " ")
-        priceLbl.text = item.SubTotal
+        priceLbl.text = item.UnitPrice
         quantityLbl.text = "x\(item.Quantity)"
-        
+        //点击编辑按钮，通过self.editFinish这个block传递productDetail和item
         editBtn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
-            QNNetworkTool.fetchProductDetail(item.ProductId.integerValue) { (productDetail, error, dictionary) -> Void in
-                if productDetail != nil {
-                    self.editFinish(productDetail: productDetail!,item:item)
-                } else {
-                    ZMDTool.showErrorPromptView(nil, error: error)
+            //多线程处理
+            dispatch_async(dispatch_get_global_queue(0, 0), { () -> Void in
+                QNNetworkTool.fetchProductDetail(item.ProductId.integerValue) { (productDetail, error, dictionary) -> Void in
+                    if productDetail != nil
+                    {
+                        dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                            self.editFinish(productDetail: productDetail!,item: item)
+                        })
+                    }else{
+                        ZMDTool.showErrorPromptView(nil, error: error)
+                    }
                 }
-            }
+            })
+
             return RACSignal.empty()
         })
+        //选中某个商品,通过selectFinish回调
         selectBtn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
             (sender as! UIButton).selected = !(sender as! UIButton).selected
             self.selectFinish(Sci: item,isAdd: (sender as! UIButton).selected)
             return RACSignal.empty()
         })
+        //先让所有的selectBtn的selected为false
         selectBtn.selected = false
+        //scis为选中商品的数组
         for tmp in scis {
+            //遍历选中购物单中的item判断cell是否选中，然后在改变cell的selectedBtn
             if (tmp as! ZMDShoppingItem).Id == item.Id {
                 selectBtn.selected = true
             }

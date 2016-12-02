@@ -43,15 +43,16 @@ class PsWordFindViewController: UIViewController, ZMDInterceptorNavigationBarHid
     //MARK: - PrivateMethod
     func updateUI() {
         // 进一步配置账号和密码输入UI
-        let configLeftView = { (textField : UITextField) -> Void in
-            let tmpV = UIImageView(frame: CGRectMake(0, 0, 12, 20))
+        let configLeftView = { (textField : UITextField, imageName: String) -> Void in
+            let tmpV = UIImageView(frame: CGRectMake(10, 0, 40, 20))
             tmpV.contentMode = UIViewContentMode.ScaleAspectFit
+            tmpV.image = UIImage(named: imageName)
             textField.leftView = tmpV
             textField.leftViewMode =  UITextFieldViewMode.Always
         }
-        configLeftView(self.accountTextField)
-        configLeftView(self.verificationTextField)
-        configLeftView(self.psTextField)
+        configLeftView(self.accountTextField, "login_account")
+        configLeftView(self.verificationTextField, "login_password")
+        configLeftView(self.psTextField, "login_password")
         ZMDTool.configViewLayerWithSize(self.confirmBtn, size: 12)
         confirmBtn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
             if !self.checkAccountPassWord() {
@@ -110,17 +111,17 @@ class PsWordFindViewController: UIViewController, ZMDInterceptorNavigationBarHid
     // 判断输入的合法性
     private func checkAccountPassWord() -> Bool {
         if (self.accountTextField.text?.characters.count == 0 && self.verificationTextField.text?.characters.count == 0) {
-            ZMDTool.showPromptView("请输入账号与密码")
+            ZMDTool.showPromptView("请输入手机号和验证码")
             self.accountTextField.becomeFirstResponder()
             return false
         }else if(self.accountTextField.text?.characters.count == 0) {
-            ZMDTool.showPromptView("请输入密码")
-            self.verificationTextField.becomeFirstResponder()
+            ZMDTool.showPromptView("请输入手机号")
+            self.accountTextField.becomeFirstResponder()
             return false
             
         }else if (self.verificationTextField.text?.characters.count == 0){
-            ZMDTool.showPromptView("请输入账号")
-            self.accountTextField.becomeFirstResponder()
+            ZMDTool.showPromptView("请输入验证码")
+            self.verificationTextField.becomeFirstResponder()
             return false
         }
         return true

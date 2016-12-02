@@ -19,7 +19,11 @@ class ZMDShoppingItem: NSObject {
     var Warnings : NSArray!
     var DefaultPictureModel : ZMDPictureModel?
     var Picture : ZMDPictureModel?
+    var StoreId : Int!  //测试分组用
+    var Store : ZMDStoreDetail!
+    
+    var IsShipEnabled :Bool!
     override static func mj_objectClassInArray() -> [NSObject : AnyObject]! {
-        return ["DefaultPictureModel":ZMDPictureModel.classForCoder()]
+        return ["DefaultPictureModel":ZMDPictureModel.classForCoder(),"Store":ZMDStoreDetail.classForCoder()]
     }
 }

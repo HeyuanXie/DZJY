@@ -136,6 +136,7 @@ class CardVolumeConsumerDetailViewController: UIViewController,UITableViewDataSo
             return cell!
         }
     }
+    
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
 
     }
@@ -172,6 +173,7 @@ class CardVolumeConsumerDetailViewController: UIViewController,UITableViewDataSo
         
         self.view.addSubview(ZMDTool.getLine(CGRect(x: 0, y: self.view.bounds.height - 64-58-0.5, width: kScreenWidth, height: 0.5)))
         let useBtn = ZMDTool.getButton(CGRect(x: 0, y: self.view.bounds.height - 64-58, width: kScreenWidth, height: 58), textForNormal: "立即使用", fontSize: 17, backgroundColor:RGB(247,247,247,1)) { ( sender) -> Void in
+            ZMDTool.showPromptView("使用卡券功能暂未开放")
         }
         self.view.addSubview(useBtn)
         

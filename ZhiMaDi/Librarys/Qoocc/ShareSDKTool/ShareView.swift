@@ -14,6 +14,8 @@ import UIKit
 protocol QNShareViewDelegate : NSObjectProtocol {
     // MARK: 分享的数据回调
     func qnShareView(view: ShareView) -> (image: UIImage, url: String, title: String?, description: String)?
+    //分享成功显示alertView
+    func present(alert: UIAlertController) -> Void
 }
 
 
@@ -26,6 +28,10 @@ class ShareView: UIView ,UICollectionViewDelegate, UICollectionViewDataSource{
     
     weak var delegate: QNShareViewDelegate?
 
+    enum shareType {
+        
+    }
+    
     private  var shareViewHeight:CGFloat = 280.0
     private  var shareCollectionViewHeight:CGFloat = 180.0
     private  let itemHeight:CGFloat = 80.0
@@ -66,19 +72,31 @@ class ShareView: UIView ,UICollectionViewDelegate, UICollectionViewDataSource{
         self.pictureArray.removeAll(keepCapacity: false)
         self.shareTypeArray.removeAll(keepCapacity: false)
         
-//        if QNShareSDKTools.isInstalledWithType(ShareTypeWeixiTimeline) {
-            shareAdd("朋友圈", "Share_WXFriends", 23)
-            shareAdd("微信好友", "Share_WX", 22)
+    //判断是否安装客户端再是否显示shareItem
+//        if WXApi.isWXAppInstalled() {
+//            shareAdd("朋友圈", "Share_WXFriends", 23)
+//            shareAdd("微信好友", "Share_WX", 22)
 //        }
-//        if QNShareSDKTools.isInstalledWithType(ShareTypeQQ) {
-            shareAdd("QQ好友", "Share_QQ", 24)
+//        
+//        if TencentOAuth.iphoneQQInstalled() {
+//            shareAdd("QQ好友", "Share_QQ", 24)
+//            shareAdd("QQ空间", "Share_QQSpace", 6)
 //        }
-//        if QNShareSDKTools.isInstalledWithType(ShareTypeQQSpace) {
-            shareAdd("QQ空间", "Share_QQSpace", 6)
+//
+//        if WeiboSDK.isWeiboAppInstalled() {
+//            shareAdd("新浪微博", "Share_Sina", 1)
+//            shareAdd("腾讯微博", "Share_TXWeibo", 2)
 //        }
+        
+        shareAdd("朋友圈","Share_WXFriends",23)
+        shareAdd("微信好友","Share_WX",22)
+        
+        shareAdd("QQ好友","Share_QQ",24)
+        shareAdd("QQ空间","Share_QQSpace",6)
         
         shareAdd("新浪微博", "Share_Sina", 1)
         shareAdd("腾讯微博", "Share_TXWeibo", 2)
+        
         shareAdd("邮件", "Share_Email", 18)
         shareAdd("短信", "Share_SMS", 19)
         shareAdd("复制链接","common_share_link",1000)
@@ -130,12 +148,14 @@ class ShareView: UIView ,UICollectionViewDelegate, UICollectionViewDataSource{
         cancelButton.setTitleColor(appThemeColor, forState: UIControlState.Normal)
         cancelButton.addTarget(self, action: "disMissShareView", forControlEvents: UIControlEvents.TouchUpInside)
         self.bgView?.addSubview(cancelButton)
+        
     }
     
     //MARK: Touch Event
     override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
         if let touch = (touches as NSSet).anyObject() as? UITouch {
             let point = touch.locationInView(self)
+            //点击shareView外边区域，dismissShareView
             if !CGRectContainsPoint(self.bgView!.frame, point) { //判断点的位置，好用
                 self.disMissShareView()
             }
@@ -155,7 +175,7 @@ class ShareView: UIView ,UICollectionViewDelegate, UICollectionViewDataSource{
         itemButton.contentMode = UIViewContentMode.ScaleAspectFit
         
         let titleLabel = UILabel(frame: CGRectMake(0, cell.bounds.size.height - 20, cell.bounds.size.width, 20))
-        titleLabel.userInteractionEnabled = false
+        titleLabel.userInteractionEnabled = true
         titleLabel.textAlignment = NSTextAlignment.Center
         titleLabel.textColor = UIColor(white: 21.0/255.0, alpha: 1)
         titleLabel.font = UIFont.systemFontOfSize(14)
@@ -209,22 +229,83 @@ class ShareView: UIView ,UICollectionViewDelegate, UICollectionViewDataSource{
             let url = data.url
             let title = data.title!
             let description = data.description
+            
+            //设置分享参数
+            let shareParames = NSMutableDictionary()
+            shareParames.SSDKSetupShareParamsByText("葫芦堡",
+                images : image,
+                url : NSURL(string: url),
+                title : title,
+                type : SSDKContentType.Auto)
+
+            //复制链接
             if self.shareTypeArray.count == index+1 {
-//                let tmp = UIPasteboard()
-//                tmp.string = url
+                let tmp = UIPasteboard()
+                tmp.string = url
             } else if url != "" {
                 let shareType = self.shareTypeArray[index]
                 self.disMissShareView()
-//                if (shareType == 1/*ShareTypeSinaWeibo*/) && QNShareSDKTools.hasAuthorizedWithType(ShareTypeSinaWeibo) { // 新浪微博需要UI提示
-//                    QNTool.showActivityView("正在分享...", inView: nil, 3)
-//                }
-//
-//                QNShareSDKTools.shareUrl(url, image: image, title: title, content: description, shareType: shareType) { (isTure) -> Void in
-//                    let result: String = isTure ? "分享成功" : "分享失败，请稍后重试！"
-//                    QNTool.hiddenActivityView()
-//                    QNTool.showPromptView( String(format: "%@ %@", self.titileArray[index], result))
-//                }
+                if (shareType == 4/*ShareTypeSinaWeibo*/) && ShareSDK.hasAuthorized(SSDKPlatformType.TypeSinaWeibo) { // 新浪微博需要UI提示
+                    ZMDTool.showActivityView("正在分享...", inView: nil, 3)
+                }
+                
+                shareParames.SSDKEnableUseClientShare()     //允许通过客户端分享
+                
+                //开始分享
+                var sharePlatformType: SSDKPlatformType!
+                switch index {
+                case 0:
+                    sharePlatformType = SSDKPlatformType.TypeWechat
+                    break
+                case 1:
+                    sharePlatformType = SSDKPlatformType.SubTypeWechatSession
+                    shareParames.SSDKSetupWeChatParamsByText(description, title: title, url: NSURL(string: url), thumbImage: image, image: image, musicFileURL: nil, extInfo: nil, fileData: nil, emoticonData: nil, type: .Auto, forPlatformSubType: .SubTypeWechatSession)
+                    break
+                case 2:
+                    sharePlatformType = SSDKPlatformType.TypeQQ
+                    break
+                case 3:
+                    sharePlatformType = SSDKPlatformType.SubTypeQZone
+                    break
+                case 4:
+                    sharePlatformType = SSDKPlatformType.TypeSinaWeibo
+                    shareParames.SSDKSetupSinaWeiboShareParamsByText(description, title: title, image: image, url: NSURL(string: url), latitude: 0, longitude: 0, objectID: nil, type: .Auto)
+                    break
+                case 5:
+                    sharePlatformType = SSDKPlatformType.TypeTencentWeibo
+                    break
+                case 6:
+                    sharePlatformType = SSDKPlatformType.TypeMail
+                    break
+                case 7:
+                    sharePlatformType = SSDKPlatformType.TypeSMS
+                    break
+                case 8:
+                    sharePlatformType = SSDKPlatformType.TypeCopy
+                    break
+                default: 
+                    break
+                }
+
+                ShareSDK.share(sharePlatformType, parameters: shareParames) { (state : SSDKResponseState, userData : [NSObject : AnyObject]!, contentEntity :SSDKContentEntity!, error : NSError!) -> Void in
+                
+                    switch state{
+                        
+                    case SSDKResponseState.Success:
+                        print("分享成功")
+                    let alert = UIAlertController(title: "分享成功", message: "分享成功", preferredStyle: UIAlertControllerStyle.Alert)
+                    alert.addAction(UIAlertAction(title: "确定", style: UIAlertActionStyle.Cancel, handler: nil))
+                        self.delegate?.present(alert)
+                    case SSDKResponseState.Fail:    print("分享失败,错误描述:\(error)")
+                    case SSDKResponseState.Cancel:  print("分享取消")
+                        
+                    default:
+                        break
+                    }
+                }
+                
             }
+            
         }
-    }    
+    }
 }
