@@ -80,7 +80,7 @@ class MineCollectionViewController: UIViewController,UITableViewDataSource, UITa
         let goodsLbl = cell?.viewWithTag(tag++) as! UILabel
         let detailLbl = cell?.viewWithTag(tag++) as! UILabel
         let goodsPriceLbl = cell?.viewWithTag(tag++) as! UILabel
-        let freightLbl = cell?.viewWithTag(tag++) as! UILabel
+//        let freightLbl = cell?.viewWithTag(tag++) as! UILabel
         let cancelBtn = cell?.viewWithTag(tag++) as! UIButton
         
         if let item = self.data[indexPath.row] as? ZMDShoppingItem {
@@ -91,7 +91,7 @@ class MineCollectionViewController: UIViewController,UITableViewDataSource, UITa
             detailLbl.text = (item.AttributeInfo as NSString).stringByReplacingOccurrencesOfString("<br />", withString: " ")
 //            goodsPriceLbl.text = item.SubTotal
             goodsPriceLbl.attributedText = "\(item.SubTotal) 原价:\(item.UnitPrice)".AttributeText([item.SubTotal,"原价:\(item.UnitPrice)"], colors: [RGB(235,61,61,1),UIColor.lightGrayColor()], textSizes: [14,12])
-            freightLbl.text = "不包邮"
+//            freightLbl.text = "不包邮"
             cancelBtn.rac_signalForControlEvents(.TouchUpInside).subscribeNext { (sender) -> Void in
                 // 取消收藏
                 self.deleteCartItem("\(item.Id)")
@@ -171,10 +171,11 @@ class CollectionGoodsCell : UITableViewCell {
         self.contentView.addSubview(goodsPriceLbl)
         
         let freightLbl = ZMDTool.getLabel(CGRect(x: 12+125+10, y: 150-12-14, width: kScreenWidth - 12-125-10-100, height: 15), text: "", fontSize: 15,textColor: defaultDetailTextColor)
-        freightLbl.tag = tag++
-        self.contentView.addSubview(freightLbl)
+//        freightLbl.tag = tag++
+//        self.contentView.addSubview(freightLbl)
         
-        let cancelBtn = ZMDTool.getButton(CGRect(x: kScreenWidth - 80, y: 150-12-15, width: 80, height: 15), textForNormal: "取消收藏", fontSize: 15,textColorForNormal:defaultDetailTextColor, backgroundColor: UIColor.clearColor(), blockForCli: { (sender) -> Void in
+        let width = "取消收藏".sizeWithFont(UIFont.systemFontOfSize(14), maxWidth: 120).width
+        let cancelBtn = ZMDTool.getButton(CGRect(x: 12+125+10, y: 150-12-14, width: width, height: 15), textForNormal: "取消收藏", fontSize: 14,textColorForNormal:defaultDetailTextColor, backgroundColor: UIColor.clearColor(), blockForCli: { (sender) -> Void in
             //
             
         })

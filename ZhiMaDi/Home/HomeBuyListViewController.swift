@@ -85,8 +85,7 @@ class HomeBuyListViewController: UIViewController ,ZMDInterceptorProtocol, UITab
         return 0
     }
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-//        return self.typeSetting == .Horizontal ? 581/750 * kScreenWidth + 20 : 300/750 * kScreenWidth
-        return 150
+        return self.typeSetting == .Horizontal ? 581/750 * kScreenWidth + 20 : 300/750 * kScreenWidth
     }
     func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         if section == 0 {
@@ -210,50 +209,50 @@ class HomeBuyListViewController: UIViewController ,ZMDInterceptorProtocol, UITab
     }
     //MARK: -  PrivateMethod
     //创建目录视图，作为第0个section的headerView
-    func createFilterMenu() -> UIView {
-//        let filterTitles = self.isLease ? ["默认","人气","价格","筛选",""] : ["默认","销量","价格","最新",""]
-        let filterTitles = ["默认","价格","更多"]
-        let countForBtn = CGFloat(filterTitles.count) //3
+    //创建目录视图，作为第0个section的headerView
+    func createFilterMenu() -> UIView{
+        //        let filterTitles = self.isLease ? ["默认","人气","价格","筛选",""] : ["默认","销量","价格","最新",""]
+        let filterTitles = ["默认","销量","人气","价格",""]
+        let countForBtn = CGFloat(filterTitles.count) - 1 //4
         //52+16，与tableView的delegate中设置的第0个section的heightForHeader一致
         let view = UIView(frame: CGRectMake(0 , 0, kScreenWidth, 52 + 16))
         view.backgroundColor = UIColor.clearColor()
         for var i=0;i<filterTitles.count;i++ {
             let index = i%filterTitles.count
-            let btn = UIButton(frame:  CGRectMake(CGFloat(index) * (kScreenWidth)/countForBtn , 0, (kScreenWidth)/countForBtn, 52))
+            let btn = UIButton(frame:  CGRectMake(CGFloat(index) * (kScreenWidth-54)/countForBtn , 0, (kScreenWidth-54)/countForBtn, 52))
             btn.backgroundColor = UIColor.whiteColor()
             btn.selected = i == self.IndexFilter ? true : false
             btn.setTitleColor(defaultTextColor, forState: .Normal)
-            btn.setTitleColor(appThemeColorNew, forState: .Selected)
-            btn.setTitle(filterTitles[i], forState: .Normal)
-            
-            switch(filterTitles[i]){
-            case "默认" :
-                break
-            case "更多" :
-                let width = kScreenWidth/countForBtn
-                btn.imageEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 5)
-                btn.titleEdgeInsets = UIEdgeInsets(top: 0, left: 1, bottom: 0, right: 0)
-                if self.IndexFilter == 2 {
-                    btn.setImage(UIImage(named: "list_price_down"), forState: .Normal)
-                    btn.setImage(UIImage(named: "list_price_up"), forState: .Selected)
-                }else{
-                    btn.setImage(UIImage(named: "list_price_normal"), forState: .Normal)
+            btn.setTitleColor(RGB(235,61,61,1.0), forState: .Selected)
+            //控制横排和竖排的按钮
+            if filterTitles[i] == "" {
+                btn.frame = CGRectMake(CGFloat(index) * (kScreenWidth-54)/countForBtn, 0, 54, 52)
+                btn.setImage(UIImage(named: "list_shupai"), forState: .Normal)
+                btn.setImage(UIImage(named: "list_hengpai"), forState: .Selected)
+                btn.selected = self.typeSetting == .Horizontal ? false : true
+            } else {
+                btn.setTitle(filterTitles[i], forState: .Normal)
+                btn.setTitle(filterTitles[i], forState: .Selected)
+                switch(filterTitles[i]){
+                case "默认" :
+                    break
+                default :
+                    let width = (kScreenWidth-54)/countForBtn
+                    btn.imageEdgeInsets = UIEdgeInsets(top: 0, left: (width-50)/2 + 40, bottom: 0, right: 0)
+                    btn.titleEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: (width-50)/2+16)
+                    
+                    if self.IndexFilter == i {
+                        let orderbyArray = [self.orderbySalesUp,self.orderbyPopularUp,self.orderbyPriceUp]
+                        btn.selected = orderbyArray[i-1]
+                        btn.setImage(UIImage(named: "list_price_down"), forState: .Normal)
+                        btn.setImage(UIImage(named: "list_price_up"), forState: .Selected)
+                        btn.setTitleColor(RGB(235,61,61,1.0), forState: .Normal)
+                    } else {
+                        btn.setImage(UIImage(named: "list_price_normal"), forState: .Normal)
+                    }
+                    break
                 }
-                break
-            default :
-                let width = (kScreenWidth)/countForBtn
-                btn.imageEdgeInsets = UIEdgeInsets(top: 0, left: (width-50)/2 + 25, bottom: 0, right: 0)
-                btn.titleEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: (width-50)/2)
-                if self.IndexFilter == 1 {
-                    btn.selected = self.orderbyPriceUp
-                    btn.setImage(UIImage(named: "list_price_down"), forState: .Normal)
-                    btn.setImage(UIImage(named: "list_price_up"), forState: .Selected)
-                }else{
-                    btn.setImage(UIImage(named: "list_price_normal"), forState: .Normal)
-                }
-                break
             }
-            
             btn.titleLabel?.font = UIFont.systemFontOfSize(13)
             btn.tag = 1000 + i
             view.addSubview(btn)
@@ -263,6 +262,12 @@ class HomeBuyListViewController: UIViewController ,ZMDInterceptorProtocol, UITab
             btn.addSubview(line)
             
             btn.rac_signalForControlEvents(.TouchUpInside).subscribeNext({ (sender) -> Void in
+                if (sender.tag - 1000) == filterTitles.count - 1 {
+                    self.typeSetting = self.typeSetting == .Horizontal ? .vertical : .Horizontal
+                    (sender as! UIButton).selected = !(sender as! UIButton).selected
+                    self.currentTableView.reloadData()
+                    return
+                }
                 (sender as!UIButton).selected = !(sender as!UIButton).selected
                 self.IndexFilter = sender.tag - 1000
                 let orderbys = [(-1,-1),(17,18),(19,20),(10,11)]
@@ -272,19 +277,6 @@ class HomeBuyListViewController: UIViewController ,ZMDInterceptorProtocol, UITab
                 case "默认" :
                     self.orderBy = 0
                     break
-                case "更多" :
-                    let pickView = NSBundle.mainBundle().loadNibNamed("CommentView", owner: nil, options: nil)[2] as! PickView
-                    pickView.submitBtnFinished = {() -> Void in
-                        if !pickView.checkData() {
-                            return
-                        }
-                        self.dismissPopupView(pickView)
-                        //updateData With self.lower、higher、limit
-                        self.indexSkip = 1
-                        self.updateData(self.orderby)
-                    }
-                    self.viewShowWithBg(pickView, showAnimation: .SlideInFromTop, dismissAnimation: .SlideOutToTop)
-                    return
                 case "销量" :
                     self.orderbySalesUp = (sender as! UIButton).selected
                     self.orderBy = self.orderbySalesUp ? orderby.0 : orderby.1
@@ -304,7 +296,7 @@ class HomeBuyListViewController: UIViewController ,ZMDInterceptorProtocol, UITab
                 self.indexSkip = 1
                 self.updateData(self.orderBy)
             })
-
+            
         }
         return view
     }
@@ -332,14 +324,14 @@ class HomeBuyListViewController: UIViewController ,ZMDInterceptorProtocol, UITab
     }
     
     func setVCTitle() {
-//        if self.isNew == "true" {
-//            self.title = "新品推荐"
-//        }else{
-////            self.title = self.isStore ? "所有商品" : self.titleForFilter
-//            self.title = self.titleForFilter == "" ? "所有商品" : self.titleForFilter
-//        }
-        self.title = self.vcTitle
+        if self.isNew == "true" {
+            self.title = "新品推荐"
+        }else{
+            //            self.title = self.isStore ? "所有商品" : self.titleForFilter
+            self.title = self.titleForFilter == "" ? "所有商品" : self.titleForFilter
+        }
     }
+    
     func setupNewNavigation() {
         if self.isStore {
             let searchView = UIView(frame: CGRectMake(0, 0, kScreenWidth - 120, 44))

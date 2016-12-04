@@ -40,10 +40,13 @@ class PickView : UIView,UITextFieldDelegate {
     
     func checkData() -> Bool {
         if let lower = self.lower,higher = self.higher {
-            if self.lower > self.higher {
+            if lower > higher {
                 let tmp = self.lowTextField.text
                 self.lowTextField.text = self.highTextField.text
                 self.highTextField.text = tmp
+                let tmp1 = self.lower
+                self.lower = self.higher
+                self.higher = tmp1
                 return false
             }
         }

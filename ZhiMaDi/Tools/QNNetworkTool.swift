@@ -14,8 +14,9 @@ private let kServerAddress = { () -> String in
 //  "http://od.ccw.cn"
 //    "http://10.0.0.10"
 //    "http://www.hulubao.com"  
-    "http://www.ksnongte.com"
+//    "http://www.ksnongte.com"
 //    "http://xw.ccw.cn"
+    "http://www.ksnongpi.com"
 }()
 private let kOdataAddress = { () -> String in
     kServerAddress + "/odata/v1"
@@ -134,7 +135,7 @@ private extension QNNetworkTool {
      :param: completionHandler 请求完成后的回掉， 如果 dictionary 为nil，那么 error 就不可能为空
      */
     private class func requestForSelf(url: NSURL?, method: String, parameters: [String : AnyObject]?, completionHandler: (request: NSURLRequest, response: NSHTTPURLResponse?, data: AnyObject?, dictionary: NSDictionary?, error: NSError?) -> Void) {
-        request(ParameterEncoding.URL.encode(self.productRequest(url, method: method), parameters: parameters).0).response{
+        request(ParameterEncoding.JSON.encode(self.productRequest(url, method: method), parameters: parameters).0).response{
             if $3 != nil {  // 直接出错了
                 completionHandler(request: $0!, response: $1, data: $2, dictionary: nil, error: $3); return
             }
@@ -367,6 +368,56 @@ extension QNNetworkTool {
     }
 
 }
+
+//MARK:- 供求相关
+extension QNNetworkTool {
+    /**
+     供求列表(查询)
+     - customerId	否	int	用户名id，需要查询该用户供求时使用
+     - page	是	int	页码
+     - pageSize	是	int	每页显示数量
+     - check	是	int	审核状态 0 为全部 1为待审核 2为审核通过 3审核不通过 4已取消或者过期的信息
+     - q	是	string	查询字符串，全部传空值
+     - type	是	int	供求类型 1：供应 2：求购
+     - orderBy	是	int	0：默认 5 ： 名称升序，6 ：名称降序 10：价格升，11：价格降15：日期升，16：日期降
+     - fromPrice	否	decimal	筛选大于金额
+     - toPrice	否	decimal	筛选小于金额
+    
+    */
+    class func supplyDemandSearch(customerId:Int?,page:Int,pageSize:Int,check:Int,q:String,type:Int,orderBy:Int,fromPrice:Float?,toPrice:Float?,completion:(error:NSError?,products:NSArray?)->Void) {
+        let parms : NSMutableDictionary = NSMutableDictionary()
+        let keyValues = ["page":page,"pageSize":pageSize,"check":check,"q":q,"type":type,"orderBy":orderBy]
+        parms.setValuesForKeysWithDictionary(keyValues as! [String : AnyObject])
+        if customerId != nil {
+            parms.setValue(customerId, forKey: "customerId")
+        }
+        if fromPrice != nil && toPrice != nil {
+            parms.setValue(fromPrice, forKey: "fromPrice")
+            parms.setValue(toPrice, forKey: "toPrice")
+        }
+        requestPOST(kServerAddress+"/api/v1/extend/SupplyDemand/Search", parameters: parms as? [String : AnyObject]) { (request, response, data, dictionary, error) -> Void in
+            if data != nil {
+                do {
+                    let jsonObject: AnyObject? = try NSJSONSerialization.JSONObjectWithData(data as! NSData, options: NSJSONReadingOptions.MutableContainers)
+                    guard let array = jsonObject as? NSArray else {
+                        completion(error: error, products: nil)
+                        return
+                    }
+                    let productsArray = ZMDSupplyProduct.mj_objectArrayWithKeyValuesArray(array)
+                    completion(error: nil, products: productsArray)
+                }
+                catch {
+                    print("JSON解析错误")
+                }
+            }else{
+                completion(error: error, products: nil)
+            }
+        }
+    }
+    
+}
+
+
 //MARK:- 产品相关
 extension QNNetworkTool {
     /**

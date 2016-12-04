@@ -754,6 +754,9 @@
 		84A8504E1D79536800F93768 /* SortViewController2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A8504D1D79536800F93768 /* SortViewController2.swift */; };
 		84A93EEC1DACDF4F00532D4F /* tm.png in Resources */ = {isa = PBXBuildFile; fileRef = 84A93EEB1DACDF4F00532D4F /* tm.png */; };
 		84B17E661D864BAB00B9397C /* ZMDStoreDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B17E651D864BAB00B9397C /* ZMDStoreDetail.swift */; };
+		84B35E991DF3C9AF00699EEF /* SupplyDemandListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B35E981DF3C9AF00699EEF /* SupplyDemandListViewController.swift */; };
+		84B35E9B1DF3C9C900699EEF /* SupplyDemandDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B35E9A1DF3C9C900699EEF /* SupplyDemandDetailViewController.swift */; };
+		84B35E9F1DF3D98200699EEF /* SupplyDemandListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B35E9E1DF3D98200699EEF /* SupplyDemandListCell.swift */; };
 		84B54A4C1D81670500356BBA /* MyWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B54A4B1D81670500356BBA /* MyWebViewController.swift */; };
 		84B6B5531DE6DFB300A20396 /* OrderCommentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B6B5521DE6DFB300A20396 /* OrderCommentViewController.swift */; };
 		84B6B5551DE6E06500A20396 /* ZMDProductComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B6B5541DE6E06500A20396 /* ZMDProductComment.swift */; };
@@ -1584,6 +1587,9 @@
 		84A8504D1D79536800F93768 /* SortViewController2.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SortViewController2.swift; sourceTree = "<group>"; };
 		84A93EEB1DACDF4F00532D4F /* tm.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tm.png; sourceTree = "<group>"; };
 		84B17E651D864BAB00B9397C /* ZMDStoreDetail.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZMDStoreDetail.swift; sourceTree = "<group>"; };
+		84B35E981DF3C9AF00699EEF /* SupplyDemandListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SupplyDemandListViewController.swift; sourceTree = "<group>"; };
+		84B35E9A1DF3C9C900699EEF /* SupplyDemandDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SupplyDemandDetailViewController.swift; sourceTree = "<group>"; };
+		84B35E9E1DF3D98200699EEF /* SupplyDemandListCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SupplyDemandListCell.swift; sourceTree = "<group>"; };
 		84B54A4B1D81670500356BBA /* MyWebViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyWebViewController.swift; sourceTree = "<group>"; };
 		84B6B5521DE6DFB300A20396 /* OrderCommentViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OrderCommentViewController.swift; sourceTree = "<group>"; };
 		84B6B5541DE6E06500A20396 /* ZMDProductComment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZMDProductComment.swift; sourceTree = "<group>"; };
@@ -2921,6 +2927,7 @@
 				2B989C061CB4E955008C6D23 /* ShoppingCar */,
 				2B197DA21C83DB7E006494CF /* Sort */,
 				2B959EBE1C76F5A9002EA40D /* Home */,
+				84B35E971DF3C91600699EEF /* SupplyDemand */,
 				2BA3FDB11C9F83AD00018F3C /* View */,
 				3C9099651C76A6FD006B7D2C /* Resources */,
 				3C9098571C76A482006B7D2C /* AppDelegate.swift */,
@@ -3307,6 +3314,32 @@
 				8446E6091DD59AD000889E9A /* XGSetting.h */,
 			);
 			path = XGPush;
+			sourceTree = "<group>";
+		};
+		84B35E971DF3C91600699EEF /* SupplyDemand */ = {
+			isa = PBXGroup;
+			children = (
+				84B35E9C1DF3D96100699EEF /* View */,
+				84B35E9D1DF3D96A00699EEF /* VC */,
+			);
+			name = SupplyDemand;
+			sourceTree = "<group>";
+		};
+		84B35E9C1DF3D96100699EEF /* View */ = {
+			isa = PBXGroup;
+			children = (
+				84B35E9E1DF3D98200699EEF /* SupplyDemandListCell.swift */,
+			);
+			name = View;
+			sourceTree = "<group>";
+		};
+		84B35E9D1DF3D96A00699EEF /* VC */ = {
+			isa = PBXGroup;
+			children = (
+				84B35E981DF3C9AF00699EEF /* SupplyDemandListViewController.swift */,
+				84B35E9A1DF3C9C900699EEF /* SupplyDemandDetailViewController.swift */,
+			);
+			name = VC;
 			sourceTree = "<group>";
 		};
 		84E738AE1DEBD58700768D8C /* HYTabBar */ = {
@@ -3987,6 +4020,7 @@
 				3C9099001C76A6E9006B7D2C /* ChartAnimator.swift in Sources */,
 				2BA222EF1CE96BBA006BC426 /* NetworkTest.swift in Sources */,
 				3C9099171C76A6E9006B7D2C /* BarLineScatterCandleBubbleChartData.swift in Sources */,
+				84B35E9B1DF3C9C900699EEF /* SupplyDemandDetailViewController.swift in Sources */,
 				2B197DA41C83DB8B006494CF /* SortViewController.swift in Sources */,
 				2B8739CB1CBF6342007FE81A /* InvitationShareHomeViewController.swift in Sources */,
 				2BB6A8D01C87DF12008209E8 /* SignPSSetViewController.swift in Sources */,
@@ -4073,6 +4107,7 @@
 				2B8DB08B1CC0DC6A004A0FB5 /* MsgOrderViewController.swift in Sources */,
 				3C9098FE1C76A6E9006B7D2C /* Aspects.m in Sources */,
 				2BC861591CD8393D00B8D449 /* MyStoreAddLeaseViewController.swift in Sources */,
+				84B35E9F1DF3D98200699EEF /* SupplyDemandListCell.swift in Sources */,
 				2B74BEAF1CDC8FF6005E0866 /* GoodsManagerSearchViewController.swift in Sources */,
 				2B8BB2B91CBE30F600CD2AD5 /* OrderGoodsScoreViewController.swift in Sources */,
 				841B86D61DC1FE850038F689 /* ZMDOrderNote.swift in Sources */,
@@ -4216,6 +4251,7 @@
 				84F036CF1DDB10480061D478 /* TZImageManager.m in Sources */,
 				2B02B54F1CAD21E70064B47C /* CashierViewController.swift in Sources */,
 				3C90991E1C76A6E9006B7D2C /* CandleChartDataSet.swift in Sources */,
+				84B35E991DF3C9AF00699EEF /* SupplyDemandListViewController.swift in Sources */,
 				2B9DB8A61C801BF500259910 /* HomeBuyGoodsSearchViewController.swift in Sources */,
 				84DE64601DEEBCAF00C70ABD /* RecommendView.swift in Sources */,
 				3C9099371C76A6E9006B7D2C /* HorizontalBarChartHighlighter.swift in Sources */,
@@ -4376,8 +4412,8 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: The Wholesale Of Agricultural Commodities Of Jiangnan Kashi Bulk Agricultural Prod (JQV37Q32C9)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: The Wholesale Of Agricultural Commodities Of Jiangnan Kashi Bulk Agricultural Prod (JQV37Q32C9)";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
@@ -4464,7 +4500,7 @@
 					"-ObjC",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\"";
-				PRODUCT_BUNDLE_IDENTIFIER = com.dzjy;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jn.dzjy;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "ZhiMaDi/ZhiMaDi-Bridging-Header.h";
@@ -4477,8 +4513,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: The Wholesale Of Agricultural Commodities Of Jiangnan Kashi Bulk Agricultural Prod (JQV37Q32C9)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: The Wholesale Of Agricultural Commodities Of Jiangnan Kashi Bulk Agricultural Prod (JQV37Q32C9)";
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -4536,7 +4572,7 @@
 					"-ObjC",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\"";
-				PRODUCT_BUNDLE_IDENTIFIER = com.dzjy;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jn.dzjy;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "ZhiMaDi/ZhiMaDi-Bridging-Header.h";

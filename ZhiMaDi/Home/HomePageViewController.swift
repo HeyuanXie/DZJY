@@ -142,11 +142,14 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
             case .kECommerce:
                 viewController = UIViewController()
             case .kSupply:
-                viewController = HomeBuyListViewController.CreateFromMainStoryboard() as! HomeBuyListViewController
-                (viewController as! HomeBuyListViewController).vcTitle = "供求"
+                viewController = SupplyDemandListViewController.CreateFromMainStoryboard() as! SupplyDemandListViewController
+                (viewController as! SupplyDemandListViewController).vcTitle = "供应"
                 viewController.hidesBottomBarWhenPushed = true
             case .kDemand:
-                viewController = UIViewController()
+                viewController = SupplyDemandListViewController.CreateFromMainStoryboard() as! SupplyDemandListViewController
+                (viewController as! SupplyDemandListViewController).vcTitle = "求购"
+                (viewController as! SupplyDemandListViewController).check = 2
+                viewController.hidesBottomBarWhenPushed = true
             case .kEnterprise:
                 viewController = UIViewController()
             }
@@ -156,7 +159,6 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
         
         //点击菜单选择，调用方法跳转
         func didSelect(navViewController:UINavigationController){
-            self.pushViewController.hidesBottomBarWhenPushed = true
             navViewController.pushViewController(self.pushViewController, animated: false)
         }
     }
