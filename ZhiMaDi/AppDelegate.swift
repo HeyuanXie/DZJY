@@ -158,8 +158,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let array2 = ["首页","分类","购物车","我的"]
         var count = 0
         for item in array {
-            let unSelectedStr = "TabBar_"+item+"_unselected"
-            let selectedStr = "TabBar_"+item+"_selected"
+            let unSelectedStr = "Tabbar_"+item+"_unselected"
+            let selectedStr = "Tabbar_"+item+"_selected"
             let unSelectedImage = UIImage(named: unSelectedStr)
             let selectedImage = UIImage(named: selectedStr)
             images.addObject(unSelectedImage!)

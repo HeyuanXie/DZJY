@@ -43,7 +43,7 @@ class SupplyDemandListCell : UITableViewCell {
     class func configSupplyCell(cell:SupplyDemandListCell!,product:ZMDSupplyProduct!) {
         cell.titleLblLeft.text = product.Title
         cell.currentPriceLblLeft.text = "¥ \(product.Price.floatValue) /\(product.PriceUnit)"
-        cell.currentPriceLblLeft.attributedText = cell.currentPriceLblLeft.text?.AttributeText(["¥","\(product.Price)"], colors: [appThemeColorNew,appThemeColorNew], textSizes: [15,18])
+        cell.currentPriceLblLeft.attributedText = cell.currentPriceLblLeft.text?.AttributeText(["¥","\(product.Price.floatValue)"], colors: [appThemeColorNew,appThemeColorNew], textSizes: [15,18])
         cell.originalPriceLblLeft.text = "供应量: \(product.Quantity)\(product.QuantityUnit)/\(product.MinQuantity ?? 5)\(product.MinQuantityUnit)起订"
         cell.originalPriceLblLeft.attributedText = cell.originalPriceLblLeft.text?.AttributeText(["供应量:","\(product.Quantity)\(product.QuantityUnit)/\(product.MinQuantity ?? 5)\(product.MinQuantityUnit)起订",], colors: [RGB(174,174,174,1.0),defaultTextColor], textSizes: [13,13])
         cell.countLblLeft.text = "截止至: \(product.EndTime.componentsSeparatedByString("T").first!)"

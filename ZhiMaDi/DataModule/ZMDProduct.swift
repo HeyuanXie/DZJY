@@ -91,6 +91,8 @@ class ZMDSupplyProduct : NSObject {
     var Description : String!
     var CheckStatus : NSNumber!
     var Type : NSNumber!
+    var AreaName : String!
+    var AreaCode : String!
     var QQ : String!
     var UserName : String!
     var Phone : String!

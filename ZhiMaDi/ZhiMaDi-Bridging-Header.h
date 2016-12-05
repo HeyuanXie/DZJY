@@ -60,6 +60,11 @@
 
 //仿微信图片选择
 #import "TZImagePickerController.h"
+
 #import "HYTabBarController.h"
+//卡片ScrollView
+#import "PGIndexBannerSubiew.h"
+#import "NewPagedFlowView.h"
+#import "LYScrollView.h"
 
 #endif /* SleepCare_Bridging_Header_h */

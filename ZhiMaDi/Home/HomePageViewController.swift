@@ -143,12 +143,11 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
                 viewController = UIViewController()
             case .kSupply:
                 viewController = SupplyDemandListViewController.CreateFromMainStoryboard() as! SupplyDemandListViewController
-                (viewController as! SupplyDemandListViewController).vcTitle = "供应"
+                (viewController as! SupplyDemandListViewController).type = 1
                 viewController.hidesBottomBarWhenPushed = true
             case .kDemand:
                 viewController = SupplyDemandListViewController.CreateFromMainStoryboard() as! SupplyDemandListViewController
-                (viewController as! SupplyDemandListViewController).vcTitle = "求购"
-                (viewController as! SupplyDemandListViewController).check = 2
+                (viewController as! SupplyDemandListViewController).type = 2
                 viewController.hidesBottomBarWhenPushed = true
             case .kEnterprise:
                 viewController = UIViewController()
@@ -163,11 +162,50 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
         }
     }
     
+    //搜索时的类型枚举
+    enum SearchType {
+        case kSupply
+        case kDemand
+        case kGood
+        case kStore
+        
+        init() {
+            self = kSupply
+        }
+        
+        var title : String {
+            switch self {
+            case .kSupply:
+                return "供应"
+            case .kDemand:
+                return "求购"
+            case .kGood:
+                return "商品"
+            case .kStore:
+                return "店家"
+            }
+        }
+        
+        var targetVC : UIViewController {
+            let viewController : UIViewController
+            switch self {
+            case .kGood:
+                viewController = HomeBuyListViewController.CreateFromMainStoryboard() as! HomeBuyListViewController
+            case .kStore:
+                viewController = StoreShowListViewController.CreateFromMainStoryboard() as! StoreShowListViewController
+            default :
+                viewController = SupplyDemandListViewController.CreateFromMainStoryboard() as! SupplyDemandListViewController
+            }
+            return viewController
+        }
+    }
+    
     @IBOutlet weak var currentTableView: UITableView!
     
     var userCenterData = [[UserCenterCellType.HomeContentTypeAd],[.HomeContentTypeMenu,.HomeContentTypeState],[.HomeContentTypeDoubleGood,.HomeContentTypeMulityGood,.HomeContentTypeRecommend],[.HomeContentTypeMiniAd],[.HomeContentTypeSupplyHead,.HomeContentTypeSupplyDetail,.HomeContentTypeSupplyFoot],[.HomeContentTypeFruitHead,.HomeContentTypeFruitSort,.HomeContentTypeFruitDetail]]
     
-    var searchType = ["供应","求购","商品","店家"]
+    var searchTypes : [SearchType]!
+    var searchType : SearchType = .kSupply
     
     var fruitSelectIndex = 0       //水果蔬菜section 删选按钮选中记录
     var orderbySalesUp = true      //水果蔬菜section 按销量排序
@@ -312,23 +350,33 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
     
     //MARK: ***************代理方法*************
     //MARK: 触摸代理
-    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        if self.advertisementAll == nil {
-            self.fetchData()
-        }
-    }
+//    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+//        if self.advertisementAll == nil {
+//            self.fetchData()
+//        }
+//    }
+    
     //MARK: TextFieldDelegate
     func textFieldShouldReturn(textField: UITextField) -> Bool {
         self.view.endEditing(true)
-        if textField.text != "" {
+        if let text = textField.text {
             self.view.viewWithTag(100)?.removeFromSuperview()
-            let vc = HomeBuyListViewController.CreateFromMainStoryboard() as! HomeBuyListViewController
-            vc.titleForFilter = textField.text ?? ""
-            vc.hidesBottomBarWhenPushed = true
-            self.navigationController?.pushViewController(vc, animated: true)
+            let viewController = self.searchType.targetVC
+            switch self.searchType {
+            case .kGood:
+                (viewController as! HomeBuyListViewController).titleForFilter = text
+            case .kStore:
+                (viewController as! StoreShowListViewController).titleForFilter = text
+            case .kSupply:
+                (viewController as! SupplyDemandListViewController).type = 1
+            default :
+                (viewController as! SupplyDemandListViewController).type = 2
+            }
+            self.pushToViewController(viewController, animated: true, hideBottom: true)
         }
         return true
     }
+    
     //点击背景、收起键盘
     func textFieldDidBeginEditing(textField: UITextField) {
         let bgBtn = UIButton(frame: self.view.bounds)
@@ -431,7 +479,7 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
         }
         return cell!
     }
-    //MARK: ****************TableViewCell****************
+    //MARK: - ****************TableViewCell****************
     //MARK: cellFor广告section
     func cellForHomeAd(tableView: UITableView,indexPath: NSIndexPath)-> UITableViewCell {
         let cellId = "AdCell"
@@ -1000,6 +1048,7 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
     
     private func dataInit(){
         self.menuType = [.kFeature,.kECommerce,.kSupply,.kDemand,.kEnterprise]
+        self.searchTypes = [.kSupply,.kDemand,.kGood,.kStore]
     }
     
     func updateUI() {
@@ -1008,7 +1057,7 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
         self.configRightItem()
     }
     
-    //MAKR: 搜索View
+    //MAKR: - 搜索View
     func viewForSearch() {
         self.textInput = UITextField(frame: CGRect(x: 12*kScreenWidth/375, y: 32*kScreenWidth/375, width: kScreenWidth*296/375, height: 34*kScreenWidth/375))
         self.textInput.placeholder = " 搜索你想要的"
@@ -1035,10 +1084,11 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
             selectView.backgroundColor = RGB(253,124,76,1.0)
             selectView.alpha = 1.0
             ZMDTool.configViewLayer(selectView)
-            for i in 0..<self.searchType.count {
-                let title = self.searchType[i]
+            for i in 0..<self.searchTypes.count {
+                let searchType = self.searchTypes[i]
                 let btn = UIButton(frame: CGRect(x: 0, y: 36*CGFloat(i)*kScreenWidth/375, width: 60*kScreenWidth/375, height: 36*kScreenWidth/375))
-                btn.setTitle(title, forState: .Normal)
+                btn.tag = 1000+i
+                btn.setTitle(searchType.title, forState: .Normal)
                 btn.setTitleColor(UIColor.whiteColor(), forState: .Normal)
                 btn.titleLabel?.font = UIFont.systemFontOfSize(15)
                 btn.backgroundColor = UIColor.clearColor()
@@ -1046,6 +1096,7 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
                 btn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
                     selectView.removeFromSuperview()
                     leftViewBtn.setTitle((sender as! UIButton).titleLabel?.text, forState: .Normal)
+                    self.searchType = self.searchTypes[(sender as! UIButton).tag-1000]
                     return RACSignal.empty()
                 })
                 selectView.addSubview(btn)

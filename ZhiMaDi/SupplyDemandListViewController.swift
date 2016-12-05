@@ -23,9 +23,10 @@ class SupplyDemandListViewController: UIViewController ,ZMDInterceptorProtocol, 
     var orderbyPriceUp = true                       // 价格升序
     var orderBy : Int = 0  //默认为0
     var filterView : UIView!
+    var pickView : PickView!
     
     //跳转传递的值
-    var vcTitle = ""        //vc的title
+//    var vcTitle = ""        //vc的title
     
     //供求数据请求参数
     var customerId : NSNumber?
@@ -106,7 +107,7 @@ class SupplyDemandListViewController: UIViewController ,ZMDInterceptorProtocol, 
     func pushDetailVc(product : ZMDSupplyProduct) {
         let vc = SupplyDemandDetailViewController.CreateFromMainStoryboard() as! SupplyDemandDetailViewController
         vc.hidesBottomBarWhenPushed = true
-        vc.productId = 353
+        vc.data = product
         self.navigationController?.pushViewController(vc, animated: true)
     }
     
@@ -196,6 +197,8 @@ class SupplyDemandListViewController: UIViewController ,ZMDInterceptorProtocol, 
                     self.orderBy = 0
                     break
                 case "更多" :
+                    self.createFilterMenu() //更新filterMenu上的UI
+                    //MARK:pickView
                     let pickView = NSBundle.mainBundle().loadNibNamed("CommentView", owner: nil, options: nil)[2] as! PickView
                     pickView.submitBtnFinished = {() -> Void in
                         if !pickView.checkData() {
@@ -218,6 +221,7 @@ class SupplyDemandListViewController: UIViewController ,ZMDInterceptorProtocol, 
                     break
                 }
                 //点击上面的menu时让indexSkip=1(indexSkip==1时清除dataArray)，让后定义orderBy重新请求数据
+                self.createFilterMenu()     //更新filterMenu上的UI
                 self.page = 1
                 self.fetchData(self.orderBy)
             })
@@ -246,7 +250,11 @@ class SupplyDemandListViewController: UIViewController ,ZMDInterceptorProtocol, 
     }
     
     func setVCTitle() {
-        self.title = self.vcTitle
+        if self.type == 1 {
+            self.title = "供应"
+        }else{
+            self.title = "求购"
+        }
     }
     
     //
@@ -264,7 +272,6 @@ class SupplyDemandListViewController: UIViewController ,ZMDInterceptorProtocol, 
                 }
                 self.indexSkip += 1
                 self.dataArray.addObjectsFromArray(productsArr as [AnyObject])
-                self.createFilterMenu()
                 self.currentTableView.reloadData()
                 if productsArr.count < 12 {
                     self.isHasNext = false

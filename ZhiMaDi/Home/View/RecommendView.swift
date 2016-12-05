@@ -47,7 +47,6 @@ class PickView : UIView,UITextFieldDelegate {
                 let tmp1 = self.lower
                 self.lower = self.higher
                 self.higher = tmp1
-                return false
             }
         }
         

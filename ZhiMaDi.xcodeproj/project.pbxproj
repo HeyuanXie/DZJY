@@ -764,6 +764,9 @@
 		84BFAE151D94EDE400BF394F /* home_page_alock@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 84BFAE141D94EDE400BF394F /* home_page_alock@2x.png */; };
 		84C7E53D1DAE08F400096A9E /* store_home_bg.png in Resources */ = {isa = PBXBuildFile; fileRef = 84C7E53C1DAE08F400096A9E /* store_home_bg.png */; };
 		84C7E5431DAE116C00096A9E /* product_default.png in Resources */ = {isa = PBXBuildFile; fileRef = 84C7E5421DAE116C00096A9E /* product_default.png */; };
+		84C9AD831DF56AA8008E2BC7 /* LYScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C9AD821DF56AA8008E2BC7 /* LYScrollView.m */; };
+		84C9AD8A1DF572D4008E2BC7 /* PGIndexBannerSubiew.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C9AD851DF572D4008E2BC7 /* PGIndexBannerSubiew.m */; };
+		84C9AD8B1DF572D4008E2BC7 /* NewPagedFlowView.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C9AD881DF572D4008E2BC7 /* NewPagedFlowView.m */; };
 		84DB27FC1DD0508D00CDBE67 /* ZMDAlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DB27FB1DD0508D00CDBE67 /* ZMDAlertView.swift */; };
 		84DC0D671D7D474C00FB3E4E /* store_notice.png in Resources */ = {isa = PBXBuildFile; fileRef = 84DC0D661D7D474C00FB3E4E /* store_notice.png */; };
 		84DC653A1D6EE326000DECC5 /* TradeSuccessedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DC65391D6EE326000DECC5 /* TradeSuccessedViewController.swift */; };
@@ -1597,6 +1600,12 @@
 		84BFAE141D94EDE400BF394F /* home_page_alock@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "home_page_alock@2x.png"; sourceTree = "<group>"; };
 		84C7E53C1DAE08F400096A9E /* store_home_bg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = store_home_bg.png; sourceTree = "<group>"; };
 		84C7E5421DAE116C00096A9E /* product_default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = product_default.png; sourceTree = "<group>"; };
+		84C9AD811DF56AA8008E2BC7 /* LYScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LYScrollView.h; sourceTree = "<group>"; };
+		84C9AD821DF56AA8008E2BC7 /* LYScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LYScrollView.m; sourceTree = "<group>"; };
+		84C9AD841DF572D4008E2BC7 /* PGIndexBannerSubiew.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGIndexBannerSubiew.h; sourceTree = "<group>"; };
+		84C9AD851DF572D4008E2BC7 /* PGIndexBannerSubiew.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGIndexBannerSubiew.m; sourceTree = "<group>"; };
+		84C9AD871DF572D4008E2BC7 /* NewPagedFlowView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NewPagedFlowView.h; sourceTree = "<group>"; };
+		84C9AD881DF572D4008E2BC7 /* NewPagedFlowView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NewPagedFlowView.m; sourceTree = "<group>"; };
 		84DB27FB1DD0508D00CDBE67 /* ZMDAlertView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZMDAlertView.swift; sourceTree = "<group>"; };
 		84DC0D661D7D474C00FB3E4E /* store_notice.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = store_notice.png; sourceTree = "<group>"; };
 		84DC65391D6EE326000DECC5 /* TradeSuccessedViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TradeSuccessedViewController.swift; sourceTree = "<group>"; };
@@ -2994,6 +3003,7 @@
 		3C90987A1C76A6E9006B7D2C /* Librarys */ = {
 			isa = PBXGroup;
 			children = (
+				84C9AD771DF51D30008E2BC7 /* CardStyleScrollView */,
 				84E738AE1DEBD58700768D8C /* HYTabBar */,
 				84F036B61DDB10480061D478 /* TZImagePickerController */,
 				8446E6061DD59AD000889E9A /* XGPush */,
@@ -3340,6 +3350,45 @@
 				84B35E9A1DF3C9C900699EEF /* SupplyDemandDetailViewController.swift */,
 			);
 			name = VC;
+			sourceTree = "<group>";
+		};
+		84C9AD771DF51D30008E2BC7 /* CardStyleScrollView */ = {
+			isa = PBXGroup;
+			children = (
+				84C9AD861DF572D4008E2BC7 /* CustomeView */,
+				84C9AD891DF572D4008E2BC7 /* NewPagedFlowView */,
+				84C9AD801DF56A97008E2BC7 /* lyScrollView */,
+			);
+			path = CardStyleScrollView;
+			sourceTree = "<group>";
+		};
+		84C9AD801DF56A97008E2BC7 /* lyScrollView */ = {
+			isa = PBXGroup;
+			children = (
+				84C9AD811DF56AA8008E2BC7 /* LYScrollView.h */,
+				84C9AD821DF56AA8008E2BC7 /* LYScrollView.m */,
+			);
+			path = lyScrollView;
+			sourceTree = "<group>";
+		};
+		84C9AD861DF572D4008E2BC7 /* CustomeView */ = {
+			isa = PBXGroup;
+			children = (
+				84C9AD841DF572D4008E2BC7 /* PGIndexBannerSubiew.h */,
+				84C9AD851DF572D4008E2BC7 /* PGIndexBannerSubiew.m */,
+			);
+			name = CustomeView;
+			path = "../../../../../Downloads/NewPagedFlowView-master/NewPagedFlowViewDemo/NewPagedFlowViewDemo/Classes/CustomeView";
+			sourceTree = "<group>";
+		};
+		84C9AD891DF572D4008E2BC7 /* NewPagedFlowView */ = {
+			isa = PBXGroup;
+			children = (
+				84C9AD871DF572D4008E2BC7 /* NewPagedFlowView.h */,
+				84C9AD881DF572D4008E2BC7 /* NewPagedFlowView.m */,
+			);
+			name = NewPagedFlowView;
+			path = "../../../../../Downloads/NewPagedFlowView-master/NewPagedFlowViewDemo/NewPagedFlowViewDemo/Classes/NewPagedFlowView";
 			sourceTree = "<group>";
 		};
 		84E738AE1DEBD58700768D8C /* HYTabBar */ = {
@@ -4206,9 +4255,11 @@
 				3C9099381C76A6E9006B7D2C /* BarChartDataProvider.swift in Sources */,
 				3C90992F1C76A6E9006B7D2C /* ChartDefaultXAxisValueFormatter.swift in Sources */,
 				3C90991C1C76A6E9006B7D2C /* CandleChartData.swift in Sources */,
+				84C9AD831DF56AA8008E2BC7 /* LYScrollView.m in Sources */,
 				2B8739CD1CBF7AA3007FE81A /* InvitatinCodeViewController.swift in Sources */,
 				3C90994D1C76A6E9006B7D2C /* CombinedChartRenderer.swift in Sources */,
 				3C90994E1C76A6E9006B7D2C /* HorizontalBarChartRenderer.swift in Sources */,
+				84C9AD8B1DF572D4008E2BC7 /* NewPagedFlowView.m in Sources */,
 				2B02B4B41CAA62FA0064B47C /* LeasePackageView.swift in Sources */,
 				2B3AC6171C97DDC100CC8662 /* LogisticsViewController.swift in Sources */,
 				3C9099421C76A6E9006B7D2C /* ChartAxisRendererBase.swift in Sources */,
@@ -4235,6 +4286,7 @@
 				2B73D85F1C86D36E0016FEB2 /* PhoneSeteMsgVerifyViewController.swift in Sources */,
 				2BA287EF1CC09C4900B6281E /* MsgActivityViewController.swift in Sources */,
 				2B90956F1CC62F4000959E55 /* VipClubHomeViewController.swift in Sources */,
+				84C9AD8A1DF572D4008E2BC7 /* PGIndexBannerSubiew.m in Sources */,
 				3C9099071C76A6E9006B7D2C /* HorizontalBarChartView.swift in Sources */,
 				3C90990F1C76A6E9006B7D2C /* ChartLegend.swift in Sources */,
 				84F036CC1DDB10480061D478 /* NSBundle+TZImagePicker.m in Sources */,
@@ -4389,7 +4441,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "6987f787-db31-4707-8582-9553e8ff1a01";
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -4412,8 +4464,8 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: The Wholesale Of Agricultural Commodities Of Jiangnan Kashi Bulk Agricultural Prod (JQV37Q32C9)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: The Wholesale Of Agricultural Commodities Of Jiangnan Kashi Bulk Agricultural Prod (JQV37Q32C9)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
@@ -4428,7 +4480,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "6987f787-db31-4707-8582-9553e8ff1a01";
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -4502,7 +4554,7 @@
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\"";
 				PRODUCT_BUNDLE_IDENTIFIER = com.jn.dzjy;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "6987f787-db31-4707-8582-9553e8ff1a01";
 				SWIFT_OBJC_BRIDGING_HEADER = "ZhiMaDi/ZhiMaDi-Bridging-Header.h";
 			};
 			name = Debug;
@@ -4513,8 +4565,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: The Wholesale Of Agricultural Commodities Of Jiangnan Kashi Bulk Agricultural Prod (JQV37Q32C9)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: The Wholesale Of Agricultural Commodities Of Jiangnan Kashi Bulk Agricultural Prod (JQV37Q32C9)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -4574,7 +4626,7 @@
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\"";
 				PRODUCT_BUNDLE_IDENTIFIER = com.jn.dzjy;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "6987f787-db31-4707-8582-9553e8ff1a01";
 				SWIFT_OBJC_BRIDGING_HEADER = "ZhiMaDi/ZhiMaDi-Bridging-Header.h";
 			};
 			name = Release;

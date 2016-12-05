@@ -12,7 +12,7 @@ import MJRefresh
 import WebKit
 
 //商品详请
-class SupplyDemandDetailViewController: UIViewController,UITableViewDataSource,UITableViewDelegate,QNShareViewDelegate,ZMDInterceptorProtocol{
+class SupplyDemandDetailViewController: UIViewController,UITableViewDataSource,UITableViewDelegate,QNShareViewDelegate,ZMDInterceptorProtocol,NewPagedFlowViewDelegate, NewPagedFlowViewDataSource {
     enum GoodsCellType{
         case HomeContentTypeAd                       /* 广告显示页 */
         case HomeContentTypeDetail                   /* 菜单参数栏目 */
@@ -35,22 +35,25 @@ class SupplyDemandDetailViewController: UIViewController,UITableViewDataSource,U
     var navBackView : UIView!
     var navLine : UIView!
     var productId : Int!
-    var productDetail : ZMDProductDetail!
     var attrSelectArray = NSMutableArray()          // 属性选择
     var collects = NSMutableArray()
+    var pageFlowView : NewPagedFlowView!
     
     var isCollected = false        //判断是否已经收藏
     var shoppingItemId: NSNumber!
+    var data : ZMDSupplyProduct!    //从SupplyList传过来的product
+    var imageArray = NSMutableArray()
     
     //MARK: - *************LiftCircle**************
     override func viewDidLoad() {
         super.viewDidLoad()
         self.setupNavigation()
+        self.dataInit()
         self.updateUI()
     }
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(true)
-        self.dataInit()
+        self.currentTableView.reloadData()
     }
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(true)
@@ -58,6 +61,7 @@ class SupplyDemandDetailViewController: UIViewController,UITableViewDataSource,U
     
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(true)
+        self.pageFlowView.stopTimer()
     }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -78,7 +82,7 @@ class SupplyDemandDetailViewController: UIViewController,UITableViewDataSource,U
         return 1
     }
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        if tableView == self.currentTableView && self.productDetail == nil {
+        if tableView == self.currentTableView && self.data == nil {
             return 0
         }
         return self.goodsCellTypes.count
@@ -105,7 +109,7 @@ class SupplyDemandDetailViewController: UIViewController,UITableViewDataSource,U
         let cellType = self.goodsCellTypes[indexPath.section]
         switch cellType {
         case .HomeContentTypeAd :
-            return 286
+            return 286*kScreenWidth/375 //image是236
         case .HomeContentTypeDetail :
             return 127
         case .HomeContentTypeDistribution :
@@ -166,12 +170,12 @@ class SupplyDemandDetailViewController: UIViewController,UITableViewDataSource,U
     //MARK: QNShareViewDelegate
     //分享的body，返回一个data，通过data.image可以取到image
     func qnShareView(view: ShareView) -> (image: UIImage, url: String, title: String?, description: String)? {
-        if let productDetail = self.productDetail {
-            let imgUrl = kImageAddressMain + (productDetail.DetailsPictureModel?.DefaultPictureModel!.ImageUrl)!
+        if let data = self.data {
+            let imgUrl = kImageAddressMain + (data.SupplyDemandPictures[0].PictureUrl)
             let image = UIImage(data: NSData(contentsOfURL: NSURL(string: imgUrl)!)!)
-            let title = productDetail.Name
-            let url = "\(kImageAddressMain)/\(productDetail.Id.integerValue)"
-            let description = productDetail.description
+            let title = data.Title
+            let url = "\(kImageAddressMain)/\(data.Id.integerValue)"
+            let description = data.Description
             return (image!,url,title,description)
         }else{
             return (UIImage(named: "Share_Icon")!, kImageAddressMain, self.title ?? "", "疆南市场,物美价廉!")
@@ -189,6 +193,44 @@ class SupplyDemandDetailViewController: UIViewController,UITableViewDataSource,U
         webView.loadRequest(requeset)
     }
     
+    //MARK: NewPageFlowViewDelegate
+    func sizeForPageInFlowView(flowView: NewPagedFlowView!) -> CGSize {
+        return CGSizeMake(236*kScreenWidthZoom6, 236*kScreenWidthZoom6);
+    }
+    func didSelectCell(subView: UIView!, withSubViewIndex subIndex: Int) {
+        
+    }
+    
+    //MARK: NewPageFlowViewDelegate
+    func numberOfPagesInFlowView(flowView: NewPagedFlowView!) -> Int {
+        if let data = self.data {
+            return data.SupplyDemandPictures.count
+        }
+        return 0
+    }
+    func flowView(flowView: NewPagedFlowView!, cellForPageAtIndex index: Int) -> UIView! {
+        guard let bannerView = flowView.dequeueReusableCell() as? PGIndexBannerSubiew else {
+            let bannerView = PGIndexBannerSubiew(frame: CGRect(x: 0, y: 0, width: 236*kScreenWidthZoom6, height: 236*kScreenWidthZoom6))
+            bannerView.layer.cornerRadius = 4
+            bannerView.layer.masksToBounds = true
+            if let url = self.imageArray[index] as? NSURL {
+                bannerView.mainImageView.sd_setImageWithURL(url, placeholderImage: nil)
+            }
+            bannerView.mainImageView.sd_setImageWithURL(self.imageArray[index] as! NSURL, placeholderImage: nil)
+            return bannerView
+        }
+        bannerView.layer.cornerRadius = 4
+        bannerView.layer.masksToBounds = true
+        if let mainImageView = bannerView.mainImageView,url = self.imageArray[index] as? NSURL {
+            mainImageView.sd_setImageWithURL(url, placeholderImage: nil)
+        }
+        return bannerView
+    }
+    
+    func didScrollToPage(pageNumber: Int, inFlowView flowView: NewPagedFlowView!) {
+        
+    }
+    
     //MARK: - *********TableViewCell**********
     /// 广告 cell
     func cellForHomeAd(tableView: UITableView,indexPath: NSIndexPath)-> UITableViewCell {
@@ -199,30 +241,42 @@ class SupplyDemandDetailViewController: UIViewController,UITableViewDataSource,U
             ZMDTool.configTableViewCellDefault(cell!)
             cell!.selectionStyle = .None
             cell!.contentView.backgroundColor = RGB(239,240,241,1.0)
+ 
             
-        }
-        if let v = cell?.viewWithTag(10001) {
-            v.removeFromSuperview()
+            let width = 236*kScreenWidthZoom6
+            let scrollView = UIScrollView(frame: CGRect(x: 0, y: 14*kScreenWidthZoom6, width: kScreenWidth, height: width))
+            scrollView.tag = 10001
+            scrollView.showsHorizontalScrollIndicator = false
+            cell?.contentView.addSubview(scrollView)
+            
+            self.pageFlowView = NewPagedFlowView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: width))
+            self.pageFlowView.tag = 10000
+            self.pageFlowView.backgroundColor = UIColor.clearColor()
+            self.pageFlowView.delegate = self
+            self.pageFlowView.dataSource = self
+            self.pageFlowView.autoTime = 2.5
+            self.pageFlowView.minimumPageAlpha = 0.1
+            self.pageFlowView.minimumPageScale = 0.85
+            self.pageFlowView.orientation = NewPagedFlowViewOrientationHorizontal
+            //提前告诉有多少页
+            self.pageFlowView.orginPageCount = self.imageArray.count;
+            self.pageFlowView.isOpenAutoScroll = true
+
+            //初始化pageControl
+            let pageControl = UIPageControl(frame: CGRect(x: 0, y: (236+14+13)*kScreenWidthZoom6, width: kScreenWidth-24-8, height: 8))
+            cell?.contentView.addSubview(pageControl)
+            pageControl.tag = 10002
+            pageControl.currentPageIndicatorTintColor = appThemeColorNew
+            pageControl.pageIndicatorTintColor = RGB(209,210,211,1.0)
+            self.pageFlowView.pageControl = pageControl
+            
+            scrollView.addSubview(self.pageFlowView)
         }
         
-        if self.productDetail != nil && self.productDetail.DetailsPictureModel != nil {
-            let arr = NSMutableArray()
-            if let pictureModel = self.productDetail.DetailsPictureModel!.PictureModels {
-                for pic in pictureModel {
-                    let imgUrl = kImageAddressMain + (pic.ImageUrl ?? "")
-                    arr.addObject(NSURL(string: imgUrl)!)
-                }
-            }
-            let cycleScroll = CycleScrollView(frame: CGRectMake(0, 14, kScreenWidth, 286))
-            
-            cycleScroll.tag = 10001
-            cycleScroll.backgroundColor = UIColor.clearColor()
-            cycleScroll.autoScroll = true
-            cycleScroll.autoTime = 2.5
-            if arr.count != 0 {
-                cycleScroll.urlArray = arr as [AnyObject]
-            }
-            cell?.addSubview(cycleScroll)
+        let scrollView = cell?.contentView.viewWithTag(10001) as! UIScrollView
+        let pageFlowView = scrollView.viewWithTag(10000) as! NewPagedFlowView
+        if self.data != nil && self.data.SupplyDemandPictures != nil {
+            pageFlowView.reloadData()
         }
         return cell!
     }
@@ -230,8 +284,8 @@ class SupplyDemandDetailViewController: UIViewController,UITableViewDataSource,U
     func cellForHomeDetail(tableView: UITableView,indexPath: NSIndexPath)-> UITableViewCell {
         let cellId = "detailCell"
         let cell = tableView.dequeueReusableCellWithIdentifier(cellId) as! DZContentDetailCell
-        if self.productDetail != nil {
-            DZContentDetailCell.configDetailCell(cell, product: self.productDetail)
+        if self.data != nil {
+            DZContentDetailCell.configDetailCell(cell, product: self.data)
         }
         return cell
     }
@@ -264,7 +318,9 @@ class SupplyDemandDetailViewController: UIViewController,UITableViewDataSource,U
     func cellForSeller(tableView: UITableView,indexPath: NSIndexPath)-> UITableViewCell {
         let cellId = "sellerCell"
         let cell = tableView.dequeueReusableCellWithIdentifier(cellId) as! DZContentSellerCell
-        //        DZContentSellerCell.configSellerCell(cell, seller: g_customer!)
+        if let data = self.data {
+            DZContentSellerCell.configSellerCell(cell, data:data)
+        }
         return cell
     }
     /// 产品说明头部cell
@@ -308,9 +364,9 @@ class SupplyDemandDetailViewController: UIViewController,UITableViewDataSource,U
             webView.tag = 1000
             cell?.contentView.addSubview(webView)
         }
-        if let productDetail = self.productDetail {
+        if let data = self.data {
             let webView = cell?.contentView.viewWithTag(1000) as! WKWebView
-            let webUrl = kImageAddressMain + "/\(productDetail.Id.integerValue)"
+            let webUrl = kImageAddressMain + "/\(data.Id.integerValue)"
             webView.loadRequest(NSURLRequest(URL: NSURL(string: webUrl)!))
         }
         return cell!
@@ -346,17 +402,12 @@ class SupplyDemandDetailViewController: UIViewController,UITableViewDataSource,U
     
     private func dataInit(){
         self.goodsCellTypes = [.HomeContentTypeAd,.HomeContentTypeDetail,.HomeContentTypeDistribution,.HomeContentTypeSeller,.HomeContentTypeIntroductionHead,.HomeContentTypeIntroductionDetail]
-        QNNetworkTool.fetchProductDetail(self.productId) { (productDetail, error, dictionary) -> Void in
-            if productDetail != nil {
-                self.productDetail = productDetail
-                self.currentTableView.reloadData()
-                //当用户登录状态下，才判断这些商品是否收藏
-                if g_customerId != nil {
-                    //请求数据完成后判断是否已经收藏
-                    self.wheatherCollected()
-                }
-            } else {
-                ZMDTool.showErrorPromptView(nil, error: error)
+        if let data = self.data, pictures = data.SupplyDemandPictures {
+            self.imageArray.removeAllObjects()
+            for pic in pictures
+            {
+                let imgUrl = kImageAddressMain + (pic.PictureUrl ?? "")
+                self.imageArray.addObject(NSURL(string: imgUrl)!)
             }
         }
     }
@@ -398,7 +449,7 @@ class SupplyDemandDetailViewController: UIViewController,UITableViewDataSource,U
             if let shoppingItems = shoppingItems {
                 var index = 0
                 for shoppingItem in shoppingItems {
-                    if (shoppingItem as! ZMDShoppingItem).ProductName == (self.productDetail?.Name){
+                    if (shoppingItem as! ZMDShoppingItem).ProductName == (self.data?.Title){
                         self.isCollected = true
                         self.shoppingItemId = shoppingItem.Id
                         break
@@ -418,7 +469,7 @@ class SupplyDemandDetailViewController: UIViewController,UITableViewDataSource,U
             //先遍历已经收藏的items,如果其中包含当前item，则self.isCollected = true
             QNNetworkTool.fetchShoppingCart(2){(shoppingItems, dictionary, error) -> Void in
                 for shoppingItem in shoppingItems ?? [] {
-                    if (shoppingItem as! ZMDShoppingItem).ProductName == self.productDetail.Name{
+                    if (shoppingItem as! ZMDShoppingItem).ProductName == self.data.Title{
                         self.isCollected = true
                         self.shoppingItemId = shoppingItem.Id
                         break
@@ -440,7 +491,7 @@ class SupplyDemandDetailViewController: UIViewController,UITableViewDataSource,U
                         if postDic == nil {
                             return
                         }
-                        postDic!.setValue(self.productDetail.Id.integerValue, forKey: "Id")
+                        postDic!.setValue(self.data.Id.integerValue, forKey: "Id")
                         postDic!.setValue(2, forKey: "CartType")
                         postDic!.setValue(g_customerId!, forKey: "CustomerId")
                         QNNetworkTool.addProductToCart(postDic!, completion: { (succeed, dictionary, error) -> Void in
@@ -468,12 +519,23 @@ class SupplyDemandDetailViewController: UIViewController,UITableViewDataSource,U
 class DZContentDetailCell : UITableViewCell {
     @IBOutlet weak var nameLbl : UILabel!
     @IBOutlet weak var priceLbl : UILabel!
+    @IBOutlet weak var priceUnitLbl : UILabel!
     @IBOutlet weak var addressLbl : UILabel!
     @IBOutlet weak var limitLbl : UILabel!
     @IBOutlet weak var endTimeLbl : UILabel!
     
-    class func configDetailCell(cell:DZContentDetailCell,product:ZMDProductDetail) {
-        
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        self.priceUnitLbl.hidden = true
+    }
+    
+    class func configDetailCell(cell:DZContentDetailCell,product:ZMDSupplyProduct) {
+        cell.nameLbl.text = product.Title
+        cell.priceLbl.text = "\(product.Price.floatValue) /\(product.PriceUnit)"
+        cell.priceLbl.attributedText = cell.priceLbl.text?.AttributeText(["\(product.Price.floatValue)","/\(product.PriceUnit)"], colors: [appThemeColorNew,defaultTextColor], textSizes: [20,14], bolds: [true,false])
+        cell.addressLbl.text = product.AreaName.componentsSeparatedByString(">>").first!+" "+product.AreaName.componentsSeparatedByString(">>").last!
+        cell.limitLbl.text = "\(product.Quantity)\(product.QuantityUnit)/\(product.MinQuantity ?? 0)\(product.MinQuantityUnit)起订"
+        cell.endTimeLbl.text = "截止至: \(product.EndTime.componentsSeparatedByString("T").first!)"
     }
 }
 
@@ -495,8 +557,14 @@ class DZContentSellerCell : UITableViewCell {
         self.headImg.addSubview(ZMDTool.getLine(CGRect(x: 0, y: 0, width: 0.5, height: 154*kScreenWidth/375), backgroundColor: defaultLineColor))
     }
     
-    class func configSellerCell(cell:DZContentSellerCell,seller:ZMDCustomer) {
-        
+    class func configSellerCell(cell:DZContentSellerCell,data:ZMDSupplyProduct) {
+        let phoneText = "手机号: \(data.Phone)"
+        let qqText = "QQ号: \(data.QQ)"
+        let weixinText = "微信号: 就不告诉你"
+        cell.phoneLbl.attributedText = phoneText.AttributedText("手机号:", color: RGB(173,174,175,1.0))
+        cell.qqLbl.attributedText = qqText.AttributedText("QQ号:", color: RGB(173,174,175,1.0))
+        cell.weixinLbl.attributedText = weixinText.AttributedText("微信号:", color: RGB(173,174,175,1.0))
+        cell.headImg.image = UIImage(named: "user_interview_QRcode")
     }
 }
 

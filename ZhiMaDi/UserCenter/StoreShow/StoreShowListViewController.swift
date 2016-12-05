@@ -7,11 +7,9 @@
 //
 
 import UIKit
-class StoreShowListViewController: UIViewController,UITableViewDataSource,UITableViewDelegate {
-    @IBOutlet weak var currentTableView: UITableView!
-    
-    let kServerAddress  = "http://www.xjnongte.com"
+class StoreShowListViewController: UIViewController,UITableViewDataSource,UITableViewDelegate,ZMDInterceptorProtocol {
 
+    @IBOutlet weak var currentTableView: UITableView!
     var IndexFilter = 0
     var orderby = 16
     var orderBy : Int?
@@ -40,51 +38,51 @@ class StoreShowListViewController: UIViewController,UITableViewDataSource,UITabl
         if section == 0 {
             return self.createFilterMenu()
         } else {
-            let headView = UIView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 10))
+            let headView = UIView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 14*kScreenWidthZoom6))
             headView.backgroundColor = tableViewdefaultBackgroundColor
             return headView
         }
     }
     func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         if section == 0 {
-            return 52
+            return 54*kScreenWidthZoom6
         } else {
-            return 0
+            return 14*kScreenWidthZoom6
         }
     }
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
         if indexPath.row == 0 {
-            return 100
+            return 78*kScreenWidthZoom6
         } else {
-            return 130
+            return 128*kScreenWidthZoom6
         }
     }
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let store = self.dataArray[indexPath.section] as! ZMDStoreDetail
         if indexPath.row == 0{
             let cellId = "StoreCell"
-            let cell = tableView.dequeueReusableCellWithIdentifier(cellId)
-            ZMDTool.configTableViewCellDefault(cell!)
+            let cell = tableView.dequeueReusableCellWithIdentifier(cellId) as! StoreShowListStoreCell
+            ZMDTool.configTableViewCellDefault(cell)
             
-            let headGrayView = cell?.viewWithTag(10000)
+            let headGrayView = cell.viewWithTag(10000)
             headGrayView?.backgroundColor = UIColor.lightGrayColor()
             
-            let storeImage = cell?.viewWithTag(10001) as! UIImageView
+            let storeImage = cell.viewWithTag(10001) as! UIImageView
             storeImage.image = UIImage(named: "default-image-100.jpg")
             ZMDTool.configViewLayerRound(storeImage)
             let store = self.dataArray[indexPath.section] as! ZMDStoreDetail
-            if let urlStr = store.PictureUrl,url = NSURL(string: kServerAddress + urlStr) {
+            if let urlStr = store.PictureUrl,url = urlStr.hasPrefix(kImageAddressMain) ? NSURL(string: urlStr) : NSURL(string: kImageAddressMain + urlStr) {
                 storeImage.sd_setImageWithURL(url, placeholderImage: nil)
             }
             
-            let nameLabel = cell?.viewWithTag(10002) as! UILabel
+            let nameLabel = cell.viewWithTag(10002) as! UILabel
             nameLabel.text = "疆南Style"
             nameLabel.text = store.Name
-            let mainLabel = cell?.viewWithTag(10003) as! UILabel
+            let mainLabel = cell.viewWithTag(10003) as! UILabel
             mainLabel.text = "主营:...."
             mainLabel.text = store.Host == nil ? "主营:化肥、农药、农产品" : "主营:\(store.Host)"
             
-            let gotoBtn = cell?.viewWithTag(10004) as! UIButton
+            let gotoBtn = cell.viewWithTag(10004) as! UIButton
             ZMDTool.configViewLayerFrameWithColor(gotoBtn, color: defaultSelectColor)
             ZMDTool.configViewLayerWithSize(gotoBtn, size: 5)
             gotoBtn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
@@ -97,7 +95,7 @@ class StoreShowListViewController: UIViewController,UITableViewDataSource,UITabl
                 self.navigationController?.pushViewController(vc, animated: true)
                 return RACSignal.empty()
             })
-            return cell!
+            return cell
         } else {
             let cellId = "GoodsCell"
             let cell = tableView.dequeueReusableCellWithIdentifier(cellId) as! StoreShowListGoodCell
@@ -132,11 +130,11 @@ class StoreShowListViewController: UIViewController,UITableViewDataSource,UITabl
         let filterTitles = ["默认","销量","人气"]
         let countForBtn = CGFloat(filterTitles.count)
         //52+16，与tableView的delegate中设置的第0个section的heightForHeader一致
-        let view = UIView(frame: CGRectMake(0 , 0, kScreenWidth, 52 + 16))
+        let view = UIView(frame: CGRectMake(0 , 0, kScreenWidth, 54))
         view.backgroundColor = UIColor.clearColor()
         for var i=0;i<filterTitles.count;i++ {
             let index = i%filterTitles.count
-            let btn = UIButton(frame:  CGRectMake(CGFloat(index) * kScreenWidth/countForBtn , 0, kScreenWidth/countForBtn, 52))
+            let btn = UIButton(frame:  CGRectMake(CGFloat(index) * kScreenWidth/countForBtn , 0, kScreenWidth/countForBtn, 54))
             btn.backgroundColor = UIColor.whiteColor()
             btn.selected = i == self.IndexFilter ? true : false
             btn.setTitleColor(defaultTextColor, forState: .Normal)
@@ -235,6 +233,12 @@ class StoreShowListViewController: UIViewController,UITableViewDataSource,UITabl
 
 }
 
+class StoreShowListStoreCell : UITableViewCell {
+    override func awakeFromNib() {
+        self.frame = CGRect(x: 0, y: 0, width: kScreenWidth, height: 78*kScreenWidthZoom6)
+    }
+}
+
 
 class StoreShowListGoodCell: UITableViewCell {
     @IBOutlet weak var firstView:UIView!
@@ -242,10 +246,8 @@ class StoreShowListGoodCell: UITableViewCell {
     @IBOutlet weak var thirdView:UIView!
     @IBOutlet weak var fourthView:UIView!
     
-    let kServerAddress  = "http://www.xjnongte.com"
-
     override func awakeFromNib() {
-
+        self.frame = CGRect(x: 0, y: 0, width: kScreenWidth, height: 128*kScreenWidthZoom6)
     }
     
     @IBOutlet var BtnArray: [UIButton]!
@@ -275,7 +277,9 @@ class StoreShowListGoodCell: UITableViewCell {
             default:
                 break
             }
-            (view.viewWithTag(100) as!UIImageView).sd_setImageWithURL(NSURL(string: kServerAddress + (product.DefaultPictureModel?.ImageUrl)!), placeholderImage: nil)
+            if let urlStr = product.DefaultPictureModel?.ImageUrl,url = urlStr.hasPrefix(kImageAddressMain) ? NSURL(string: urlStr) : NSURL(string: kImageAddressMain+urlStr) {
+                (view.viewWithTag(100) as!UIImageView).sd_setImageWithURL(url, placeholderImage: nil)
+            }
             let productName = product.Name.stringByReplacingOccurrencesOfString("（代购）", withString: "").stringByReplacingOccurrencesOfString("【代购】", withString: "").stringByReplacingOccurrencesOfString("（预售）", withString: "")
             (view.viewWithTag(101) as!UILabel).text = productName
             (view.viewWithTag(102) as!UILabel).text = product.ProductPrice?.Price

@@ -65,6 +65,9 @@ let kScreenWidth = UIScreen.mainScreen().bounds.size.width
 let kScreenHeightZoom = kScreenHeight/568.0
 /// 屏幕宽度放大系数（相对于iPhone5/5S的屏幕）
 let kScreenWidthZoom = kScreenWidth/320.0
+/// 相对于6的放大系数
+let kScreenWidthZoom6 = kScreenWidth/375.0
+let kScreenHeightZoom6 = kScreenHeight/667.0
 
 // MARK: - NSUserDefaults.standardUserDefaults() 相关
 /// 从 NSUserDefaults.standardUserDefaults() 中获取数据
