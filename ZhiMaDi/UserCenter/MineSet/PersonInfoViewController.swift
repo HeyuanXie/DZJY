@@ -8,14 +8,23 @@
 
 import UIKit
 import SDWebImage
-//个人资料
+//账户设置
 class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableViewDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate,ZMDInterceptorProtocol,ZMDInterceptorNavigationBarShowProtocol,ZMDInterceptorMoreProtocol {
     enum UserCenterCellType{
         case Head
-        case NickN
-        case RealName
-        case ChangePs
+        case Name
+        case Gender
+        case BirthDay
+        case Location
+        
+        case WeiXin
+        case Email
+        case Phone
+        
+        case PayPassword
+        
         case Address
+        
         case Clean
         
         init(){
@@ -25,36 +34,75 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
         var title : String{
             switch self{
             case Head:
-                return "头像"
-            case NickN:
-                return "昵称"
-            case RealName :
-                return "实名认证"
-            case ChangePs:
-                return "修改登陆密码"
-            case Address:
+                return "更换头像"
+            case Name:
+                return "真实姓名"
+            case .Gender:
+                return "性别"
+            case .BirthDay:
+                return "生日"
+            case .Location:
+                return "所在地"
+                
+            case .WeiXin:
+                return "微信号"
+            case .Email:
+                return "邮箱"
+            case .Phone:
+                return "手机号"
+                
+            case .PayPassword:
+                return "设置支付密码"
+                
+            case .Address:
                 return "管理收货地址"
                 
             case Clean:
                 return "清理缓存"
             }
         }
+        
+        var text : String {
+            switch self {
+            case Head:
+                return ""
+            case .Name:
+                return ""
+            case .Gender:
+                return ""
+            case .BirthDay:
+                return "未选择"
+            case .Location:
+                return "广东 - 东莞"
+                
+            case .WeiXin:
+                return "请填写"
+            case .Email:
+                return "请填写"
+            case .Phone:
+                return "已绑定153****9415"
+                
+            default:
+                return ""
+            }
+        }
 
         var pushViewController :UIViewController{
             let viewController: UIViewController
             switch self{
-            case Head:
+            case .Gender:
                 viewController = UIViewController()
-            case NickN:
-                viewController = InputTextViewController()
-            case RealName :
-                viewController = RealAuthenticationViewController()
-            case ChangePs:
-                viewController = PsWordFindViewController.CreateFromLoginStoryboard() as! PsWordFindViewController
-            case Address:
+            case .BirthDay:
+                viewController = UIViewController()
+            case .Location :
+                viewController = UIViewController()
+                
+            case .PayPassword:
+                viewController = UIViewController()
+            case .Address:
                 viewController = AddressViewController.CreateFromMainStoryboard() as! AddressViewController
-            case Clean:
-                viewController = UIViewController()
+            default:
+                viewController = InputTextViewController()
             }
             viewController.hidesBottomBarWhenPushed = true
             return viewController
@@ -78,7 +126,7 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
     var moreView :UIView!
     var picker: UIImagePickerController?
     
-    var userCenterData: [UserCenterCellType]!
+    var userCenterData: [[UserCenterCellType]]!
     
     var isMoreViewShow = true   //判断点击moreBtn时是否显示popView(首页、消息)
     var isSaveImage = false
@@ -97,126 +145,122 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
     
     //MARK:- UITableViewDataSource,UITableViewDelegate
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 1
+        return self.userCenterData[section].count
     }
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         return self.userCenterData.count
     }
     func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return (section == self.userCenterData.count - 1) ? 16 : 1
+        return zoom(12)
     }
     func tableView(tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         return 0
     }
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-        return indexPath.section == 0 ? 85 : tableViewCellDefaultHeight
+        if self.userCenterData[indexPath.section][indexPath.row] == .Head {
+            return zoom(68)
+        }else{
+            return zoom(tableViewCellDefaultHeight)
+        }
     }
     func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let headView = UIView(frame: CGRectMake(0, 0, kScreenWidth, 16))
+        let headView = UIView(frame: CGRectMake(0, 0, kScreenWidth, zoom(12)))
         headView.backgroundColor = UIColor.clearColor()
         return headView
     }
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cellId = "cell\(indexPath.row)\(indexPath.section)"
-        var cell = tableView.dequeueReusableCellWithIdentifier(cellId) as UITableViewCell!
-        if cell == nil{
-            cell = UITableViewCell(style: UITableViewCellStyle.Default, reuseIdentifier: cellId)
-            ZMDTool.configTableViewCellDefault(cell)
-            cell.selectionStyle = .None
-        }
-        
-        let content = self.userCenterData[indexPath.section]
-        cell.textLabel?.text = content.title
+        let content = self.userCenterData[indexPath.section][indexPath.row]
         switch content {
         case .Head://选择图像
-            cell.accessoryType = UITableViewCellAccessoryType.DisclosureIndicator
-            if self.headerView == nil {
-                self.headerView = UIImageView(frame: CGRectMake(kScreenWidth - 60 - 38, (85-60)/2, 60, 60))
-                self.headerView.layer.masksToBounds = true
-                self.headerView.layer.cornerRadius = self.headerView.frame.width/2
-                cell.contentView.addSubview(self.headerView)
+            let cellId = "headCell"
+            var cell = tableView.dequeueReusableCellWithIdentifier(cellId) as UITableViewCell!
+            if cell == nil{
+                cell = UITableViewCell(style: UITableViewCellStyle.Default, reuseIdentifier: cellId)
+                ZMDTool.configTableViewCellDefault(cell)
+                cell.accessoryView = ZMDTool.getDefaultAccessoryDisclosureIndicator()
+//                cell.accessoryType = UITableViewCellAccessoryType.DisclosureIndicator
+                
+                if self.headerView == nil {
+                    self.headerView = UIImageView(frame: CGRectMake(kScreenWidth - zoom(60 + 38), 0, zoom(50), zoom(50)))
+                    self.headerView.layer.masksToBounds = true
+                    self.headerView.layer.cornerRadius = self.headerView.frame.width/2
+                    cell.contentView.addSubview(self.headerView)
+                    self.headerView.image = UIImage(named: "示例图像")
+                    self.headerView.set("cy",value: zoom(34))
+                }
+                cell.addLine()
             }
             //如果headerView.iamge == nil刷新，避免每次拖动table都从ulr取图片
             if self.headerView.image == nil ,let urlStr = g_customer?.Avatar?.AvatarUrl,url = NSURL(string:urlStr) {
                 self.headerView.sd_setImageWithURL(url, placeholderImage: nil)
             }
-        case .NickN:
-            cell.accessoryType = UITableViewCellAccessoryType.DisclosureIndicator
-            if self.nameLB == nil {
-                self.nameLB = UILabel(frame: CGRectMake(kScreenWidth - 100 - 58, 0, 120, tableViewCellDefaultHeight))
-                self.nameLB.font = UIFont.systemFontOfSize(17)
-                self.nameLB.textAlignment = NSTextAlignment.Right
-                self.nameLB.textColor = defaultDetailTextColor
-                cell.contentView.addSubview(self.nameLB)
+            cell.textLabel?.text = content.title
+            cell.textLabel?.font = UIFont.systemFontOfSize(15)
+            return cell!
+        default:
+            let cellId = "defaultCell"
+            var cell = tableView.dequeueReusableCellWithIdentifier(cellId)
+            if cell == nil {
+                cell = UITableViewCell(style: .Default, reuseIdentifier: cellId)
+                ZMDTool.configTableViewCellDefault(cell!)
+
+                let rightLbl = UILabel(frame: CGRectMake(kScreenWidth - zoom(190+48), 0, zoom(190), zoom(tableViewCellDefaultHeight)))
+                rightLbl.font = UIFont.systemFontOfSize(15)
+                rightLbl.textAlignment = NSTextAlignment.Right
+                rightLbl.textColor = defaultDetailTextColor
+                rightLbl.tag = 10000
+                cell!.contentView.addSubview(rightLbl)
+                if content != .Address && content != .PayPassword && content != .Address && content != .Phone {
+                    cell?.addLine()
+                }
             }
-            
-            self.nameLB.text = g_customer?.FirstName ?? ""      //目前FirstName为phonenumber，所以用下面的
-            if g_isLogin! {
-                self.nameLB.text  = getObjectFromUserDefaults("nickName") as? String
+            if content == .Name || content == .WeiXin || content == .Email {
+                cell?.accessoryType = .None
             }else{
-                self.nameLB.text = " "
+                cell?.accessoryView = ZMDTool.getDefaultAccessoryDisclosureIndicator()
+//                cell?.accessoryType = .DisclosureIndicator
             }
-            
-        case .RealName:
-            cell.accessoryType = UITableViewCellAccessoryType.DisclosureIndicator
-            self.sexLB = UILabel(frame: CGRectMake(kScreenWidth - 100 - 38, 0,100, tableViewCellDefaultHeight))
-            self.sexLB.font = UIFont.systemFontOfSize(17)
-            self.sexLB.textAlignment = NSTextAlignment.Right
-            self.sexLB.text = "未认证"
-            self.sexLB.textColor = defaultDetailTextColor
-            cell.contentView.addSubview(self.sexLB)
-        case .Address:
-            cell.accessoryType = UITableViewCellAccessoryType.DisclosureIndicator
-            self.addressLB = UILabel(frame: CGRectMake(kScreenWidth - 100 - 38,0,100,tableViewCellDefaultHeight))
-            self.addressLB.font = UIFont.systemFontOfSize(17)
-            self.addressLB.text = ""
-            self.addressLB.textAlignment = NSTextAlignment.Right
-            self.addressLB.textColor = defaultDetailTextColor
-            cell.contentView.addSubview(self.addressLB)
-        case .ChangePs:
-            cell.accessoryType = UITableViewCellAccessoryType.DisclosureIndicator
-        case .Clean:
-            cell.accessoryType = UITableViewCellAccessoryType.DisclosureIndicator
+            cell?.textLabel?.text = content.title
+            cell?.textLabel!.font = defaultSysFontWithSize(15)
+            let rightLbl = cell?.contentView.viewWithTag(10000) as! UILabel
+            rightLbl.text = content.text
+            return cell!
         }
-        
-        ZMDTool.configTableViewCellDefault(cell)
-        return cell
     }
+        
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath){
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
-        let type = self.userCenterData[indexPath.section]
-        if indexPath.section == 0 {
-            switch type {
-            case .Head :
-                if !g_isLogin {
-                    self.commonAlertShow(true, title: "提示:未登录!", message: "是否立即登录?", preferredStyle: UIAlertControllerStyle.Alert)
-                    return
-                }
-                let actionSheet = UIActionSheet(title: nil, delegate: nil, cancelButtonTitle: "取消", destructiveButtonTitle: nil)
-                actionSheet.addButtonWithTitle("从手机相册选择")
-                actionSheet.addButtonWithTitle("拍照")
-                actionSheet.rac_buttonClickedSignal().subscribeNext({ (index) -> Void in
-                    if let indexInt = index as? Int {
-                        switch indexInt {
-                        case 1, 2:
-                            if self.picker == nil {
-                                self.picker = UIImagePickerController()
-                                self.picker!.delegate = self
-                            }
-                            
-                            self.picker!.sourceType = (indexInt == 1) ? .SavedPhotosAlbum : .Camera
-                            self.picker!.allowsEditing = true
-                            self.presentViewController(self.picker!, animated: true, completion: nil)
-                        default: break
-                        }
-                    }
-                })
-                actionSheet.showInView(self.view)
-            default: return
+        let type = self.userCenterData[indexPath.section][indexPath.row]
+        switch type {
+        case .Head:
+            if !g_isLogin {
+                self.commonAlertShow(true, title: "提示:未登录!", message: "是否立即登录?", preferredStyle: UIAlertControllerStyle.Alert)
+                return
             }
-        } else if indexPath.section == self.userCenterData.count - 1 {
+            let actionSheet = UIActionSheet(title: nil, delegate: nil, cancelButtonTitle: "取消", destructiveButtonTitle: nil)
+            actionSheet.addButtonWithTitle("从手机相册选择")
+            actionSheet.addButtonWithTitle("拍照")
+            actionSheet.rac_buttonClickedSignal().subscribeNext({ (index) -> Void in
+                if let indexInt = index as? Int {
+                    switch indexInt {
+                    case 1, 2:
+                        if self.picker == nil {
+                            self.picker = UIImagePickerController()
+                            self.picker!.delegate = self
+                        }
+                        
+                        self.picker!.sourceType = (indexInt == 1) ? .SavedPhotosAlbum : .Camera
+                        self.picker!.allowsEditing = true
+                        self.presentViewController(self.picker!, animated: true, completion: nil)
+                    default: break
+                    }
+                }
+            })
+            actionSheet.showInView(self.view)
+            break
+        case .Clean:
             //计算缓存，计算完成菊花消失，显示alertView
-//            ZMDTool.showActivityView("请稍候")
+            //            ZMDTool.showActivityView("请稍候")
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), { () -> Void in
                 //计算缓存
                 let size = self.fileSizeOfCache()
@@ -237,16 +281,8 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
                     cleanAlert.addAction(action2)
                 })
             })
-        }else if indexPath.section == 1 {
-            //点击昵称
-            let inputTextViewController = InputTextViewController()
-            inputTextViewController.hidesBottomBarWhenPushed = true
-            inputTextViewController.finished = { (text) -> Void in
-                self.nameLB.text = text
-                saveObjectToUserDefaults("nickName", value: text)
-            }
-            self.navigationController?.pushViewController(inputTextViewController, animated: true)
-        }else {
+            break
+        default:
             type.didSelect(self.navigationController!)
         }
     }
@@ -305,17 +341,17 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
 
     //MARK:- Private Method
     private func subViewInit(){
-        self.title = "个人设置"
+        self.title = "账户设置"
         self.tableView = UITableView(frame: CGRectMake(0, 0, kScreenWidth, kScreenHeight - 64), style: UITableViewStyle.Plain)
         self.tableView.backgroundColor = RGB(245,245,245,1)
         self.tableView.separatorStyle = .None
         self.tableView.dataSource = self
         self.tableView.delegate = self
         self.view.addSubview(self.tableView)
-        let footV = UIView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 64+50+20))
+        let footV = UIView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: zoom(64+50+20)))
         footV.backgroundColor = UIColor.clearColor()
         let text = g_isLogin! ? "退出登陆" : "登陆"
-        let btn = ZMDTool.getButton(CGRect(x: 12, y: 64, width: kScreenWidth - 24, height: 50), textForNormal: text, fontSize: 17,textColorForNormal:RGB(173,173,173,1), backgroundColor: UIColor.clearColor()) { (sender) -> Void in
+        let btn = ZMDTool.getButton(CGRect(x: zoom(12), y: zoom(64), width: kScreenWidth - zoom(24), height: zoom(50)), textForNormal: text, fontSize: 17,textColorForNormal:RGB(173,173,173,1), backgroundColor: UIColor.clearColor()) { (sender) -> Void in
             cleanPassword()
             g_customerId = nil
             if (sender as! UIButton).titleLabel?.text == "退出登陆" {
@@ -330,13 +366,13 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
             }
         }
         btn.center = footV.center
-        ZMDTool.configViewLayerWithSize(btn, size: 20)
+        ZMDTool.configViewLayerWithSize(btn, size: zoom(20))
         ZMDTool.configViewLayerFrameWithColor(btn, color: defaultTextColor)
         footV.addSubview(btn)
         self.tableView.tableFooterView = footV
     }
     private func dataInit(){
-        self.userCenterData = [UserCenterCellType.Head,UserCenterCellType.NickN /*,UserCenterCellType.RealName*/, UserCenterCellType.Address, UserCenterCellType.ChangePs, UserCenterCellType.Clean]
+        self.userCenterData = [[.Head,.Name,.Gender,.BirthDay,.Location],[.WeiXin,.Email,.Phone],[.PayPassword],[.Address]]
     }
     //MARK:创建moreView
     func moreViewUpdate() {

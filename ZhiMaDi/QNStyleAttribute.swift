@@ -69,7 +69,7 @@ let COEFFICIENT_OF_WIDTH_ZOOM = kScreenWidth/375.0
 /// 默认tableView背景色
 let tableViewdefaultBackgroundColor = UIColor(red: 240/255, green: 240/255, blue: 240/255, alpha: 1.0)
 /// 默认高度
-let tableViewCellDefaultHeight: CGFloat = 56.0
+let tableViewCellDefaultHeight: CGFloat = 52.0
 /// 默念head高度
 let tableViewCellHeadDefaultHeight: CGFloat = 10.0
 /// 默认cell背景色

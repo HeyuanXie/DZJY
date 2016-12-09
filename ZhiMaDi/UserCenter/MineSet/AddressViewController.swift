@@ -10,18 +10,24 @@
     tableViewDataSource中，如果section > kuaidiArray.count 就configDaiShouCell
 */
 import UIKit
+//import MGSwipeTableCell
+
 //管理收货地址
 class AddressViewController: UIViewController,UITableViewDataSource, UITableViewDelegate,ZMDInterceptorProtocol,ZMDInterceptorNavigationBarShowProtocol,ZMDInterceptorMoreProtocol {
 
+    enum ContentType {
+        case Edit,Add
+    }
+    
     @IBOutlet weak var currentTableView: UITableView!
     @IBOutlet weak var AddAddressBtn: UIButton!
     var rightItem : UIBarButtonItem!
     
     var selectAddressFinished : ((address : String)->Void)?
-    var isEdit = false
+    var contentType = ContentType.Add
+    var isEidt = false  //是否处于编辑状态
     var addresses = NSMutableArray()
     var kuaiDiArray = NSMutableArray()  //快递上门地址数组
-    var daiShouArray = NSMutableArray() //网点代收地址数组
     
     var selectIndex = 0
     var finished : ((address:ZMDAddress)->Void)?
@@ -49,13 +55,7 @@ class AddressViewController: UIViewController,UITableViewDataSource, UITableView
 //        return self.kuaiDiArray.count + self.daiShouArray.count
     }
     func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        /*
-        if section == 2 {
-            return 40
-        }
-        return 16
-        */
-        return 16
+        return section == 0 ? zoom(12) : 0
     }
     func tableView(tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         return 0
@@ -76,7 +76,7 @@ class AddressViewController: UIViewController,UITableViewDataSource, UITableView
             
             AdressTableViewCell.configCell(cell, address: address)
             cell.selectedBtn.selected = indexPath.section == self.selectIndex
-            if !self.isEdit {
+            if !self.isEidt {
                 cell.editBtn.hidden = true
                 
                 if !canSelect {
@@ -151,7 +151,7 @@ class AddressViewController: UIViewController,UITableViewDataSource, UITableView
             let address = self.addresses[indexPath.section] as! ZMDAddress
             AdressTableViewDaiShouCell.configCell(cell, address: address)
             cell.selectedBtn.selected = indexPath.section == self.selectIndex
-            if !self.isEdit {
+            if !self.isEidt {
                 cell.editBtn.hidden = true
                 UIView.animateWithDuration(0.2, animations: { () -> Void in
                     cell.editBtnWidthConstraint.constant = 12
@@ -281,19 +281,6 @@ class AddressViewController: UIViewController,UITableViewDataSource, UITableView
     }
     //MARK: -  PrivateMethod
     func updateUI() {
-        if self.rightItem == nil {
-            self.rightItem = UIBarButtonItem(title:"编辑", style: UIBarButtonItemStyle.Done, target: nil, action: nil)
-            rightItem.customView?.tintColor = defaultDetailTextColor
-            rightItem.rac_command = RACCommand(signalBlock: { [weak self](sender) -> RACSignal! in
-                if let StrongSelf = self {
-                    StrongSelf.isEdit = !StrongSelf.isEdit
-                    StrongSelf.currentTableView.reloadData()
-                    StrongSelf.rightItem.title = StrongSelf.isEdit ? "取消" : "编辑"
-                }
-                return RACSignal.empty()
-            })
-            self.navigationItem.rightBarButtonItem = rightItem
-        }
         self.currentTableView.backgroundColor = tableViewdefaultBackgroundColor
     }
     func fetchData() {
@@ -308,7 +295,6 @@ class AddressViewController: UIViewController,UITableViewDataSource, UITableView
                         self.selectIndex = index
                     }
                 }
-                self.kuaiDiArray.addObjectsFromArray(self.addresses as [AnyObject])
                 self.currentTableView.reloadData()
             } else {
                 ZMDTool.showErrorPromptView(nil, error: error, errorMsg: "")

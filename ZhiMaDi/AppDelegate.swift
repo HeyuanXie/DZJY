@@ -154,12 +154,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     //MARK: - 自定义TabBar
     func customTabBar() {
-        let array = ["home","category","shoppingCar","mine"]
+        let array = ["home","list","cart","mine"]
         let array2 = ["首页","分类","购物车","我的"]
         var count = 0
         for item in array {
-            let unSelectedStr = "Tabbar_"+item+"_unselected"
-            let selectedStr = "Tabbar_"+item+"_selected"
+            let unSelectedStr = "tab bar_"+item+"01"
+            let selectedStr = "tab bar_"+item+"02"
             let unSelectedImage = UIImage(named: unSelectedStr)
             let selectedImage = UIImage(named: selectedStr)
             images.addObject(unSelectedImage!)

@@ -265,6 +265,12 @@ extension ZMDTool {
 }
 
 extension ZMDTool {
+    /// 默认AccessoryDisclosureIndicator
+    class func getDefaultAccessoryDisclosureIndicator() -> UIImageView {
+        let imgView = UIImageView(frame: CGRect(x: 0, y: 0, width: 10, height: 10))
+        imgView.image = UIImage(named: "btn_Arrow_TurnRight1")
+        return imgView
+    }
     
     class func getTextField(frame:CGRect,placeholder:String,fontSize:CGFloat,textColor:UIColor = defaultTextColor) -> UITextField {
         let textField = UITextField(frame: frame)

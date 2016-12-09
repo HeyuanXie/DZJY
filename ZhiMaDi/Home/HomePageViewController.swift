@@ -52,9 +52,9 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
             case .HomeContentTypeMenu :
                 return kScreenWidth * 210 / 750
             case .HomeContentTypeState :
+                return kScreenWidth * 80 / 750
 
                 //******MiniAdSection********
-                return kScreenWidth * 80 / 750
             case .HomeContentTypeMiniAd :
                 return 90
                 
@@ -606,17 +606,16 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
             cell?.accessoryType = .DisclosureIndicator
             cell?.selectionStyle = .None
             
-            let text = "交易动态"
-            let width = text.sizeWithFont(UIFont.systemFontOfSize(14), maxWidth: 200).width+10*kScreenWidth/375
-            let label = ZMDTool.getLabel(CGRect(x: 10*kScreenWidth/375, y: 10*kScreenWidth/375, width: width, height: 20*kScreenWidth/375), text: text, fontSize: 13, textColor: UIColor.whiteColor(), textAlignment: .Center)
-            ZMDTool.configViewLayerWithSize(label, size: 4)
-            cell?.contentView.addSubview(label)
-            label.backgroundColor = appThemeColorNew
+            let imgView = UIImageView(frame: CGRect(x: zoom(10), y: zoom(8), width: zoom(68), height: zoom(22)))
+            imgView.image = UIImage(named: "交易动态")
+            cell?.contentView.addSubview(imgView)
             
             let text2 = "[xj**12] 新疆吐鲁番无核白葡萄 8吨"
-            let detailLbl = ZMDTool.getLabel(CGRect(x: 12+width+10, y: 10*kScreenWidth/375, width: kScreenWidth-(12+width+10)-20, height: 14), text: text2, fontSize: 13, textColor: UIColor.whiteColor(), textAlignment: .Left)
+            let detailLbl = ZMDTool.getLabel(CGRect(x: zoom(10+68+10), y: 10*kScreenWidth/375, width: kScreenWidth-zoom((12+68+10)-20), height: zoom(14)), text: text2, fontSize: 13, textColor: UIColor.whiteColor(), textAlignment: .Left)
             detailLbl.attributedText = text2.AttributedMutableText(["[xj**12]","新疆吐鲁番无核白葡萄 8吨"], colors: [appThemeColorNew,defaultTextColor])
             cell?.contentView.addSubview(detailLbl)
+            imgView.set("cy", value: zoom(20))
+            detailLbl.set("cy", value: zoom(20))
         }
         return cell!
     }
