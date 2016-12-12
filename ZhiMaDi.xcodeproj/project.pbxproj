@@ -741,6 +741,8 @@
 		841B86D81DC1FEDC0038F689 /* ZMDNewPrice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 841B86D71DC1FEDC0038F689 /* ZMDNewPrice.swift */; };
 		841BAF9B1DC9C73400E0C3DC /* UILabelExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 841BAF9A1DC9C73400E0C3DC /* UILabelExtension.swift */; };
 		842317531D7525DE003D3632 /* StoreShowListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 842317521D7525DE003D3632 /* StoreShowListViewController.swift */; };
+		842631211DFE786300B2959E /* SupplyDemandView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 842631201DFE786300B2959E /* SupplyDemandView.xib */; };
+		842631231DFE7BDD00B2959E /* CollectionDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 842631221DFE7BDD00B2959E /* CollectionDetailView.swift */; };
 		842DFCF41DBA06AC00258628 /* user_address@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 842DFCF31DBA06AC00258628 /* user_address@2x.png */; };
 		8446E60A1DD59AD100889E9A /* libXG-SDK.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8446E6071DD59AD000889E9A /* libXG-SDK.a */; };
 		84683B071D63F9AF003C848F /* Navi_Msg_50*50@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 84683B061D63F9AF003C848F /* Navi_Msg_50*50@2x.png */; };
@@ -1505,7 +1507,7 @@
 		3C9098611C76A482006B7D2C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		3C9098631C76A482006B7D2C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3C9098691C76A687006B7D2C /* readme */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = readme; sourceTree = "<group>"; };
-		3C90986B1C76A6AA006B7D2C /* Constents.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constents.swift; sourceTree = "<group>"; };
+		3C90986B1C76A6AA006B7D2C /* Constents.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Constents.swift; path = ZhiMaDi/Constents.swift; sourceTree = "<group>"; };
 		3C90986C1C76A6AA006B7D2C /* QNSharedDatas.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QNSharedDatas.swift; sourceTree = "<group>"; };
 		3C90986D1C76A6AA006B7D2C /* QNStyleAttribute.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QNStyleAttribute.swift; sourceTree = "<group>"; };
 		3C90986E1C76A6AA006B7D2C /* ZhiMaDi-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ZhiMaDi-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -1631,6 +1633,8 @@
 		841B86D71DC1FEDC0038F689 /* ZMDNewPrice.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZMDNewPrice.swift; sourceTree = "<group>"; };
 		841BAF9A1DC9C73400E0C3DC /* UILabelExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UILabelExtension.swift; sourceTree = "<group>"; };
 		842317521D7525DE003D3632 /* StoreShowListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StoreShowListViewController.swift; sourceTree = "<group>"; };
+		842631201DFE786300B2959E /* SupplyDemandView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SupplyDemandView.xib; sourceTree = "<group>"; };
+		842631221DFE7BDD00B2959E /* CollectionDetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CollectionDetailView.swift; sourceTree = "<group>"; };
 		842DFCF31DBA06AC00258628 /* user_address@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "user_address@2x.png"; sourceTree = "<group>"; };
 		8446E6071DD59AD000889E9A /* libXG-SDK.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libXG-SDK.a"; sourceTree = "<group>"; };
 		8446E6081DD59AD000889E9A /* XGPush.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XGPush.h; sourceTree = "<group>"; };
@@ -3016,6 +3020,7 @@
 		3C90984B1C76A482006B7D2C = {
 			isa = PBXGroup;
 			children = (
+				3C90986B1C76A6AA006B7D2C /* Constents.swift */,
 				3C9098691C76A687006B7D2C /* readme */,
 				840A66CF1D5180A80074DE49 /* MyChange */,
 				3C9098561C76A482006B7D2C /* ZhiMaDi */,
@@ -3038,7 +3043,6 @@
 		3C9098561C76A482006B7D2C /* ZhiMaDi */ = {
 			isa = PBXGroup;
 			children = (
-				3C90986B1C76A6AA006B7D2C /* Constents.swift */,
 				3C90986C1C76A6AA006B7D2C /* QNSharedDatas.swift */,
 				3C90986D1C76A6AA006B7D2C /* QNStyleAttribute.swift */,
 				3C90986E1C76A6AA006B7D2C /* ZhiMaDi-Bridging-Header.h */,
@@ -3543,6 +3547,8 @@
 			isa = PBXGroup;
 			children = (
 				84B35E9E1DF3D98200699EEF /* SupplyDemandListCell.swift */,
+				842631221DFE7BDD00B2959E /* CollectionDetailView.swift */,
+				842631201DFE786300B2959E /* SupplyDemandView.xib */,
 			);
 			name = View;
 			sourceTree = "<group>";
@@ -4156,6 +4162,7 @@
 				2B989C0E1CB50736008C6D23 /* none_wallet@2x.png in Resources */,
 				2BF52F621CB39B060099F296 /* shop_02order@3x.png in Resources */,
 				2B5FF4061CA3F03C0067909D /* common_01unselected@3x.png in Resources */,
+				842631211DFE786300B2959E /* SupplyDemandView.xib in Resources */,
 				2BF52F791CB39B060099F296 /* shop_preview@3x.png in Resources */,
 				2BF52F611CB39B060099F296 /* shop_02order@2x.png in Resources */,
 				2BDEF3A41C7E9DA800927F64 /* Home_Buy_Services@2x.png in Resources */,
@@ -4452,6 +4459,7 @@
 				2BF8D8711CD0AC52008237D9 /* MyStoreOrderDetailViewController.swift in Sources */,
 				2B02B4B21CAA62FA0064B47C /* HomeLeaseListViewController.swift in Sources */,
 				2BA222F31CE96CB3006BC426 /* GoodsManagerGoodsSortViewController.swift in Sources */,
+				842631231DFE7BDD00B2959E /* CollectionDetailView.swift in Sources */,
 				2B02B5131CABB7510064B47C /* MyOrderViewController.swift in Sources */,
 				2B0ACCB31C858E31000EC299 /* PersonInfoViewController.swift in Sources */,
 				3C90990A1C76A6E9006B7D2C /* PieRadarChartViewBase.swift in Sources */,
@@ -4701,7 +4709,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				PROVISIONING_PROFILE = "6987f787-db31-4707-8582-9553e8ff1a01";
+				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -4724,8 +4732,8 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
@@ -4740,7 +4748,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				PROVISIONING_PROFILE = "6987f787-db31-4707-8582-9553e8ff1a01";
+				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -4814,7 +4822,7 @@
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\"";
 				PRODUCT_BUNDLE_IDENTIFIER = com.jn.dzjy;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "6987f787-db31-4707-8582-9553e8ff1a01";
+				PROVISIONING_PROFILE = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "ZhiMaDi/ZhiMaDi-Bridging-Header.h";
 			};
 			name = Debug;
@@ -4825,8 +4833,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -4886,7 +4894,7 @@
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\"";
 				PRODUCT_BUNDLE_IDENTIFIER = com.jn.dzjy;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "6987f787-db31-4707-8582-9553e8ff1a01";
+				PROVISIONING_PROFILE = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "ZhiMaDi/ZhiMaDi-Bridging-Header.h";
 			};
 			name = Release;

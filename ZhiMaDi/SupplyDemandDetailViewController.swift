@@ -543,7 +543,6 @@ class DZContentSellerCell : UITableViewCell {
     @IBOutlet weak var phoneLbl : UILabel!
     @IBOutlet weak var qqLbl : UILabel!
     @IBOutlet weak var weixinLbl : UILabel!
-    @IBOutlet weak var headImg : UIImageView!
     
     override func awakeFromNib() {
         self.frame = CGRect(x: 0, y: 0, width: kScreenWidth, height: 154*kScreenWidth/375)
@@ -554,7 +553,6 @@ class DZContentSellerCell : UITableViewCell {
         for i in 0..<2 {
             self.addSubview(ZMDTool.getLine(CGRect(x: 0, y: CGFloat(i+1)*lblHeight, width: lblWidth, height: 0.5), backgroundColor: defaultLineColor))
         }
-        self.headImg.addSubview(ZMDTool.getLine(CGRect(x: 0, y: 0, width: 0.5, height: 154*kScreenWidth/375), backgroundColor: defaultLineColor))
     }
     
     class func configSellerCell(cell:DZContentSellerCell,data:ZMDSupplyProduct) {
@@ -564,7 +562,6 @@ class DZContentSellerCell : UITableViewCell {
         cell.phoneLbl.attributedText = phoneText.AttributedText("手机号:", color: RGB(173,174,175,1.0))
         cell.qqLbl.attributedText = qqText.AttributedText("QQ号:", color: RGB(173,174,175,1.0))
         cell.weixinLbl.attributedText = weixinText.AttributedText("微信号:", color: RGB(173,174,175,1.0))
-        cell.headImg.image = UIImage(named: "user_interview_QRcode")
     }
 }
 

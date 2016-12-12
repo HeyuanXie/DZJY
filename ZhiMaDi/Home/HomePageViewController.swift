@@ -533,7 +533,7 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
                 _ = 0
                 let btnHeight = kScreenWidth * 210 / 750
                 let width = kScreenWidth/CGFloat(self.menuType.count)
-                let btn = UIButton(frame: CGRectMake(kScreenWidth/4*CGFloat(i), 0 ,width, btnHeight))
+                let btn = UIButton(frame: CGRectMake(kScreenWidth/5*CGFloat(i), 0 ,width, btnHeight))
                 btn.tag = 10000 + i
                 btn.backgroundColor = UIColor.whiteColor()
                 

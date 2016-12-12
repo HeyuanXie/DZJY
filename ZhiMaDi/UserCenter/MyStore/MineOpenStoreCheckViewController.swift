@@ -8,7 +8,7 @@
 
 import UIKit
 //我要开店 审核中
-class MineOpenStoreCheckViewController: UIViewController {
+class MineOpenStoreCheckViewController: UIViewController,ZMDInterceptorStoreProtocol {
 
     override func viewDidLoad() {
         super.viewDidLoad()

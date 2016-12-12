@@ -29,6 +29,9 @@ protocol ZMDInterceptorMsnProtocol: ZMDInterceptorProtocol {}
 /// 遵循此协议的 ViewController 会提供更多按扭
 protocol ZMDInterceptorMoreProtocol: ZMDInterceptorProtocol {}
 
+/// 遵循此协议的 ViewController 表示从Store.StoryBroad产生
+protocol ZMDInterceptorStoreProtocol: ZMDInterceptorProtocol {}
+
 /** 拦截器，拦截遵循了g_ZMDInterceptorProtocol 协议的类的实例 */
 class ZMDInterceptor : NSObject {
     
@@ -135,6 +138,19 @@ class ZMDInterceptor : NSObject {
                             viewController.view.backgroundColor = RGB(66,221,211,1)
                             viewController.navigationController?.navigationBar.tintColor = UIColor.whiteColor()
                             viewController.navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor(), NSFontAttributeName: navigationTextFont]
+                        }
+                        if viewController is ZMDInterceptorStoreProtocol {
+                            viewController.view.backgroundColor = defaultGrayColor
+                            let item = UIBarButtonItem(title: "开店规则", style: .Plain, target: nil, action: nil)
+                            item.setTitleTextAttributes([NSFontAttributeName:UIFont.systemFontOfSize(14)], forState: .Normal)
+                            item.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
+                                //...
+                                let vc = UIViewController()
+                                vc.title = "开店规则"
+                                viewController.pushToViewController(vc, animated: true, hideBottom: true)
+                                return RACSignal.empty()
+                            })
+                            viewController.navigationItem.rightBarButtonItem = item
                         }
                     }
                 }

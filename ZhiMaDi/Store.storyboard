@@ -5,6 +5,7 @@
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9529"/>
         <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
     </dependencies>
     <scenes>
         <!--我要开店-->
@@ -16,16 +17,146 @@
                         <viewControllerLayoutGuide type="bottom" id="VSy-pF-SZZ"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="bum-l4-0Kf">
-                        <rect key="frame" x="0.0" y="64" width="375" height="603"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="J6e-nv-Um7">
+                                <rect key="frame" x="0.0" y="64" width="375" height="75"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="申请卖家店铺完全免费，一个身份只能开一个店铺，开店后店铺无法注销，申请到正式开通预计需1-3个工作日。了解更多请看《开店规则》" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IiK-zf-MzF">
+                                        <rect key="frame" x="5" y="0.0" width="365" height="75"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                                        <color key="textColor" red="0.30980392159999998" green="0.30980392159999998" blue="0.30980392159999998" alpha="1" colorSpace="calibratedRGB"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                                <color key="backgroundColor" red="0.99215686274509807" green="0.96078431372549022" blue="0.84705882352941175" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="bottom" secondItem="IiK-zf-MzF" secondAttribute="bottom" id="PK1-7F-7A5"/>
+                                    <constraint firstItem="IiK-zf-MzF" firstAttribute="leading" secondItem="J6e-nv-Um7" secondAttribute="leading" constant="5" id="YEX-6I-bdc"/>
+                                    <constraint firstAttribute="trailing" secondItem="IiK-zf-MzF" secondAttribute="trailing" constant="5" id="oPL-9V-BzQ"/>
+                                    <constraint firstAttribute="height" constant="75" id="trW-ee-Qdg"/>
+                                    <constraint firstItem="IiK-zf-MzF" firstAttribute="top" secondItem="J6e-nv-Um7" secondAttribute="top" id="xAB-wv-bqd"/>
+                                </constraints>
+                            </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Ocx-Qe-EWn">
+                                <rect key="frame" x="72" y="171" width="232" height="200"/>
+                                <subviews>
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="个人店铺图标.png" translatesAutoresizingMaskIntoConstraints="NO" id="GVt-Pn-zod">
+                                        <rect key="frame" x="84" y="20" width="65" height="65"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" secondItem="GVt-Pn-zod" secondAttribute="height" multiplier="1:1" id="5tz-Nb-jZP"/>
+                                        </constraints>
+                                    </imageView>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="imB-cV-U0W">
+                                        <rect key="frame" x="16" y="144" width="200" height="40"/>
+                                        <color key="backgroundColor" red="0.98431372549999996" green="0.49019607840000001" blue="0.30196078430000001" alpha="1" colorSpace="calibratedRGB"/>
+                                        <state key="normal" title="创建个人店铺">
+                                            <color key="titleColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="openPersonalStore:" destination="6Re-md-WJQ" eventType="touchUpInside" id="um0-0Z-c9H"/>
+                                        </connections>
+                                    </button>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="个人店铺" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lGZ-DO-Yl7">
+                                        <rect key="frame" x="68" y="99" width="97" height="21"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="21" id="WeP-MM-2sd"/>
+                                            <constraint firstAttribute="width" constant="97" id="iNC-Rn-fZA"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                        <color key="textColor" red="0.30980392159999998" green="0.30980392159999998" blue="0.30980392159999998" alpha="1" colorSpace="calibratedRGB"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="trailing" secondItem="imB-cV-U0W" secondAttribute="trailing" constant="16" id="61H-g2-Kc9"/>
+                                    <constraint firstItem="GVt-Pn-zod" firstAttribute="top" secondItem="Ocx-Qe-EWn" secondAttribute="top" constant="20" id="76T-ad-zqF"/>
+                                    <constraint firstAttribute="width" secondItem="Ocx-Qe-EWn" secondAttribute="height" multiplier="29:25" id="9jU-tQ-Tt1"/>
+                                    <constraint firstItem="GVt-Pn-zod" firstAttribute="centerX" secondItem="Ocx-Qe-EWn" secondAttribute="centerX" id="IM3-90-StO"/>
+                                    <constraint firstItem="imB-cV-U0W" firstAttribute="leading" secondItem="Ocx-Qe-EWn" secondAttribute="leading" constant="16" id="IeQ-es-F8s"/>
+                                    <constraint firstAttribute="bottom" secondItem="imB-cV-U0W" secondAttribute="bottom" constant="16" id="Lwm-hL-wXJ"/>
+                                    <constraint firstItem="lGZ-DO-Yl7" firstAttribute="centerX" secondItem="Ocx-Qe-EWn" secondAttribute="centerX" id="N4K-zp-oEK"/>
+                                    <constraint firstAttribute="bottom" secondItem="imB-cV-U0W" secondAttribute="bottom" constant="16" id="Rmp-2b-EJO"/>
+                                    <constraint firstItem="imB-cV-U0W" firstAttribute="centerX" secondItem="Ocx-Qe-EWn" secondAttribute="centerX" id="YJI-YE-aI5"/>
+                                    <constraint firstItem="GVt-Pn-zod" firstAttribute="width" secondItem="Ocx-Qe-EWn" secondAttribute="width" multiplier="0.28" id="cBa-z3-BY6"/>
+                                    <constraint firstItem="lGZ-DO-Yl7" firstAttribute="top" secondItem="GVt-Pn-zod" secondAttribute="bottom" constant="14" id="eE9-tH-WrN"/>
+                                    <constraint firstAttribute="trailing" secondItem="imB-cV-U0W" secondAttribute="trailing" constant="16" id="wLF-7R-xof"/>
+                                    <constraint firstItem="imB-cV-U0W" firstAttribute="leading" secondItem="Ocx-Qe-EWn" secondAttribute="leading" constant="16" id="waE-gV-foY"/>
+                                    <constraint firstItem="imB-cV-U0W" firstAttribute="height" secondItem="Ocx-Qe-EWn" secondAttribute="height" multiplier="0.2" id="z3Y-Js-AHG"/>
+                                </constraints>
+                            </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="nkD-rs-VoZ">
+                                <rect key="frame" x="72" y="395" width="232" height="200"/>
+                                <subviews>
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="企业店铺图标.png" translatesAutoresizingMaskIntoConstraints="NO" id="1oN-Ka-JhT">
+                                        <rect key="frame" x="84" y="20" width="65" height="65"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" secondItem="1oN-Ka-JhT" secondAttribute="height" multiplier="1:1" id="MhZ-MJ-PCE"/>
+                                        </constraints>
+                                    </imageView>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xK4-YA-Zuo">
+                                        <rect key="frame" x="16" y="144" width="200" height="40"/>
+                                        <color key="backgroundColor" red="0.98431372549999996" green="0.49019607840000001" blue="0.30196078430000001" alpha="1" colorSpace="calibratedRGB"/>
+                                        <state key="normal" title="创建企业店铺">
+                                            <color key="titleColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="openCompanyStore:" destination="6Re-md-WJQ" eventType="touchUpInside" id="buZ-m8-bES"/>
+                                        </connections>
+                                    </button>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="企业店铺" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ot3-SD-Q3M">
+                                        <rect key="frame" x="68" y="99" width="97" height="21"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="21" id="BnT-Xz-4gc"/>
+                                            <constraint firstAttribute="width" constant="97" id="HlN-Kc-Lca"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                        <color key="textColor" red="0.30980392159999998" green="0.30980392159999998" blue="0.30980392159999998" alpha="1" colorSpace="calibratedRGB"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstItem="ot3-SD-Q3M" firstAttribute="centerX" secondItem="nkD-rs-VoZ" secondAttribute="centerX" id="4Sm-by-q5F"/>
+                                    <constraint firstItem="xK4-YA-Zuo" firstAttribute="height" secondItem="nkD-rs-VoZ" secondAttribute="height" multiplier="0.2" id="D7W-gm-k5k"/>
+                                    <constraint firstItem="ot3-SD-Q3M" firstAttribute="top" secondItem="1oN-Ka-JhT" secondAttribute="bottom" constant="14" id="F59-X2-AV4"/>
+                                    <constraint firstItem="xK4-YA-Zuo" firstAttribute="centerX" secondItem="nkD-rs-VoZ" secondAttribute="centerX" id="KSB-5g-unf"/>
+                                    <constraint firstItem="1oN-Ka-JhT" firstAttribute="width" secondItem="nkD-rs-VoZ" secondAttribute="width" multiplier="0.28" id="OJd-um-BRa"/>
+                                    <constraint firstAttribute="trailing" secondItem="xK4-YA-Zuo" secondAttribute="trailing" constant="16" id="T2i-Z5-efQ"/>
+                                    <constraint firstItem="1oN-Ka-JhT" firstAttribute="top" secondItem="nkD-rs-VoZ" secondAttribute="top" constant="20" id="gu9-UQ-dNF"/>
+                                    <constraint firstItem="1oN-Ka-JhT" firstAttribute="centerX" secondItem="nkD-rs-VoZ" secondAttribute="centerX" id="jKm-t3-lFH"/>
+                                    <constraint firstItem="xK4-YA-Zuo" firstAttribute="leading" secondItem="nkD-rs-VoZ" secondAttribute="leading" constant="16" id="wid-ND-TbS"/>
+                                    <constraint firstAttribute="width" secondItem="nkD-rs-VoZ" secondAttribute="height" multiplier="29:25" id="x9W-bn-AON"/>
+                                    <constraint firstAttribute="bottom" secondItem="xK4-YA-Zuo" secondAttribute="bottom" constant="16" id="ywk-d5-pGq"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" red="0.94117647058823528" green="0.94117647058823528" blue="0.94117647058823528" alpha="1" colorSpace="calibratedRGB"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="J6e-nv-Um7" secondAttribute="trailing" id="3Yv-6Y-nRI"/>
+                            <constraint firstItem="Ocx-Qe-EWn" firstAttribute="top" secondItem="J6e-nv-Um7" secondAttribute="bottom" constant="32" id="9V9-sQ-iNw"/>
+                            <constraint firstItem="nkD-rs-VoZ" firstAttribute="width" secondItem="bum-l4-0Kf" secondAttribute="width" multiplier="0.618" id="AkM-Nj-GhJ"/>
+                            <constraint firstItem="J6e-nv-Um7" firstAttribute="top" secondItem="Z4K-4S-zUq" secondAttribute="bottom" id="SSE-Rq-YlX"/>
+                            <constraint firstItem="Ocx-Qe-EWn" firstAttribute="centerX" secondItem="bum-l4-0Kf" secondAttribute="centerX" id="VdQ-gU-c6D"/>
+                            <constraint firstItem="nkD-rs-VoZ" firstAttribute="top" secondItem="Ocx-Qe-EWn" secondAttribute="bottom" constant="24" id="ZFW-Gy-WHQ"/>
+                            <constraint firstItem="J6e-nv-Um7" firstAttribute="leading" secondItem="bum-l4-0Kf" secondAttribute="leading" id="fJo-yr-CeH"/>
+                            <constraint firstItem="Ocx-Qe-EWn" firstAttribute="width" secondItem="bum-l4-0Kf" secondAttribute="width" multiplier="0.618" id="hDc-wl-q7g"/>
+                            <constraint firstItem="nkD-rs-VoZ" firstAttribute="centerX" secondItem="bum-l4-0Kf" secondAttribute="centerX" id="sit-Zo-S0C"/>
+                        </constraints>
                     </view>
-                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
+                    <navigationItem key="navigationItem" title="我要开店" id="nMf-hr-yxj">
+                        <barButtonItem key="rightBarButtonItem" title="开店规则" id="BgY-ug-zGA">
+                            <color key="tintColor" red="0.30980392159999998" green="0.30980392159999998" blue="0.30980392159999998" alpha="1" colorSpace="calibratedRGB"/>
+                        </barButtonItem>
+                    </navigationItem>
+                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
                     <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina47"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="hpa-oy-WcL" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-356" y="-977"/>
+            <point key="canvasLocation" x="129.5" y="-987.5"/>
         </scene>
         <!--Mine Open Store Second View Controller-->
         <scene sceneID="Q5S-pI-hcn">
@@ -36,14 +167,37 @@
                         <viewControllerLayoutGuide type="bottom" id="OY2-5V-F2P"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="wV3-KO-HSP">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="frX-XA-jlm">
+                                <rect key="frame" x="0.0" y="607" width="375" height="60"/>
+                                <color key="backgroundColor" red="0.98431372549999996" green="0.49019607840000001" blue="0.30196078430000001" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="frX-XA-jlm" secondAttribute="height" multiplier="25:4" id="zRL-7z-Ui3"/>
+                                </constraints>
+                                <state key="normal" title="我已了解 , 继续开店">
+                                    <color key="titleColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                </state>
+                                <connections>
+                                    <segue destination="lEj-ka-RHS" kind="push" id="Db9-GW-ZAp"/>
+                                </connections>
+                            </button>
+                        </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="frX-XA-jlm" secondAttribute="trailing" id="9xB-ax-iMI"/>
+                            <constraint firstItem="frX-XA-jlm" firstAttribute="leading" secondItem="wV3-KO-HSP" secondAttribute="leading" id="PE4-tD-cWr"/>
+                            <constraint firstItem="OY2-5V-F2P" firstAttribute="top" secondItem="frX-XA-jlm" secondAttribute="bottom" id="gs9-V9-kdR"/>
+                        </constraints>
                     </view>
+                    <navigationItem key="navigationItem" id="ZpO-oj-gYZ"/>
+                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
+                    <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina47"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="xxd-zU-hof" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="44" y="-1028"/>
+            <point key="canvasLocation" x="548.5" y="-988.5"/>
         </scene>
         <!--Mine Open Store Third View Controller-->
         <scene sceneID="PSO-5U-G9Y">
@@ -54,17 +208,38 @@
                         <viewControllerLayoutGuide type="bottom" id="rmI-sm-XN0"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="Odw-tf-5yz">
-                        <rect key="frame" x="0.0" y="64" width="320" height="504"/>
+                        <rect key="frame" x="0.0" y="64" width="375" height="603"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="CYq-05-70C">
+                                <rect key="frame" x="0.0" y="543" width="375" height="60"/>
+                                <color key="backgroundColor" red="0.98431372549999996" green="0.49019607840000001" blue="0.30196078430000001" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="CYq-05-70C" secondAttribute="height" multiplier="25:4" id="Cga-6h-eq9"/>
+                                </constraints>
+                                <state key="normal" title="提交审核">
+                                    <color key="titleColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                </state>
+                                <connections>
+                                    <segue destination="pKo-QO-k5K" kind="push" id="xRh-d4-KnC"/>
+                                </connections>
+                            </button>
+                        </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="CYq-05-70C" secondAttribute="trailing" id="5GO-J0-x6S"/>
+                            <constraint firstItem="CYq-05-70C" firstAttribute="leading" secondItem="Odw-tf-5yz" secondAttribute="leading" id="Oqg-pO-HyE"/>
+                            <constraint firstItem="rmI-sm-XN0" firstAttribute="top" secondItem="CYq-05-70C" secondAttribute="bottom" id="oaq-pu-Yhi"/>
+                        </constraints>
                     </view>
+                    <navigationItem key="navigationItem" id="A96-gQ-cYs"/>
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="a1C-t2-sC2" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="468" y="-1037"/>
+            <point key="canvasLocation" x="1104" y="-1037"/>
         </scene>
-        <!--Mine Open Store Check View Controller-->
+        <!--我要开店-->
         <scene sceneID="0tV-8w-QvJ">
             <objects>
                 <viewController storyboardIdentifier="MineOpenStoreCheckViewController" id="pKo-QO-k5K" customClass="MineOpenStoreCheckViewController" customModule="ZhiMaDi" customModuleProvider="target" sceneMemberID="viewController">
@@ -73,15 +248,53 @@
                         <viewControllerLayoutGuide type="bottom" id="Cdh-Ny-9sf"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="SED-gp-yJL">
-                        <rect key="frame" x="0.0" y="64" width="320" height="504"/>
+                        <rect key="frame" x="0.0" y="64" width="375" height="603"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="审核中背景图.png" translatesAutoresizingMaskIntoConstraints="NO" id="bkS-iS-iBy">
+                                <rect key="frame" x="62" y="95" width="250" height="210"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="bkS-iS-iBy" secondAttribute="height" multiplier="25:21" id="Pwv-hp-kvo"/>
+                                </constraints>
+                            </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="店铺审核中" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hQo-ew-Bsl">
+                                <rect key="frame" x="111" y="345" width="153" height="29"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="153" id="RgO-HK-A9L"/>
+                                    <constraint firstAttribute="height" constant="29" id="uJe-ff-Q8f"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" red="0.30980392159999998" green="0.30980392159999998" blue="0.30980392159999998" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="提交审核日期 : 2016-12-13" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Acz-HJ-IyT">
+                                <rect key="frame" x="0.0" y="374" width="375" height="20"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="20" id="sdN-6L-R8p"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                <color key="textColor" red="0.30980392159999998" green="0.30980392159999998" blue="0.30980392159999998" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="Acz-HJ-IyT" firstAttribute="top" secondItem="hQo-ew-Bsl" secondAttribute="bottom" id="Gfr-gR-wfQ"/>
+                            <constraint firstItem="Acz-HJ-IyT" firstAttribute="leading" secondItem="SED-gp-yJL" secondAttribute="leading" id="J1d-4q-RB4"/>
+                            <constraint firstItem="hQo-ew-Bsl" firstAttribute="top" secondItem="bkS-iS-iBy" secondAttribute="bottom" constant="40" id="Lcu-rw-jmC"/>
+                            <constraint firstAttribute="trailing" secondItem="Acz-HJ-IyT" secondAttribute="trailing" id="cWF-YT-T3Z"/>
+                            <constraint firstItem="bkS-iS-iBy" firstAttribute="width" secondItem="SED-gp-yJL" secondAttribute="width" multiplier="0.667" id="eCT-x0-iCE"/>
+                            <constraint firstItem="hQo-ew-Bsl" firstAttribute="centerX" secondItem="SED-gp-yJL" secondAttribute="centerX" id="k8U-iS-0es"/>
+                            <constraint firstItem="bkS-iS-iBy" firstAttribute="top" secondItem="HBg-dp-hNH" secondAttribute="bottom" constant="95" id="kY1-H4-oR8"/>
+                            <constraint firstItem="bkS-iS-iBy" firstAttribute="centerX" secondItem="SED-gp-yJL" secondAttribute="centerX" id="rDU-Xj-Z5U"/>
+                        </constraints>
                     </view>
+                    <navigationItem key="navigationItem" title="我要开店" id="bmV-p7-hpC"/>
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dgL-YC-MfA" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="868" y="-1045"/>
+            <point key="canvasLocation" x="1652.5" y="-1014.5"/>
         </scene>
         <!--我的店铺-->
         <scene sceneID="WlT-rg-ALv">
@@ -388,7 +601,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="2O5-EP-6ff" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-139" y="-332"/>
+            <point key="canvasLocation" x="507" y="-245"/>
         </scene>
         <!--订单管理-->
         <scene sceneID="qwP-rO-0UY">
@@ -539,7 +752,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="6yJ-cT-qbf" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="203" y="-332"/>
+            <point key="canvasLocation" x="849" y="-245"/>
         </scene>
         <!--订单详情-->
         <scene sceneID="Ycr-1T-Ycx">
@@ -690,7 +903,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="i4G-jZ-gom" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="544" y="-332"/>
+            <point key="canvasLocation" x="1190" y="-245"/>
         </scene>
         <!--Title-->
         <scene sceneID="BjR-km-LfQ">
@@ -1368,6 +1581,24 @@
             </objects>
             <point key="canvasLocation" x="548" y="1512"/>
         </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="lhQ-Z1-pwR">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="5w8-bF-9Ea" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="mYA-kw-a6o">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="6Re-md-WJQ" kind="relationship" relationship="rootViewController" id="Tdc-EY-bTw"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ouo-Vl-sid" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-403" y="-988"/>
+        </scene>
     </scenes>
     <resources>
         <image name="btn_delete.png" width="25" height="25"/>
@@ -1377,5 +1608,8 @@
         <image name="product_pic.png" width="375" height="375"/>
         <image name="shop_add_product.png" width="25" height="25"/>
         <image name="user_wallet_coins.png" width="19" height="25"/>
+        <image name="个人店铺图标.png" width="60" height="60"/>
+        <image name="企业店铺图标.png" width="60" height="60"/>
+        <image name="审核中背景图.png" width="267" height="229"/>
     </resources>
 </document>

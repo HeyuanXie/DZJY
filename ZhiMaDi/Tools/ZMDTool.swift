@@ -394,6 +394,43 @@ extension ZMDTool {
         UIColor.clearColor().setStroke()    //设置边框色
         CGContextDrawPath(context, .FillStroke)
     }
+    
+}
+
+//MARK: - 自定义搜索框
+extension ZMDTool {
+    class ZMDSearchBar : UISearchBar,UISearchBarDelegate {
+        var finished :((text:String)->Void)!
+        override init(frame: CGRect) {
+            super.init(frame: frame)
+            self.delegate = self
+        }
+        
+        required init?(coder aDecoder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+        func searchBarSearchButtonClicked(searchBar: UISearchBar) {
+            searchBar.endEditing(true)
+        }
+        func searchBarTextDidEndEditing(searchBar: UISearchBar) {
+            if self.finished != nil {
+                self.finished(text: searchBar.text ?? "")
+            }
+        }
+    }
+    class func searchBar(placeholder:String,placeholderColor:UIColor = defaultDetailTextColor) -> ZMDSearchBar {
+        let searchBar = ZMDSearchBar(frame: CGRect.zero)
+        
+        searchBar.setImage(UIImage(named: "list_search"), forSearchBarIcon: UISearchBarIcon(rawValue: 0)!, state: .Normal)
+        searchBar.tintColor = appThemeColor
+        searchBar.backgroundColor = UIColor.clearColor()
+        searchBar.backgroundImage = UIImage.colorImage(UIColor.clearColor(), size: CGSize(width: kScreenWidth-24, height: 32))//
+        searchBar.setSearchFieldBackgroundImage(UIImage.colorImage(defaultGrayColor, size: CGSize(width: kScreenWidth-zoom(24), height: 32)), forState: .Normal)
+        let searchTf = searchBar.valueForKey("_searchField") as! UITextField
+        searchTf.attributedPlaceholder = placeholder.AttributedText(placeholder, color: placeholderColor)
+        ZMDTool.configViewLayer(searchTf)
+        return searchBar
+    }
 }
 
 // test

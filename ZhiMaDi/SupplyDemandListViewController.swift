@@ -155,11 +155,11 @@ class SupplyDemandListViewController: UIViewController ,ZMDInterceptorProtocol, 
                 btn.titleEdgeInsets = UIEdgeInsets(top: 0, left: 1, bottom: 0, right: 0)
                 if self.IndexFilter == 2 {
                     btn.setTitleColor(appThemeColorNew, forState: .Normal)
-                    btn.setImage(UIImage(named: "list_price_down"), forState: .Normal)
-                    btn.setImage(UIImage(named: "list_price_up"), forState: .Selected)
+                    btn.setImage(UIImage(named: "more02"), forState: .Normal)
+                    btn.setImage(UIImage(named: "more02"), forState: .Selected)
                 }else{
                     btn.setTitleColor(defaultTextColor, forState: .Normal)
-                    btn.setImage(UIImage(named: "list_price_normal"), forState: .Normal)
+                    btn.setImage(UIImage(named: "more01"), forState: .Normal)
                 }
                 break
             default :
@@ -189,7 +189,8 @@ class SupplyDemandListViewController: UIViewController ,ZMDInterceptorProtocol, 
             btn.rac_signalForControlEvents(.TouchUpInside).subscribeNext({ (sender) -> Void in
                 (sender as!UIButton).selected = !(sender as!UIButton).selected
                 self.IndexFilter = sender.tag - 1000
-                let orderbys = [(-1,-1),(17,18),(19,20),(10,11)]
+                //0：默认 5 ： 名称升序，6 ：名称降序 10：价格升，11：价格降15：日期升，16：日期降
+                let orderbys = [(0,0),(10,11),(0,0)]
                 let title = filterTitles[sender.tag - 1000]
                 let orderby = orderbys[sender.tag - 1000]
                 switch title {
@@ -265,7 +266,9 @@ class SupplyDemandListViewController: UIViewController ,ZMDInterceptorProtocol, 
     }
     
     func fetchData(orderBy:Int!) {
+        ZMDTool.showActivityView(nil)
         QNNetworkTool.supplyDemandSearch(self.customerId?.integerValue, page: self.page, pageSize: 12, check: self.check, q: self.q, type: self.type, orderBy: orderBy, fromPrice: self.fromPrice?.floatValue, toPrice: self.toPrice?.floatValue) { (error, products) -> Void in
+            ZMDTool.hiddenActivityView()
             if let productsArr = products {
                 if self.page == 1 {
                     self.dataArray.removeAllObjects()

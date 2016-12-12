@@ -8,14 +8,24 @@
 
 import UIKit
 //我要开店 第二部
-class MineOpenStoreSecondViewController: UIViewController {
+class MineOpenStoreSecondViewController: UIViewController,ZMDInterceptorProtocol,ZMDInterceptorStoreProtocol {
+    enum ContentType {
+        case Personal,Company
+    }
+    var contentType = ContentType.Personal
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        self.initUI()
         // Do any additional setup after loading the view.
     }
 
+    
+    //MARK: - ************PrivateMethod**************
+    func initUI() {
+        self.title = self.contentType == .Personal ? "创建个人店铺" : "创建企业店铺"
+        
+    }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.

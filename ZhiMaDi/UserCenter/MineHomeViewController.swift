@@ -83,7 +83,7 @@ class MineHomeViewController: UIViewController,UITableViewDataSource, UITableVie
             case .UserCollect:
                 viewController = MineCollectionViewController()
             case .UserOpenStore:
-                viewController = MineOpenStoreFirstViewController()
+                viewController = MineOpenStoreFirstViewController.CreateFromStoreStoryboard() as! MineOpenStoreFirstViewController
             case .UserSetting:
                 viewController = PersonInfoViewController()
             default :

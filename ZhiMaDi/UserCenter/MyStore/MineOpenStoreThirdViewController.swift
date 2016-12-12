@@ -8,7 +8,7 @@
 
 import UIKit
 //我要开店 第三部
-class MineOpenStoreThirdViewController: UIViewController {
+class MineOpenStoreThirdViewController: UIViewController,ZMDInterceptorStoreProtocol {
 
     override func viewDidLoad() {
         super.viewDidLoad()

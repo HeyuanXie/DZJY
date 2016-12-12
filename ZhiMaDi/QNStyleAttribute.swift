@@ -11,9 +11,9 @@
 import UIKit.UIColor
 
 // MARK: - 颜色
-/// App主色    
-let appThemeColor = UIColor(red: 237/255.0, green: 191/255.0, blue: 28/255.0, alpha: 1.0)
-let appThemeColorNew = RGB(251,125,77,1.0)
+/// App主色 appThemeColor = appThemeColorNew
+let appThemeColor = RGB(251,125,77,1.0)   //黄色
+let appThemeColorNew = RGB(251,125,77,1.0)  //黄色
 //从深到浅
 // MARK: 导航栏
 /// 导航栏文本颜色
@@ -91,6 +91,7 @@ extension ZMDTool {
         cell.contentView.backgroundColor = tableViewCellDefaultBackgroundColor
         cell.detailTextLabel?.font = tableViewCellDefaultDetailTextFont
         cell.detailTextLabel?.textColor = tableViewCellDefaultDetailTextColor
+        cell.selectionStyle = .None
     }
     /// 对UIView对象进行配置(cornerRadius)
     class func configViewLayer(view: UIView) {
