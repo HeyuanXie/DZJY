@@ -67,4 +67,8 @@
 #import "NewPagedFlowView.h"
 #import "LYScrollView.h"
 
+//用于左滑cell
+#import "MGSwipeTableCell.h"
+#import "MGSwipeButton.h"
+
 #endif /* SleepCare_Bridging_Header_h */
