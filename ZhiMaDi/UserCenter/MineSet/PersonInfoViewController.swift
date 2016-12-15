@@ -9,7 +9,7 @@
 import UIKit
 import SDWebImage
 //账户设置
-class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableViewDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate,ZMDInterceptorProtocol,ZMDInterceptorNavigationBarShowProtocol,ZMDInterceptorMoreProtocol {
+class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableViewDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate,ZMDInterceptorProtocol,ZMDInterceptorNavigationBarShowProtocol,ZMDInterceptorMoreProtocol,HZQDatePickerViewDelegate {
     enum UserCenterCellType{
         case Head
         case Name
@@ -98,9 +98,10 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
                 viewController = UIViewController()
                 
             case .PayPassword:
-                viewController = UIViewController()
+                viewController = PayPasswordChangeViewController()
             case .Address:
                 viewController = AddressViewController.CreateFromMainStoryboard() as! AddressViewController
+                (viewController as! AddressViewController).contentType = .Manage
             default:
                 viewController = InputTextViewController()
             }
@@ -125,6 +126,7 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
     var descriptionLB: UILabel!
     var moreView :UIView!
     var picker: UIImagePickerController?
+    var pickerView : HZQDatePickerView!
     
     var userCenterData: [[UserCenterCellType]]!
     
@@ -282,12 +284,59 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
                 })
             })
             break
-        default:
+        case .Gender:
+            let sheet = UIAlertController(title: "性别", message: "", preferredStyle: .ActionSheet)
+            for title in ["男","女"] {
+                sheet.addAction(UIAlertAction(title: title, style: .Default, handler: { (sheet) -> Void in
+                    let cell = tableView.cellForRowAtIndexPath(NSIndexPath(forRow: 2, inSection: 0))
+                    let rightLbl = cell?.contentView.viewWithTag(10000) as! UILabel
+                    rightLbl.text = title
+                }))
+            }
+            sheet.addAction(UIAlertAction(title: "取消", style: .Cancel, handler: nil))
+            self.presentViewController(sheet, animated: true, completion: nil)
+            return
+        case .BirthDay:
+            self.pickerView = HZQDatePickerView.instanceDatePickerView()
+            self.pickerView.frame = CGRectMake(0, 0, kScreenWidth, kScreenHeight + 20)
+            self.pickerView.backgroundColor = UIColor.clearColor()
+            self.pickerView.delegate = self
+            self.pickerView.type = DateType.init(0)
+            self.pickerView.datePickerView?.minimumDate = NSDate()
+            self.view.addSubview(self.pickerView)
+            break
+        case .Location:
+            let vc = AddressSelectViewController()
+            vc.finished = {(text)->Void in
+                let cell = tableView.cellForRowAtIndexPath(NSIndexPath(forRow: 4, inSection: 0))
+                let rightLbl = cell?.contentView.viewWithTag(10000) as! UILabel
+                rightLbl.text = text
+            }
+            self.presentViewController(vc, animated: true, completion: nil)
+            return
+        case .Address:
             type.didSelect(self.navigationController!)
+        case .PayPassword:
+            type.didSelect(self.navigationController!)
+        default:
+            let cell = tableView.cellForRowAtIndexPath(indexPath)
+            let vc = InputTextViewController()
+            vc.finished = {(string)->Void in
+                let rightLbl = cell?.contentView.viewWithTag(10000) as! UILabel
+                rightLbl.text = string
+            }
+            self.pushToViewController(vc, animated: true, hideBottom: true)
         }
     }
+    
+    //MARK: - TimePickerDelegate
+    func getSelectDate(date: String!, type: DateType) {
+        let cell = self.tableView.cellForRowAtIndexPath(NSIndexPath(forRow: 3, inSection: 0))
+        let rightLbl = cell?.contentView.viewWithTag(10000) as! UILabel
+        rightLbl.text = date
+    }
 
-    //MARK: UIImagePickerControllerDelegate
+    //MARK: - UIImagePickerControllerDelegate
     func imagePickerController(picker: UIImagePickerController, didFinishPickingImage image: UIImage!, editingInfo: [NSObject : AnyObject]!) {
         // 存储图片
         let size = CGSizeMake(image.size.width, image.size.height)
@@ -299,7 +348,7 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
     func imagePickerControllerDidCancel(picker: UIImagePickerController) {
         self.picker?.dismissViewControllerAnimated(true, completion: nil)
     }
-    
+
     // 上传头像
     private func uploadUserFace(imageData: NSData!) {
         if imageData == nil {
@@ -356,6 +405,8 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
             g_customerId = nil
             if (sender as! UIButton).titleLabel?.text == "退出登陆" {
                 ZMDTool.showPromptView("退出登陆成功")
+                g_customer?.Avatar?.AvatarUrl = nil
+                self.navigationController?.popViewControllerAnimated(true)
                 (sender as! UIButton).setTitle("登陆", forState: .Normal)
             }else{
                 let vc = LoginViewController.CreateFromLoginStoryboard() as! LoginViewController

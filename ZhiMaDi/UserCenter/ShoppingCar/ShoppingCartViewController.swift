@@ -334,7 +334,6 @@ class ShoppingCartViewController: UIViewController,UITableViewDataSource,UITable
         let storeArray = NSMutableArray()
         for(var i=0;i<self.dataArray.count;i++){
             let item = self.dataArray[i] as! ZMDShoppingItem
-            item.Store.Id = i%2
             var j = 0
             for (;j<storeArray.count;j++){
                 let arr = storeArray[j] as! NSMutableArray

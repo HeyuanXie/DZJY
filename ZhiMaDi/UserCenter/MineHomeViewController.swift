@@ -226,6 +226,8 @@ class MineHomeViewController: UIViewController,UITableViewDataSource, UITableVie
                 ZMDTool.configViewLayerWithSize(personImgV, size: 30)
                 if let urlStr = g_customer?.Avatar?.AvatarUrl,url = NSURL(string: urlStr) {
                     personImgV.sd_setImageWithURL(url, placeholderImage: nil)
+                }else{
+                    personImgV.image = UIImage(named: "示例头像")
                 }
             }
             //设置用户名Label.text

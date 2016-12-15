@@ -9,24 +9,19 @@
 import UIKit
 import ReactiveCocoa
 import MJRefresh
-//商品列表
+//供求列表
 class SupplyDemandListViewController: UIViewController ,ZMDInterceptorProtocol, UITableViewDataSource, UITableViewDelegate,UISearchBarDelegate {
-    
     @IBOutlet weak var currentTableView: UITableView!
-    
     var popView : UIView!
     var footer : MJRefreshAutoNormalFooter!
     var dataArray = NSMutableArray()
-    var indexSkip = 1
     var IndexFilter = 0     //记录排序cell上的selected
-    var isHasNext = true
+    var isHasNext = false
     var orderbyPriceUp = true                       // 价格升序
     var orderBy : Int = 0  //默认为0
     var filterView : UIView!
     var pickView : PickView!
     
-    //跳转传递的值
-//    var vcTitle = ""        //vc的title
     
     //供求数据请求参数
     var customerId : NSNumber?
@@ -39,10 +34,8 @@ class SupplyDemandListViewController: UIViewController ,ZMDInterceptorProtocol, 
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         self.subViewInit()
         self.fetchData(self.orderBy)
-        //        self.updateData(self.orderBy)   //第一次进来用orderby = 16的方式排序
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -87,16 +80,23 @@ class SupplyDemandListViewController: UIViewController ,ZMDInterceptorProtocol, 
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cellId = "goodsCell"
         let cell = tableView.dequeueReusableCellWithIdentifier(cellId) as! SupplyDemandListCell
+
         //singleCell的收藏
         cell.contentView.bringSubviewToFront(cell.isCollectionBtnLeft)
-        cell.isCollectionBtnLeft.setImage(UIImage(named: "list_collect_normal.png"), forState: UIControlState.Normal)
-        cell.isCollectionBtnLeft.setImage(UIImage(named: "list_collect_selected.png"), forState: UIControlState.Selected)
+        cell.isCollectionBtnLeft.setImage(UIImage(named: "collect01"), forState: UIControlState.Normal)
+        cell.isCollectionBtnLeft.setImage(UIImage(named: "collect02"), forState: UIControlState.Selected)
         let product = self.dataArray[indexPath.section] as! ZMDSupplyProduct
         cell.isCollectionBtnLeft.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
             cell.isCollectionBtnLeft.selected = !cell.isCollectionBtnLeft.selected
             return RACSignal.empty()
         })
-        SupplyDemandListCell.configSupplyCell(cell, product: product)
+        if self.type == 2 {
+            cell.goodsImgVBotConstraint.constant = 150-12
+            cell.goodsImgVLeft.hidden = true
+            SupplyDemandListCell.configSupplyCell(cell, product: product,isDemand: true)
+        }else{
+            SupplyDemandListCell.configSupplyCell(cell, product: product)
+        }
         return cell
     }
     
@@ -108,6 +108,7 @@ class SupplyDemandListViewController: UIViewController ,ZMDInterceptorProtocol, 
         let vc = SupplyDemandDetailViewController.CreateFromMainStoryboard() as! SupplyDemandDetailViewController
         vc.hidesBottomBarWhenPushed = true
         vc.data = product
+        vc.type = self.type
         self.navigationController?.pushViewController(vc, animated: true)
     }
     
@@ -208,6 +209,7 @@ class SupplyDemandListViewController: UIViewController ,ZMDInterceptorProtocol, 
                         self.dismissPopupView(pickView)
                         //updateData With self.lower、higher、limit
                         self.page = 1
+                        self.isHasNext = false
                         self.fromPrice = pickView.lower
                         self.toPrice = pickView.higher
                         self.fetchData(self.orderBy)
@@ -221,9 +223,13 @@ class SupplyDemandListViewController: UIViewController ,ZMDInterceptorProtocol, 
                 default :
                     break
                 }
-                //点击上面的menu时让indexSkip=1(indexSkip==1时清除dataArray)，让后定义orderBy重新请求数据
+                //点击上面的menu时让page=1(page==1时清除dataArray)，让后定义orderBy重新请求数据
                 self.createFilterMenu()     //更新filterMenu上的UI
                 self.page = 1
+                self.isHasNext = false
+                self.dataArray.removeAllObjects()
+                self.currentTableView.reloadData()
+                self.currentTableView.contentOffset = CGPoint(x: 0, y: 0)
                 self.fetchData(self.orderBy)
             })
             
@@ -267,21 +273,20 @@ class SupplyDemandListViewController: UIViewController ,ZMDInterceptorProtocol, 
     
     func fetchData(orderBy:Int!) {
         ZMDTool.showActivityView(nil)
-        QNNetworkTool.supplyDemandSearch(self.customerId?.integerValue, page: self.page, pageSize: 12, check: self.check, q: self.q, type: self.type, orderBy: orderBy, fromPrice: self.fromPrice?.floatValue, toPrice: self.toPrice?.floatValue) { (error, products) -> Void in
+        QNNetworkTool.supplyDemandSearch(0, page: self.page, pageSize: 12, check: self.check, q: self.q, type: self.type, orderBy: orderBy, fromPrice: self.fromPrice?.floatValue, toPrice: self.toPrice?.floatValue) { (error, products) -> Void in
             ZMDTool.hiddenActivityView()
             if let productsArr = products {
                 if self.page == 1 {
                     self.dataArray.removeAllObjects()
                 }
-                self.indexSkip += 1
+                self.page = self.page + 1
                 self.dataArray.addObjectsFromArray(productsArr as [AnyObject])
                 self.currentTableView.reloadData()
-                if productsArr.count < 12 {
+                if productsArr.count == 12 {
+                    self.isHasNext = true
+                }else{
                     self.isHasNext = false
                     self.footer.endRefreshingWithNoMoreData()
-                }else{
-                    self.isHasNext = true
-                    self.footer.endRefreshing()
                 }
             }else{
                 ZMDTool.showErrorPromptView(nil, error: error)
@@ -295,7 +300,7 @@ class SupplyDemandListViewController: UIViewController ,ZMDInterceptorProtocol, 
         if self.isHasNext {
             self.fetchData(self.orderBy)
         }else{
-            self.currentTableView.mj_footer.endRefreshingWithNoMoreData()
+            self.footer.endRefreshingWithNoMoreData()
         }
     }
     

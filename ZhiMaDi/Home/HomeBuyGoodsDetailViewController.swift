@@ -1100,7 +1100,8 @@ class HomeBuyGoodsDetailViewController: UIViewController,UITableViewDataSource,U
     
     //MARK:-alertDestructiveAction 重写
     override func alertDestructiveAction() {
-        ZMDTool.enterLoginViewController()
+        let vc = LoginViewController.CreateFromLoginStoryboard() as! LoginViewController
+        self.pushToViewController(vc, animated: true, hideBottom: true)
     }
 }
 

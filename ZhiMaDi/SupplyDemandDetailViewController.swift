@@ -11,7 +11,7 @@ import TYAttributedLabel
 import MJRefresh
 import WebKit
 
-//商品详请
+//供求详请
 class SupplyDemandDetailViewController: UIViewController,UITableViewDataSource,UITableViewDelegate,QNShareViewDelegate,ZMDInterceptorProtocol,NewPagedFlowViewDelegate, NewPagedFlowViewDataSource {
     enum GoodsCellType{
         case HomeContentTypeAd                       /* 广告显示页 */
@@ -26,6 +26,7 @@ class SupplyDemandDetailViewController: UIViewController,UITableViewDataSource,U
     }
     
     @IBOutlet weak var currentTableView: UITableView!
+    var type = 1    // 1为供应，2为求购
     var countForBounghtLbl : UIButton!               // 购买数量Lbl
     var productAttrV : ZMDProductAttrView!
     var kTagEditViewShow = 100001
@@ -34,9 +35,8 @@ class SupplyDemandDetailViewController: UIViewController,UITableViewDataSource,U
     var goodsCellTypes: [GoodsCellType]!
     var navBackView : UIView!
     var navLine : UIView!
-    var productId : Int!
-    var attrSelectArray = NSMutableArray()          // 属性选择
-    var collects = NSMutableArray()
+    
+    var supplyProductId : Int!
     var pageFlowView : NewPagedFlowView!
     
     var isCollected = false        //判断是否已经收藏
@@ -47,6 +47,7 @@ class SupplyDemandDetailViewController: UIViewController,UITableViewDataSource,U
     //MARK: - *************LiftCircle**************
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.fetchData()
         self.setupNavigation()
         self.dataInit()
         self.updateUI()
@@ -61,7 +62,9 @@ class SupplyDemandDetailViewController: UIViewController,UITableViewDataSource,U
     
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(true)
-        self.pageFlowView.stopTimer()
+        if let pageFlowView = self.pageFlowView {
+            pageFlowView.stopTimer()
+        }
     }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -175,7 +178,7 @@ class SupplyDemandDetailViewController: UIViewController,UITableViewDataSource,U
             let image = UIImage(data: NSData(contentsOfURL: NSURL(string: imgUrl)!)!)
             let title = data.Title
             let url = "\(kImageAddressMain)/\(data.Id.integerValue)"
-            let description = data.Description
+            let description = data.Description ?? ""
             return (image!,url,title,description)
         }else{
             return (UIImage(named: "Share_Icon")!, kImageAddressMain, self.title ?? "", "疆南市场,物美价廉!")
@@ -188,9 +191,7 @@ class SupplyDemandDetailViewController: UIViewController,UITableViewDataSource,U
     
     
     func updateDetailView(webView:WKWebView) {
-        let urlString = kImageAddressMain + "/product/ProductDetailview?productId=\(self.productId)"
-        let requeset = NSURLRequest(URL: NSURL(string: urlString)!)
-        webView.loadRequest(requeset)
+        
     }
     
     //MARK: NewPageFlowViewDelegate
@@ -285,7 +286,11 @@ class SupplyDemandDetailViewController: UIViewController,UITableViewDataSource,U
         let cellId = "detailCell"
         let cell = tableView.dequeueReusableCellWithIdentifier(cellId) as! DZContentDetailCell
         if self.data != nil {
-            DZContentDetailCell.configDetailCell(cell, product: self.data)
+            if self.type == 1 {
+                DZContentDetailCell.configDetailCell(cell, product: self.data, isDemand: false)
+            }else{
+                DZContentDetailCell.configDetailCell(cell, product: self.data, isDemand: true)
+            }
         }
         return cell
     }
@@ -373,23 +378,29 @@ class SupplyDemandDetailViewController: UIViewController,UITableViewDataSource,U
     }
     
     //MARK: - ************PrivateMethod*************
+    //MARK: fetchData
+    func fetchData() {
+        
+    }
     //MARK: setupNavigation
     func setupNavigation() {
         self.title = "详情"
         
         let height = (self.navigationController?.navigationBar.frame.height)!
-        let rightView = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: height))
-        let images = ["product_collect_03","product_share_02","common_more"]
+        let rightView = UIView(frame: CGRect(x: 0, y: 0, width: 85, height: height))
+        let images = ["collect01","分享","common_more"]
         for i in 0..<3 {
-            let btn = UIButton(frame: CGRect(x: CGFloat(i)*(30+5), y: 0, width: 30, height: height))
+            let btn = UIButton(frame: CGRect(x: CGFloat(i)*(25+3), y: (height-25)/2.0, width: 25, height: 25))
             btn.setImage(UIImage(named: images[i])?.imageWithRenderingMode(UIImageRenderingMode.AlwaysOriginal), forState: .Normal)
             rightView.addSubview(btn)
             btn.tag = 1000 + i
             btn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
                 switch (sender as! UIButton).tag {
                 case 1000:
+                    
                     break
                 case 1001:
+//                    ZMDShareSDKTool.
                     break
                 default:
                     break
@@ -402,6 +413,9 @@ class SupplyDemandDetailViewController: UIViewController,UITableViewDataSource,U
     
     private func dataInit(){
         self.goodsCellTypes = [.HomeContentTypeAd,.HomeContentTypeDetail,.HomeContentTypeDistribution,.HomeContentTypeSeller,.HomeContentTypeIntroductionHead,.HomeContentTypeIntroductionDetail]
+        if self.type == 2 {
+            self.goodsCellTypes = [.HomeContentTypeDetail,.HomeContentTypeDistribution,.HomeContentTypeSeller,.HomeContentTypeIntroductionHead,.HomeContentTypeIntroductionDetail]
+        }
         if let data = self.data, pictures = data.SupplyDemandPictures {
             self.imageArray.removeAllObjects()
             for pic in pictures
@@ -517,6 +531,7 @@ class SupplyDemandDetailViewController: UIViewController,UITableViewDataSource,U
 }
 
 class DZContentDetailCell : UITableViewCell {
+    @IBOutlet weak var quantityNameLbl : UILabel!
     @IBOutlet weak var nameLbl : UILabel!
     @IBOutlet weak var priceLbl : UILabel!
     @IBOutlet weak var priceUnitLbl : UILabel!
@@ -529,13 +544,18 @@ class DZContentDetailCell : UITableViewCell {
         self.priceUnitLbl.hidden = true
     }
     
-    class func configDetailCell(cell:DZContentDetailCell,product:ZMDSupplyProduct) {
+    class func configDetailCell(cell:DZContentDetailCell,product:ZMDSupplyProduct,isDemand:Bool) {
         cell.nameLbl.text = product.Title
         cell.priceLbl.text = "\(product.Price.floatValue) /\(product.PriceUnit)"
         cell.priceLbl.attributedText = cell.priceLbl.text?.AttributeText(["\(product.Price.floatValue)","/\(product.PriceUnit)"], colors: [appThemeColorNew,defaultTextColor], textSizes: [20,14], bolds: [true,false])
         cell.addressLbl.text = product.AreaName.componentsSeparatedByString(">>").first!+" "+product.AreaName.componentsSeparatedByString(">>").last!
         cell.limitLbl.text = "\(product.Quantity)\(product.QuantityUnit)/\(product.MinQuantity ?? 0)\(product.MinQuantityUnit)起订"
         cell.endTimeLbl.text = "截止至: \(product.EndTime.componentsSeparatedByString("T").first!)"
+
+        if isDemand {
+            cell.quantityNameLbl.text = "采购量"
+            cell.limitLbl.text = "\(product.Quantity)\(product.QuantityUnit)"
+        }
     }
 }
 
@@ -546,12 +566,9 @@ class DZContentSellerCell : UITableViewCell {
     
     override func awakeFromNib() {
         self.frame = CGRect(x: 0, y: 0, width: kScreenWidth, height: 154*kScreenWidth/375)
-        let lblWidth = kScreenWidth - 154*kScreenWidth/375
         let lblHeight = 154*kScreenWidth/(375*3)
-        //        self.phoneLbl.addSubview(ZMDTool.getLine(CGRect(x: 0, y: lblHeight-0.5, width: lblWidth, height: 0.5), backgroundColor: defaultLineColor))
-        //        self.qqLbl.addSubview(ZMDTool.getLine(CGRect(x: 0, y: lblHeight-0.5, width: lblWidth, height: 0.5), backgroundColor: defaultLineColor))
         for i in 0..<2 {
-            self.addSubview(ZMDTool.getLine(CGRect(x: 0, y: CGFloat(i+1)*lblHeight, width: lblWidth, height: 0.5), backgroundColor: defaultLineColor))
+            self.addSubview(ZMDTool.getLine(CGRect(x: 0, y: CGFloat(i+1)*lblHeight, width: kScreenWidth, height: 0.5), backgroundColor: defaultLineColor))
         }
     }
     

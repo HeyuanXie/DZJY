@@ -305,7 +305,9 @@ extension ZMDTool {
         btn.setTitle(textForNormal, forState: .Normal)
         btn.setTitleColor(textColorForNormal, forState: .Normal)
         btn.titleLabel!.font = defaultSysFontWithSize(fontSize)
-        btn.rac_signalForControlEvents(.TouchUpInside).subscribeNext(blockForCli)
+        if blockForCli != nil {
+            btn.rac_signalForControlEvents(.TouchUpInside).subscribeNext(blockForCli)
+        }
         return btn
     }
     class func getButton (frame:CGRect,textForNormal:String,fontSize:CGFloat,textColorForNormal:UIColor = defaultTextColor,backgroundColor:UIColor,blockForCom : ((AnyObject!) -> RACSignal!)?) -> UIButton {

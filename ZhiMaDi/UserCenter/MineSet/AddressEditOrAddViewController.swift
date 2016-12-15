@@ -12,9 +12,9 @@ class AddressEditOrAddViewController: UIViewController,UITableViewDataSource,UIT
     var currentTableView: UITableView!
     var usrNameTextFidld : UITextField!,phoneTextFidld : UITextField!,codeTextFidld : UITextField!,addressTextFidld : UITextField!
     var areaLbl : UILabel! // 所在地区
-    var swithBtn : UISwitch!
+    var defaultBtn : UIButton!
     var isAdd : Bool = true //默认为添加地址
-    let titles = ["收件人 : ","手机号码 : ","收货地址 : "/*,"邮政编码 : "*/,"详细地址 : ","设为默认地址 : "]
+    let titles = ["联系人 : ","手机号 : ","所在地 : ","邮政编码 : ","详细地址 : "]
 
     let titles2 = ["选择配送方式:","快递送货上门","收件人 : ","手机号码 : ","收货地址 : ","邮政编码 : ","详细地址 : ","设为默认地址 : "]
     let titles3 = ["选择配送方式:","快递送货上门","收件人 : ","手机号码 : ","选择区域 : ","邮政编码 : ","选择网点 : ","设为默认地址 : "]
@@ -51,14 +51,17 @@ class AddressEditOrAddViewController: UIViewController,UITableViewDataSource,UIT
         if section == 0 {
             return 10
         }else{
-            return 1
+            return 0.5
         }
     }
     func tableView(tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        return 0
+        return section == self.titles.count-1 ? zoom(55) : 0
     }
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-        return 56
+        if self.titles[indexPath.section] == "详细地址 : " {
+            return 50
+        }
+        return zoom(50)
     }
     func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         if section == 2 {
@@ -67,6 +70,37 @@ class AddressEditOrAddViewController: UIViewController,UITableViewDataSource,UIT
         }else{
             return nil
         }
+    }
+    func tableView(tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        if section == self.titles.count-1 {
+            let view = UIView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: zoom(55)))
+            self.defaultBtn = UIButton(frame: CGRect.zero)
+            self.defaultBtn.setImage(UIImage.imageWithColor(RGB(239,67,70,1.0), size: CGSize(width: zoom(15), height: zoom(15))), forState: .Selected)
+            self.defaultBtn.setImage(UIImage.imageWithColor(UIColor.whiteColor(), size: CGSize(width: zoom(15), height: zoom(15))), forState: .Normal)
+            self.defaultBtn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
+                (sender as! UIButton).selected = !(sender as! UIButton).selected
+                return RACSignal.empty()
+            })
+            view.addSubview(self.defaultBtn)
+            let label = ZMDTool.getLabel(CGRect.zero, text: "设为默认地址", fontSize: 14)
+            label.textColor = defaultTextColor
+            label.textAlignment = .Center
+            view.addSubview(label)
+            label.snp_makeConstraints(closure: { (make) -> Void in
+                make.top.equalTo(0)
+                make.right.equalTo(-(zoom(10)))
+                make.height.equalTo(zoom(55))
+                make.width.equalTo(zoom(120))
+            })
+            self.defaultBtn.snp_makeConstraints(closure: { (make) -> Void in
+                make.top.equalTo(zoom(20))
+                make.right.equalTo(label.snp_left).offset(-zoom(5))
+                make.width.equalTo(zoom(15))
+                make.height.equalTo(zoom(15))
+            })
+            return view
+        }
+        return nil
     }
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let title = self.titles[indexPath.section]
@@ -81,7 +115,8 @@ class AddressEditOrAddViewController: UIViewController,UITableViewDataSource,UIT
                 cell?.backgroundColor = tableViewdefaultBackgroundColor
             }
             cell?.textLabel?.text = self.titles[indexPath.section]
-            cell?.textLabel?.textColor = UIColor.darkGrayColor()
+            cell?.textLabel?.textColor = defaultTextColor
+            cell?.textLabel?.font = UIFont.systemFontOfSize(14)
             return cell!
         case "快递送货上门" :
             let cellId = "cell\(indexPath.section)"
@@ -94,6 +129,9 @@ class AddressEditOrAddViewController: UIViewController,UITableViewDataSource,UIT
                 ZMDTool.configTableViewCellDefault(cell!)
             }
             cell?.textLabel?.text = self.isToHome ? "快递送货上门" : "网点代收"
+            cell?.textLabel?.text = self.titles[indexPath.section]
+            cell?.textLabel?.textColor = defaultTextColor
+            cell?.textLabel?.font = UIFont.systemFontOfSize(14)
             let btn = UIButton(frame: CGRect(x: kScreenWidth-40, y: 8, width: 40, height: 40))
             btn.setImage(UIImage(named: "btn_Arrow_TurnDown1@2x"), forState: .Normal)
             cell?.contentView.addSubview(btn)
@@ -104,7 +142,7 @@ class AddressEditOrAddViewController: UIViewController,UITableViewDataSource,UIT
                 return RACSignal.empty()
             })
             return cell!
-        case  "收件人 : ":
+        case  "联系人 : ":
             let cellId = "cell\(indexPath.section)"
             var cell = tableView.dequeueReusableCellWithIdentifier(cellId)
             if cell == nil {
@@ -115,17 +153,20 @@ class AddressEditOrAddViewController: UIViewController,UITableViewDataSource,UIT
                 ZMDTool.configTableViewCellDefault(cell!)
             }
             cell?.textLabel?.text = self.titles[indexPath.section]
-            let size = self.titles[indexPath.section].sizeWithFont(defaultSysFontWithSize(17), maxWidth: 320)
+            cell?.textLabel?.textColor = defaultTextColor
+            cell?.textLabel?.font = UIFont.systemFontOfSize(14)
+            let size = self.titles[indexPath.section].sizeWithFont(defaultSysFontWithSize(14), maxWidth: 320)
             if self.usrNameTextFidld == nil {
-                self.usrNameTextFidld = UITextField(frame: CGRect(x: 20 + size.width, y: 0, width: kScreenWidth - 20 - size.width - 12, height: 56))
-                self.usrNameTextFidld.font = defaultSysFontWithSize(17)
+                self.usrNameTextFidld = UITextField(frame: CGRect(x: zoom(20) + size.width, y: 0, width: kScreenWidth - zoom(20) - size.width - zoom(12), height: zoom(50)))
+                self.usrNameTextFidld.textColor = defaultTextColor
+                self.usrNameTextFidld.font = defaultSysFontWithSize(14)
                 cell?.contentView.addSubview(self.usrNameTextFidld)
             }
             if self.address != nil {
                 self.usrNameTextFidld.text = self.address.FirstName
             }
             return cell!
-        case "手机号码 : " :
+        case "手机号 : " :
             let cellId = "cell\(indexPath.section)"
             var cell = tableView.dequeueReusableCellWithIdentifier(cellId)
             if cell == nil {
@@ -136,17 +177,20 @@ class AddressEditOrAddViewController: UIViewController,UITableViewDataSource,UIT
                 ZMDTool.configTableViewCellDefault(cell!)
             }
             cell?.textLabel?.text = self.titles[indexPath.section]
-            let size = self.titles[indexPath.section].sizeWithFont(defaultSysFontWithSize(17), maxWidth: 320)
+            cell?.textLabel?.textColor = defaultTextColor
+            cell?.textLabel?.font = UIFont.systemFontOfSize(14)
+            let size = self.titles[indexPath.section].sizeWithFont(defaultSysFontWithSize(14), maxWidth: 320)
             if self.phoneTextFidld == nil {
-                self.phoneTextFidld = UITextField(frame: CGRect(x: 20 + size.width, y: 0, width: kScreenWidth - 20 - size.width - 12, height: 56))
-                self.usrNameTextFidld.font = defaultSysFontWithSize(17)
+                self.phoneTextFidld = UITextField(frame: CGRect(x: zoom(20) + size.width, y: 0, width: kScreenWidth - zoom(20) - size.width - zoom(12), height: zoom(50)))
+                self.phoneTextFidld.textColor = defaultTextColor
+                self.phoneTextFidld.font = defaultSysFontWithSize(14)
                 cell?.contentView.addSubview(self.phoneTextFidld)
             }
             if self.address != nil {
                 self.phoneTextFidld.text = self.address.PhoneNumber
             }
             return cell!
-        case "收货地址 : ":
+        case "所在地 : ":
             //收货地址（选择区域）
             let cellId = "cell\(indexPath.section)"
             var cell = tableView.dequeueReusableCellWithIdentifier(cellId)
@@ -158,13 +202,14 @@ class AddressEditOrAddViewController: UIViewController,UITableViewDataSource,UIT
                 ZMDTool.configTableViewCellDefault(cell!)
             }
             cell?.textLabel?.text = self.titles[indexPath.section]
-//            cell?.textLabel?.text = self.isToHome ? "选择地址" : "选择区域"   //农资
+            cell?.textLabel?.textColor = defaultTextColor
+            cell?.textLabel?.font = UIFont.systemFontOfSize(14)
             
-            let size = self.titles[indexPath.section].sizeWithFont(defaultSysFontWithSize(17), maxWidth: 320)
+            let size = self.titles[indexPath.section].sizeWithFont(defaultSysFontWithSize(14), maxWidth: 320)
             if self.areaLbl == nil {
-                self.areaLbl = ZMDTool.getLabel( CGRect(x: 20 + size.width, y: 0, width: kScreenWidth - 20 - size.width - 12, height: 56), text: "", fontSize: 17)
+                self.areaLbl = ZMDTool.getLabel( CGRect(x: zoom(20) + size.width, y: 0, width: kScreenWidth - zoom(20) - size.width - zoom(12), height: zoom(50)), text: "", fontSize: 14)
                 areaLbl.text  = "省/市/区"
-                areaLbl.textColor = UIColor.lightGrayColor()
+                areaLbl.textColor = defaultTextColor
                 cell?.contentView.addSubview(self.areaLbl)
             }
             if self.address != nil {
@@ -183,10 +228,13 @@ class AddressEditOrAddViewController: UIViewController,UITableViewDataSource,UIT
                 ZMDTool.configTableViewCellDefault(cell!)
             }
             cell?.textLabel?.text = self.titles[indexPath.section]
+            cell?.textLabel?.textColor = defaultTextColor
+            cell?.textLabel?.font = UIFont.systemFontOfSize(14)
             let size = self.titles[indexPath.section].sizeWithFont(defaultSysFontWithSize(17), maxWidth: 320)
             if self.codeTextFidld == nil {
-                self.codeTextFidld = UITextField(frame: CGRect(x: 20 + size.width, y: 0, width: kScreenWidth - 20 - size.width - 12, height: 56))
-                self.codeTextFidld.font = defaultSysFontWithSize(17)
+                self.codeTextFidld = UITextField(frame: CGRect(x: zoom(20) + size.width, y: 0, width: kScreenWidth - zoom(20) - size.width - zoom(12), height: zoom(50)))
+                self.codeTextFidld.font = defaultSysFontWithSize(14)
+                self.codeTextFidld.textColor = defaultTextColor
                 cell?.contentView.addSubview(self.codeTextFidld)
             }
             if self.address != nil {
@@ -205,38 +253,19 @@ class AddressEditOrAddViewController: UIViewController,UITableViewDataSource,UIT
                 ZMDTool.configTableViewCellDefault(cell!)
             }
             cell?.textLabel?.text = self.titles[indexPath.section]
-//            cell?.textLabel?.text = self.isToHome ? "详细地址" : "选择网点"   //农资
+            cell?.textLabel?.textColor = defaultTextColor
+            cell?.textLabel?.font = UIFont.systemFontOfSize(14)
             let size = self.titles[indexPath.section].sizeWithFont(defaultSysFontWithSize(17), maxWidth: 320)
             if self.addressTextFidld == nil {
-                self.addressTextFidld = UITextField(frame: CGRect(x: 20 + size.width, y: 0, width: kScreenWidth - 20 - size.width - 12, height: 56))
-                self.addressTextFidld.font = defaultSysFontWithSize(17)
+                self.addressTextFidld = UITextField(frame: CGRect(x: zoom(20) + size.width, y: 0, width: kScreenWidth - zoom(20) - size.width - zoom(12), height: zoom(50)))
+                self.addressTextFidld.font = defaultSysFontWithSize(14)
+                self.addressTextFidld.textColor = defaultTextColor
                 cell?.contentView.addSubview(self.addressTextFidld)
             }
             self.addressTextFidld.placeholder = self.isToHome ? " " : "请选择代收网点"
             if self.address != nil {
                 self.addressTextFidld.text = self.address.Address2 ?? ""
             }
-            return cell!
-        case "设为默认地址 : " :
-            let cellId = "cell\(indexPath.section)"
-            var cell = tableView.dequeueReusableCellWithIdentifier(cellId)
-            if cell == nil {
-                cell = UITableViewCell(style: .Subtitle, reuseIdentifier: cellId)
-                cell?.accessoryType = UITableViewCellAccessoryType.None
-                cell!.selectionStyle = .None
-                
-                ZMDTool.configTableViewCellDefault(cell!)
-                
-                if self.swithBtn == nil {
-                    self.swithBtn = UISwitch(frame: CGRect(x: kScreenWidth - 12 - 56, y: 14, width: 56, height: 28))
-                    cell?.contentView.addSubview(swithBtn)
-                    if !self.isAdd && self.address != nil {
-                        self.swithBtn.on = self.address.IsDefault.boolValue
-                    }
-                }
-            }
-            cell?.textLabel?.text = self.titles[indexPath.section]
-            
             return cell!
         default :
             return UITableViewCell()
@@ -259,27 +288,43 @@ class AddressEditOrAddViewController: UIViewController,UITableViewDataSource,UIT
     }
     //MARK:- Private Method
     private func subViewInit(){
-        if self.isAdd {
-            self.title = "添加收货地址"
-        } else {
-            self.title = "编辑收货地址"
-        }
+        self.title = self.isAdd ? "新建收货地址" : "编辑收货地址"
+   
         self.currentTableView = UITableView(frame: self.view.bounds)
-        self.currentTableView.frame = CGRect(x: 0, y: 0, width: kScreenWidth, height: kScreenHeight - 64)
         self.currentTableView.backgroundColor = tableViewdefaultBackgroundColor
         self.currentTableView.separatorStyle = .None
         self.currentTableView.dataSource = self
         self.currentTableView.delegate = self
         self.view.addSubview(self.currentTableView)
-        
-        let fotView = UIView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 100))
-        fotView.backgroundColor = UIColor.clearColor()
-        let saveBtn = ZMDTool.getButton(CGRect(x: 12, y: 45, width: kScreenWidth - 24, height: 50), textForNormal: "保存", fontSize: 20, textColorForNormal: UIColor.whiteColor(), backgroundColor: RGB(235,61,61,1.0)) { (sender) -> Void in
-            self.addAddress()
+        self.currentTableView.snp_makeConstraints { (make) -> Void in
+            make.top.equalTo(0)
+            make.left.equalTo(0)
+            make.right.equalTo(0)
+            make.bottom.equalTo(-50)
         }
-        ZMDTool.configViewLayerWithSize(saveBtn, size: 25)
-        fotView.addSubview(saveBtn)
-        self.currentTableView.tableFooterView = fotView
+        self.viewForFoot()
+    }
+    
+    func viewForFoot() {
+        if self.isAdd {
+            self.addBottomBtn(blockForCli: { (sender) -> Void in
+                self.addAddress()
+            })
+        }else{
+            self.addBottomBtns(["删除","保存"], colors: [RGB(239,67,70,1.0),appThemeColor])
+            let bgView = self.view.viewWithTag(66666)
+            for i in 0..<2 {
+                let btn = bgView?.viewWithTag(1000+i) as! UIButton
+                btn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
+                    if i==0 {
+                        self.deleteAddress()
+                    }else{
+                        self.addAddress()
+                    }
+                    return RACSignal.empty()
+                })
+            }
+        }
     }
     
     private func checkData() -> Bool {
@@ -310,13 +355,25 @@ class AddressEditOrAddViewController: UIViewController,UITableViewDataSource,UIT
         address.Address1 = areaLbl.text
         address.Address2 = addressTextFidld.text
         address.AreaCode = self.addressId == ""  ? address.AreaCode : self.addressId
-        address.IsDefault = self.swithBtn.on
+        address.IsDefault = self.defaultBtn.selected
         address.City = "市辖区"
         address.CountryId = 23
 //        address.FaxNumber = self.codeTextFidld.text
         return address
     }
     
+    
+    func deleteAddress() {
+        QNNetworkTool.deleteAddress(self.address.Id.integerValue, customerId: g_customerId!, completion: { (succeed, dictionary,error) -> Void in
+            if error == nil {
+                ZMDTool.showPromptView("删除成功")
+                self.navigationController?.popViewControllerAnimated(true)
+            } else {
+                ZMDTool.showErrorPromptView(nil, error: error, errorMsg: "")
+            }
+        })
+
+    }
     func addAddress() {
         if !self.checkData() {
             return

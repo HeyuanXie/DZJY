@@ -199,8 +199,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let btnPadding = (kScreenWidth - 2*(40+80)*zoom)
             for i in 0..<2 {
                 let btn = ZMDTool.getButton(CGRect(x: 50*zoom+CGFloat(i)*(80*zoom+btnPadding), y: kScreenHeight-230*zoom, width: 80*zoom, height: 80*zoom), textForNormal: "", fontSize: 15, textColorForNormal: defaultTextColor, backgroundColor: UIColor.clearColor(), blockForCli: { (sender) -> Void in
-                    let title = (sender as! UIButton).titleLabel?.text
-                    print(title)
+                    let rootVc = (self.tabBar.viewControllers?[self.tabBar.selectedIndex] as! UINavigationController).viewControllers.first
+                    if !g_isLogin {
+                        view.removePop()
+                        self.showLoginAlert(rootVc!)
+                        return
+                    }
+                    view.removePop()
+                    let vc = PublishSupplyViewController.CreateFromMainStoryboard() as! PublishSupplyViewController
+                    vc.contentType = i == 0 ? .Supply : .Demand
+                    rootVc?.pushToViewController(vc, animated: true, hideBottom: true)
                 })
                 btn.setImage(UIImage(named: images[i]), forState: .Normal)
 
@@ -218,6 +226,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.window?.backgroundColor = UIColor.whiteColor()
         self.window?.rootViewController = tabBar
         self.window?.makeKeyAndVisible()
+    }
+    
+    //MAKR: - 没有登陆Alert
+    func showLoginAlert(rootVC:UIViewController) {
+        let alert = UIAlertController(title: "未登录!", message: "登陆才能发布,是否立即登陆?", preferredStyle: UIAlertControllerStyle.Alert)
+        alert.addAction(UIAlertAction(title: "确定", style: .Destructive, handler: { (alert) -> Void in
+            let vc = LoginViewController.CreateFromLoginStoryboard() as! LoginViewController
+            rootVC.pushToViewController(vc, animated: true, hideBottom: true)
+        }))
+        alert.addAction(UIAlertAction(title: "取消", style: UIAlertActionStyle.Cancel, handler: nil))
+        rootVC.presentViewController(alert, animated: true, completion: nil)
     }
     
     //MARK: - 初始化信鸽推送

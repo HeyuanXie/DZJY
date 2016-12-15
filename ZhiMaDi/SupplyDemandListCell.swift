@@ -28,6 +28,7 @@ class SupplyDemandListCell : UITableViewCell {
     @IBOutlet weak var originalPriceLblLeft: UILabel!  // 原价
     @IBOutlet weak var countLblLeft: UILabel!
     @IBOutlet weak var isCollectionBtnLeft: UIButton!
+    @IBOutlet weak var goodsImgVBotConstraint : NSLayoutConstraint!
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -40,7 +41,7 @@ class SupplyDemandListCell : UITableViewCell {
         // Configure the view for the selected state
     }
     
-    class func configSupplyCell(cell:SupplyDemandListCell!,product:ZMDSupplyProduct!) {
+    class func configSupplyCell(cell:SupplyDemandListCell!,product:ZMDSupplyProduct!,isDemand:Bool=false) {
         cell.titleLblLeft.text = product.Title
         cell.currentPriceLblLeft.text = "¥ \(product.Price.floatValue) /\(product.PriceUnit)"
         cell.currentPriceLblLeft.attributedText = cell.currentPriceLblLeft.text?.AttributeText(["¥","\(product.Price.floatValue)"], colors: [appThemeColorNew,appThemeColorNew], textSizes: [15,18])
@@ -50,8 +51,21 @@ class SupplyDemandListCell : UITableViewCell {
         if let pictures = product.SupplyDemandPictures where pictures.count != 0 {
             let url = kImageAddressMain + pictures[0].PictureUrl
             cell.goodsImgVLeft.sd_setImageWithURL(NSURL(string: url), placeholderImage: nil)
+        }else{
+            cell.goodsImgVLeft.image = UIImage(named: "product_default")
+        }
+        if isDemand {
+            cell.goodsImgVBotConstraint.constant = 150-12
+            cell.originalPriceLblLeft.text = "采购量: \(product.Quantity)\(product.QuantityUnit)"
+            cell.currentPriceLblLeft.text = "期望价格: ¥ \(product.Price.floatValue) /\(product.PriceUnit)"
+            cell.currentPriceLblLeft.attributedText = cell.currentPriceLblLeft.text?.AttributeText(["¥","\(product.Price.floatValue)"], colors: [appThemeColor,appThemeColor], textSizes: [15,18])
         }
     }
+}
+
+
+class DemandListCell: UITableViewCell {
+    
 }
 
 

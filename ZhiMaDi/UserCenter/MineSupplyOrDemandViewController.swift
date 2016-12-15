@@ -17,7 +17,15 @@ class MineSupplyOrDemandViewController: UIViewController,UITableViewDelegate,UIT
         case kPublish = 0,kCheck,kDated
     }
     @IBOutlet weak var currentTableView : UITableView!
+    @IBOutlet weak var currentTableViewTopConstraint : NSLayoutConstraint!
+    
     var dataArray = NSMutableArray()
+    var pageIndex = 1
+    var check = 0
+    var type = 1
+    var keyword = ""
+    var haveNext = false
+    
     var contentType = ContentType.Supply
     var statu = StatuType.kPublish
     
@@ -25,7 +33,7 @@ class MineSupplyOrDemandViewController: UIViewController,UITableViewDelegate,UIT
     //MARK: - ****************LifeCircle*******************
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.dataArray = ["",""]
+        self.fetchData(self.statu, keyword: self.keyword)
         self.initUI()
         // Do any additional setup after loading the view.
     }
@@ -46,12 +54,25 @@ class MineSupplyOrDemandViewController: UIViewController,UITableViewDelegate,UIT
         return view
     }
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+        let data = self.dataArray[indexPath.section] as! ZMDSupplyProduct
         if indexPath.row == 1 {
             return zoom(54)
         }else if self.contentType == .Demand {
-            return 170
+            return data.Description == "" ? 120 : 170
         }else{
-            return 335
+            if let pictures = data.SupplyDemandPictures where pictures.count != 0 {
+                if let des = data.Description where des != "" {
+                    return 320
+                }else{
+                    return 235
+                }
+            }else{
+                if let des = data.Description where des != "" {
+                    return 185
+                }else{
+                    return 115
+                }
+            }
         }
     }
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
@@ -66,7 +87,7 @@ class MineSupplyOrDemandViewController: UIViewController,UITableViewDelegate,UIT
     
     //MARK: - ***************TableViewCell****************
     func cellForActions(tableView:UITableView,indexPath:NSIndexPath) -> UITableViewCell {
-        let titles = ["修改","查看详情"]
+        let titles = self.statu == .kDated ? ["查看详情"] : ["修改","查看详情"]
         let width = zoom(85)
         var index = -1
         let cellId = "actionsCell"
@@ -77,10 +98,18 @@ class MineSupplyOrDemandViewController: UIViewController,UITableViewDelegate,UIT
             for title in titles {
                 index = index + 1
                 let btn = ZMDTool.getButton(CGRect(x: kScreenWidth-zoom(12)-CGFloat(index)*zoom(10+85)-width, y: zoom(10), width: width, height: zoom(34)), textForNormal: title, fontSize: 13, backgroundColor: UIColor.clearColor(), blockForCli: { (sender) -> Void in
-                    if (sender as! UIButton).tag == 1000 {
+                    let data = self.dataArray[indexPath.section]
+                    if (sender as! UIButton).titleLabel?.text == "查看详情" {
                         //详情
+                        let vc = SupplyDemandDetailViewController.CreateFromMainStoryboard() as! SupplyDemandDetailViewController
+                        vc.data = data as! ZMDSupplyProduct
+                        vc.type = self.contentType == .Supply ? 1 : 2
+                        self.pushToViewController(vc, animated: true, hideBottom: true)
                     }else{
                         //修改
+                        let vc = PublishSupplyViewController.CreateFromMainStoryboard() as! PublishSupplyViewController
+                        vc.data = data as! ZMDSupplyProduct
+                        self.pushToViewController(vc, animated: true, hideBottom: true)
                     }
                 })
                 btn.tag = 1000+index
@@ -93,41 +122,88 @@ class MineSupplyOrDemandViewController: UIViewController,UITableViewDelegate,UIT
     }
     func cellForDemandDetail(tableView:UITableView,indexPath:NSIndexPath) -> UITableViewCell {
         let cellId = "demandDetailCell"
-        let cell = tableView.dequeueReusableCellWithIdentifier(cellId) as! SupplyDetailCell
+        let cell = tableView.dequeueReusableCellWithIdentifier(cellId) as! DemandDetailCell
         ZMDTool.configTableViewCellDefault(cell)
         cell.addLine()
         
+        let data = self.dataArray[indexPath.section]
+        cell.configCell(cell, data: data as! ZMDSupplyProduct)
         return cell
     }
     func cellForSupplyDetail(tableView:UITableView,indexPath:NSIndexPath) -> UITableViewCell {
         let cellId = "supplyDetailCell"
-        var cell = tableView.dequeueReusableCellWithIdentifier(cellId)
-        if cell == nil {
-            cell = UITableViewCell(style: .Default, reuseIdentifier: cellId)
-            ZMDTool.configTableViewCellDefault(cell!)
-            cell?.addLine()
+        var cell = tableView.dequeueReusableCellWithIdentifier(cellId) as! SupplyDetailCell
+        ZMDTool.configTableViewCellDefault(cell)
+        cell.addLine()
+        
+        let data = self.dataArray[indexPath.section] as! ZMDSupplyProduct
+        if let pictures = data.SupplyDemandPictures where pictures.count != 0 {
+            cell.scrollView.snp_updateConstraints { (make) -> Void in
+                make.top.equalTo(0)
+                make.left.equalTo(0)
+                make.right.equalTo(0)
+                make.height.equalTo(115)
+            }
+        }else{
+            cell.scrollView.snp_updateConstraints(closure: { (make) -> Void in
+                make.top.equalTo(0)
+                make.height.equalTo(0)
+            })
         }
-        return cell!
+        
+        cell.detailLblWidthConstraint.constant = data.Description == "" ? 0 : 60
+        cell.detailLblBotConstraint.constant = data.Description == "" ? 0 : 10
+        cell.configCell(cell, data: data)
+        return cell
     }
     
     //MARK: - ***************PrivateMethod******************
     func initUI() {
-        
+        self.currentTableView.backgroundColor = tableViewdefaultBackgroundColor
+        self.currentTableViewTopConstraint.constant = zoom(60)
+        self.currentTableView.addFooterRefresh()
         self.viewForSearch()
         let segmentView = viewForSegment()
         self.view.addSubview(segmentView)
-        
     }
     
-    func fetchData() {
-        //...
+    func fetchData(statu:StatuType,keyword:String) {
+        ZMDTool.showActivityView(nil)
+        switch statu {
+        case .kPublish:
+            self.check = 2
+        case .kCheck:
+            self.check = 1
+        case .kDated:
+            self.check = 4
+        }
+        self.type = self.contentType == .Supply ? 1 : 2
+        QNNetworkTool.supplyDemandSearch(g_customerId!, page: self.pageIndex, pageSize: 12, check: self.check, q: keyword, type: self.type, orderBy: 0, fromPrice: nil, toPrice: nil) { (error, products) -> Void in
+            ZMDTool.hiddenActivityView()
+            if let products = products {
+                if self.pageIndex == 1 {
+                    self.dataArray.removeAllObjects()
+                }
+                if products.count == 12 {
+                    self.haveNext = true
+                }else{
+                    self.haveNext = false
+                }
+                self.dataArray.addObjectsFromArray(products as [AnyObject])
+                self.currentTableView.reloadData()
+            }else{
+                ZMDTool.showErrorPromptView(nil, error: error)
+            }
+        }
     }
     
     func viewForSearch() {
         let searchBar = ZMDTool.searchBar("输入关键词")
         searchBar.finished = {(text)->Void in
             self.view.endEditing(true)
-            self.fetchData()
+            self.pageIndex = 1
+            self.keyword = text
+            self.fetchData(self.statu,keyword:self.keyword)
         }
         self.navigationItem.titleView = searchBar
     }
@@ -158,6 +234,8 @@ class MineSupplyOrDemandViewController: UIViewController,UITableViewDelegate,UIT
                         (item as! UIButton).selected = false
                     }
                 }
+                self.pageIndex = 1
+                self.fetchData(self.statu,keyword: self.keyword)
             })
             btnArray.addObject(btn)
             if index != 2 {
@@ -178,6 +256,14 @@ class MineSupplyOrDemandViewController: UIViewController,UITableViewDelegate,UIT
     
     
     //MARK: - ***************Override****************
+    override func customFooterRefresh() {
+        if !self.haveNext {
+            self.currentTableView.mj_footer.endRefreshingWithNoMoreData()
+            return
+        }
+        self.pageIndex = self.pageIndex + 1
+        self.fetchData(self.statu, keyword: self.keyword)
+    }
     override func gotoMore() {
         
     }
@@ -185,17 +271,6 @@ class MineSupplyOrDemandViewController: UIViewController,UITableViewDelegate,UIT
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
 
 }
 
@@ -207,13 +282,54 @@ class DemandDetailCell : UITableViewCell {
     @IBOutlet weak var priceLbl : UILabel!
     @IBOutlet weak var beginLbl : UILabel!
     @IBOutlet weak var endLbl : UILabel!
-    var images : NSArray!
+    
+    func configCell(cell:DemandDetailCell,data:ZMDSupplyProduct) {
+        cell.nameLbl.text = data.Title
+        cell.detailLbl.text = data.Description
+        cell.quantityLbl.text = "\(data.Quantity.integerValue)"+"/\(data.QuantityUnit)"
+        cell.priceLbl.text = "\(data.Price.floatValue)/\(data.PriceUnit)"
+        cell.beginLbl.text = data.CreateOn
+        let endTime = data.EndTime.componentsSeparatedByString("T").first
+        let days = QNFormatTool.getDaysWithDateString(endTime!)
+        cell.endLbl.text = days == "0" ? endTime! : endTime! + "(剩余\(days)天)"
+    }
 }
+
 class SupplyDetailCell : UITableViewCell {
+    @IBOutlet weak var scrollView : UIScrollView!
     @IBOutlet weak var nameLbl : UILabel!
     @IBOutlet weak var detailLbl : UILabel!
     @IBOutlet weak var quantityLbl : UILabel!
     @IBOutlet weak var priceLbl : UILabel!
     @IBOutlet weak var beginLbl : UILabel!
     @IBOutlet weak var endLbl : UILabel!
+    @IBOutlet weak var detailLblWidthConstraint : NSLayoutConstraint!
+    @IBOutlet weak var detailLblBotConstraint : NSLayoutConstraint!
+    
+    func configCell(cell:SupplyDetailCell,data:ZMDSupplyProduct) {
+        cell.nameLbl.text = data.Title
+        cell.detailLbl.text = data.Description
+        cell.quantityLbl.text = "\(data.Quantity.integerValue)"+"/\(data.QuantityUnit)"
+        cell.priceLbl.text = "\(data.Price.floatValue)/\(data.PriceUnit)"
+        cell.beginLbl.text = data.CreateOn
+        let endTime = data.EndTime.componentsSeparatedByString("T").first
+        let days = QNFormatTool.getDaysWithDateString(endTime!)
+        cell.endLbl.text = days == "0" ? endTime!+"(已过期)" : endTime! + "(剩余\(days)天)"
+        
+        if let pictures = data.SupplyDemandPictures {
+            cell.scrollView.contentSize = CGSizeMake(12+CGFloat(pictures.count)*(135+10), 0)
+            for item in data.SupplyDemandPictures {
+                var index = -1
+                for pic in pictures {
+                    index = index + 1
+                    let view = UIView(frame: CGRect(x: 12+CGFloat(index)*(135+10), y: 0, width: 135, height: 135))
+                    let imgView = UIImageView(frame: CGRect(x: 0, y: 0, width: 135, height: 135))
+                    imgView.sd_setImageWithURL(NSURL(string: kImageAddressMain+(pic as! ZMDSupplyPicture).PictureUrl), placeholderImage: nil)
+                    view.addSubview(imgView)
+                    cell.scrollView.addSubview(view)
+                }
+            }
+        }
+
+    }
 }

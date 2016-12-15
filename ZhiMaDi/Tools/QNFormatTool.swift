@@ -112,7 +112,12 @@ extension QNFormatTool {
         }
     }
     
-    
+    class func getDaysWithDateString(dateStr1:String) -> String {
+        let date1 = QNFormatTool.date(dateStr1, format: "yyyy-MM-dd")
+        let time = date1?.timeIntervalSinceNow
+        let days = Int(time!)/(3600*24)
+        return "\(days)"
+    }
 }
 
 // MARK: - 消息未读数的格式化

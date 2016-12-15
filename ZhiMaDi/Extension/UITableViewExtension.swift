@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import MJRefresh
 
 extension UITableView {
     //添加尾部视图
@@ -17,6 +18,13 @@ extension UITableView {
         ZMDTool.configViewLayerWithSize(btn, size: 25)
         footView.addSubview(btn)
         self.tableFooterView = footView
+    }
+    
+    func addFooterRefresh() {
+        let footer = MJRefreshAutoNormalFooter { () -> Void in
+            (self.delegate as! UIViewController).customFooterRefresh()
+        }
+        self.mj_footer = footer
     }
 }
 

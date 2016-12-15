@@ -125,5 +125,11 @@ extension String{
 //        let identityCardPredicate = NSPredicate(format: "SELF MATCHES %@", regex)
 //        return identityCardPredicate.evaluateWithObject(self)
 //    }
+    
+    func isConcludeSubString(subString:String) -> Bool {
+        let str = self as NSString
+        let range = str.rangeOfString(subString)
+        return range.length > 0 ? true : false
+    }
 
 }

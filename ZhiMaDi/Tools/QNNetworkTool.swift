@@ -301,7 +301,7 @@ extension QNNetworkTool {
             if let customerDic = dic["customer"] as? NSDictionary,customer = ZMDCustomer.mj_objectWithKeyValues(customerDic) {
                 g_customer = customer
                 if let url = g_customer?.Avatar?.AvatarUrl  {
-                    g_customer?.Avatar?.AvatarUrl = kImageAddressMain + url
+                    g_customer?.Avatar?.AvatarUrl = url.hasPrefix("http") ? url : kImageAddressMain + url
                     g_customer?.FirstName = Username
                 }
             }
@@ -361,7 +361,7 @@ extension QNNetworkTool {
                     completion(succeed: false, dic: nil, error: $3)
                     return
                 }
-                g_customer?.Avatar?.AvatarUrl = url
+                g_customer?.Avatar?.AvatarUrl = url.hasPrefix("http") ? url : kImageAddressMain + url
                 completion(succeed: true, dic: dic, error: $3)
             } catch {}
         }
@@ -396,14 +396,10 @@ extension QNNetworkTool {
             parms.setValue(toPrice, forKey: "toPrice")
         }
         requestPOST(kServerAddress+"/api/v1/extend/SupplyDemand/Search", parameters: parms as? [String : AnyObject]) { (request, response, data, dictionary, error) -> Void in
-            if data != nil {
+            if let data = data {
                 do {
                     let jsonObject: AnyObject? = try NSJSONSerialization.JSONObjectWithData(data as! NSData, options: NSJSONReadingOptions.MutableContainers)
-                    guard let array = jsonObject as? NSArray else {
-                        completion(error: error, products: nil)
-                        return
-                    }
-                    let productsArray = ZMDSupplyProduct.mj_objectArrayWithKeyValuesArray(array)
+                    let productsArray = ZMDSupplyProduct.mj_objectArrayWithKeyValuesArray(jsonObject as? NSArray)
                     completion(error: nil, products: productsArray)
                 }
                 catch {
@@ -411,6 +407,80 @@ extension QNNetworkTool {
                 }
             }else{
                 completion(error: error, products: nil)
+            }
+        }
+    }
+    
+    
+    ///供求详情
+    class func supplyDemandDetail(id:Int,completion:(success:Bool?,supplyProduct:ZMDSupplyProduct?,error:NSError?)->Void) {
+        requestPOST(kServerAddress+"/api/v1/extend/SupplyDemand/Detail", parameters: ["id":id]) { (request, response, data, dictionary, error) -> Void in
+            if let dic = dictionary,product = ZMDSupplyProduct.mj_objectWithKeyValues(dic) as? ZMDSupplyProduct {
+                completion(success: true, supplyProduct: product, error:nil)
+            }else{
+                completion(success: false, supplyProduct: nil, error:error)
+            }
+        }
+    }
+    
+    
+    ///发布供求
+    class func supplyDemandPublish(supplyProduct:ZMDSupplyProduct,completion:(success:Bool?,errorMsg:String?,supplyDemandsId:Int?)->Void) {
+        let dic = supplyProduct.mj_keyValues()
+        requestPOST(kServerAddress+"/api/v1/extend/SupplyDemand/add", parameters: dic as? [String:AnyObject]) { (request, response, data, dictionary, error) -> Void in
+            guard let dic = dictionary, success = dic["success"] as? Bool where success == true else {
+                completion(success: false, errorMsg: dictionary?["error"] as? String, supplyDemandsId: nil)
+                return
+            }
+            completion(success: true, errorMsg: nil, supplyDemandsId: dictionary!["supplyDemandsId"] as? Int)
+        }
+    }
+    
+    ///发布供应时图片上传
+    class func supplyPublishUploadImage(file: NSData, fileName: String, completion:(success:Bool?,error:NSError?)->Void) {
+        let url = NSURL(string: kServerAddress+"/api/v1/extend/SupplyDemand/UploadImage")
+        request(self.productUploadRequest( url, method: "POST", data: file, fileName: fileName)).response{
+            do {
+                let jsonObject: AnyObject? = try NSJSONSerialization.JSONObjectWithData($2!, options: NSJSONReadingOptions.MutableContainers)
+                guard let data = jsonObject as? NSArray,dic = data[0] as? NSDictionary,url = dic["ImageUrl"] as? String else {
+                    completion(success: false, error: $3)
+                    return
+                }
+                println(url)
+                completion(success: true, error: $3)
+            } catch {}
+        }
+    }
+    
+    ///修改供求信息
+    class func supplyDemandAmend(supplyProduct:ZMDSupplyProduct,completion:(success:Bool?,errorMsg:String?,supplyDemandsId:Int?)->Void) {
+        let dic = supplyProduct.mj_keyValues()
+        requestPOST(kServerAddress+"/api/v1/extend/SupplyDemand/update", parameters: dic as? [String:AnyObject]) { (request, response, data, dictionary, error) -> Void in
+            guard let dic = dictionary, success = dic["success"] as? Bool where success == true else {
+                completion(success: false, errorMsg: dictionary?["error"] as? String, supplyDemandsId: nil)
+                return
+            }
+            completion(success: true, errorMsg: nil, supplyDemandsId: dictionary!["supplyDemandsId"] as? Int)
+        }
+    }
+    
+    
+    ///供求图片上传
+    class func supplyDemandUploadImage(SupplyDemandsId:Int,completion:(success:Bool?,error:NSError?)->Void) {
+        requestPOST(kServerAddress+"/api/v1/extend/SupplyDemand/UploadImage", parameters: ["SupplyDemandsId":SupplyDemandsId]) { (request, response, data, dictionary, error) -> Void in
+            if data != nil{
+                do {
+                    let jsonObject: AnyObject? = try NSJSONSerialization.JSONObjectWithData(data as! NSData, options: NSJSONReadingOptions.MutableContainers)
+                    guard let array = jsonObject as? NSArray else {
+                        completion(success: false, error: error)
+                        return
+                    }
+                    completion(success: true, error: nil)
+                } catch {
+                    println("Json解析过程出错")
+                }
+            }else {
+                completion(success: false, error: error)
             }
         }
     }

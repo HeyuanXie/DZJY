@@ -150,7 +150,7 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
                 (viewController as! SupplyDemandListViewController).type = 2
                 viewController.hidesBottomBarWhenPushed = true
             case .kEnterprise:
-                viewController = UIViewController()
+                viewController = EnterpirseListViewController.CreateFromMainStoryboard() as! EnterpirseListViewController
             }
             viewController.title = self.title
             return viewController

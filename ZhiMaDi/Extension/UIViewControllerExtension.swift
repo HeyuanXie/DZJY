@@ -60,6 +60,9 @@ extension UIViewController {
             self.dismissViewControllerAnimated(true, completion: { () -> Void in })
         }
     }
+    @IBAction func customFooterRefresh() {
+        
+    }
 }
 
 //MARK:- 为 UIViewController ... 提供一个标准的导航栏返回按钮配置
@@ -124,14 +127,54 @@ extension UIViewController {
 
 //MARK: 经常出现的UI
 extension UIViewController {
-    func addBottomBtn(title:String = "保存",blockForCli : ((AnyObject!) -> Void)!) {
+    func addBottomBtn(title:String = "保存",color:UIColor = appThemeColor, blockForCli : ((AnyObject!) -> Void)!) {
+        let bgViewTag = 66666
+        let bgView = UIView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 50))
+        bgView.backgroundColor = appThemeColor
+        bgView.tag = bgViewTag
+        self.view.addSubview(bgView)
+        bgView.snp_makeConstraints { (make) -> Void in
+            make.bottom.equalTo(0)
+            make.left.equalTo(0)
+            make.width.equalTo(kScreenWidth)
+            make.height.equalTo(50)
+        }
+        
         let saveBtn = ZMDTool.getButton(CGRect.zero, textForNormal: title, fontSize: 16, textColorForNormal: UIColor.whiteColor(), backgroundColor: appThemeColor,blockForCli: blockForCli)
-        self.view.addSubview(saveBtn)
+        bgView.addSubview(saveBtn)
         saveBtn.snp_makeConstraints { (make) -> Void in
             make.left.equalTo(0)
             make.right.equalTo(0)
             make.bottom.equalTo(0)
             make.height.equalTo(50)
+        }
+    }
+
+    func addBottomBtns(titles:[String] = ["保存"],colors:[UIColor] = [appThemeColor]) {
+        let bgViewTag = 66666
+        let bgView = UIView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 50))
+        bgView.backgroundColor = appThemeColor
+        bgView.tag = bgViewTag
+        self.view.addSubview(bgView)
+        bgView.snp_makeConstraints { (make) -> Void in
+            make.bottom.equalTo(0)
+            make.left.equalTo(0)
+            make.width.equalTo(kScreenWidth)
+            make.height.equalTo(50)
+        }
+        
+        let width = kScreenWidth/CGFloat(titles.count)
+        for i in 0..<titles.count {
+            let title = titles[i]
+            let saveBtn = ZMDTool.getButton(CGRect.zero, textForNormal: title, fontSize: 16, textColorForNormal: UIColor.whiteColor(), backgroundColor: colors[i],blockForCli: nil)
+            bgView.addSubview(saveBtn)
+            saveBtn.tag = 1000+i
+            saveBtn.snp_makeConstraints { (make) -> Void in
+                make.left.equalTo(CGFloat(i)*width)
+                make.width.equalTo(width)
+                make.bottom.equalTo(0)
+                make.height.equalTo(50)
+            }
         }
     }
 }
