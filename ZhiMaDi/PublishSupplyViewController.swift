@@ -506,7 +506,7 @@ class PublishSupplyViewController: UIViewController,ZMDInterceptorProtocol,UITab
                 text = data.Price == 0 ? "" : "\(data.Price)"
                 cell.unitLbl.text = data.PriceUnit
             case .kEndTime:
-                text = data.EndTime
+                text = data.EndTime.componentsSeparatedByString("T").first!
             case .kLocation:
                 text = data.AreaName
             case .kContactName:

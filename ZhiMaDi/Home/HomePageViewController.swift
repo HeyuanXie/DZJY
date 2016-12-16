@@ -121,15 +121,15 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
         var image : UIImage?{
             switch self{
             case .kFeature:
-                return UIImage(named: "home_new")
+                return UIImage(named: "01nongte")
             case .kECommerce:
-                return UIImage(named: "home_list")
+                return UIImage(named: "02kacunwang")
             case .kSupply:
-                return UIImage(named: "home_zulin")
+                return UIImage(named: "03gongying")
             case .kDemand:
-                return UIImage(named: "home_coupons")
+                return UIImage(named: "04qiugou")
             case .kEnterprise:
-                return UIImage(named: "home_new")
+                return UIImage(named: "05qiye")
             }
         }
         
@@ -560,12 +560,20 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
                 switch menuType {
                 case .kFeature :
                     if let url = NSURL(string: "appJNNT://") {
-                        UIApplication.sharedApplication().openURL(url)
+                        if UIApplication.sharedApplication().canOpenURL(url) {
+                            UIApplication.sharedApplication().openURL(url)
+                        }else{
+                            ZMDTool.showPromptView("您还未安装“疆南农特”App")
+                        }
                     }
                     break
                 case .kECommerce :
                     if let url = NSURL(string: "appJNNZ://") {
-                        UIApplication.sharedApplication().openURL(url)
+                        if UIApplication.sharedApplication().canOpenURL(url) {
+                            UIApplication.sharedApplication().openURL(url)
+                        }else{
+                            ZMDTool.showPromptView("您还未安装“咔村网”App")
+                        }
                     }
                     break
                 default :
@@ -575,22 +583,6 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
             })
             label.text = menuType.title
             imgV.image = menuType.image
-            
-            
-            //当请求数据成功时,更新cellForHomeMenu上btn的图片和title
-            /*if let advertisementAll = self.advertisementAll,icon = advertisementAll.icon {
-                if icon.count != 0 {
-                    let icon = i>=2 ? icon[i+1] : icon[i]
-                    //icon的title暂时自定义为 类目i
-                    label.text = icon.Title
-                    var url = kImageAddressNew + (icon.ResourcesCDNPath ?? "")
-                    if icon.ResourcesCDNPath!.hasPrefix("http") {
-                        url = icon.ResourcesCDNPath!
-                    }
-                    //没图片，暂时不用
-                    imgV.sd_setImageWithURL(NSURL(string: url), placeholderImage: nil)
-                }
-            }*/
          }
         cell?.addLine()
         return cell!
@@ -756,7 +748,7 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
             let btn = ZMDTool.getButton(CGRect(x: 0, y: 0, width: 160, height: 50*kScreenWidth/375), textForNormal: "查看全部", fontSize: 15, textColorForNormal: defaultTextColor, backgroundColor: UIColor.clearColor(), blockForCli: { (sender) -> Void in
                 print("查看全部")
             })
-            btn.setImage(UIImage(named: "right"), forState: .Normal)
+            btn.setImage(UIImage(named: "view-all"), forState: .Normal)
             btn.set("cx",value:kScreenWidth/2)
             cell?.contentView.addSubview(btn)
         }
@@ -1069,7 +1061,7 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
         let leftViewBtn = UIButton(frame: CGRect(x: 0, y: 4*kScreenWidth/375, width: 60*kScreenWidth/375, height: 36*kScreenWidth/375))
         leftViewBtn.backgroundColor = RGB(253,124,76,1.0)
         leftViewBtn.alpha = 1.0
-        leftViewBtn.setImage(UIImage(named: "storeList_down"), forState: .Normal)
+        leftViewBtn.setImage(UIImage(named: "arrow-down"), forState: .Normal)
         leftViewBtn.setTitle("供应", forState: .Normal)
         leftViewBtn.setTitleColor(UIColor.whiteColor(), forState: .Normal)
         leftViewBtn.titleLabel?.font = UIFont.systemFontOfSize(15)

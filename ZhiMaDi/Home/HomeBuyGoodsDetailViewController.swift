@@ -75,6 +75,8 @@ class HomeBuyGoodsDetailViewController: UIViewController,UITableViewDataSource,U
     
     var responsitoryNumber = 15          //商品库存量
     
+    
+    //MARK: - LifeCircle
     override func viewDidLoad() {
         super.viewDidLoad()
         self.getResponsitoryNubmer()
@@ -120,7 +122,8 @@ class HomeBuyGoodsDetailViewController: UIViewController,UITableViewDataSource,U
     @IBAction func AddProductToCard(sender: UIButton) {
         // 购物车
         let vc = ShoppingCartViewController.CreateFromMainStoryboard() as! ShoppingCartViewController
-        self.navigationController?.pushViewController(vc, animated: true)
+        vc.tabBarHidden = true
+        self.pushToViewController(vc, animated: true, hideBottom: true)
     }
     
     //MARK:- UITableViewDataSource,UITableViewDelegate

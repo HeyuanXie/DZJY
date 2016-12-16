@@ -177,4 +177,39 @@ extension UIViewController {
             }
         }
     }
+    
+    
+    //下拉筛选Btn
+    func addSelectBtn(titles:[String],frame:CGRect,selectViewBgColor:UIColor) -> UIButton {
+        let btn = ZMDTool.getButton(frame, textForNormal: "", fontSize: 0, backgroundColor: UIColor.clearColor(), blockForCli: { (sender) in
+            let downBtn = sender as! UIButton     //downBtn
+            downBtn.selected = !downBtn.selected
+            let selectView = UIView(frame: CGRect(x: zoom(65), y: 64, width: zoom(80), height: 3*zoom(36)))
+            selectView.backgroundColor = selectViewBgColor
+            selectView.alpha = 1.0
+            ZMDTool.configViewLayer(selectView)
+            var i = -1
+            for title in titles {
+                i = i + 1
+                let btn = UIButton(frame: CGRect(x: 0, y: 36*CGFloat(i)*kScreenWidth/375, width: 80*kScreenWidth/375, height: 36*kScreenWidth/375))
+                btn.tag = 1000+i
+                btn.setTitle(title, forState: .Normal)
+                btn.setTitleColor(UIColor.whiteColor(), forState: .Normal)
+                btn.titleLabel?.font = UIFont.systemFontOfSize(15)
+                btn.backgroundColor = UIColor.clearColor()
+                btn.addSubview(ZMDTool.getLine(CGRect(x: 0, y: btn.frame.height-0.5, width: btn.frame.width, height: 0.5), backgroundColor: UIColor.whiteColor()))
+                btn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
+                    selectView.removeFromSuperview()
+                    
+                    return RACSignal.empty()
+                })
+                selectView.addSubview(btn)
+            }
+            selectView.showAsPop(setBgColor: false)
+        })
+        btn.setImage(UIImage(named: "btn_Arrow_turnDown1"), forState: .Normal)
+        return btn
+    }
+
+
 }

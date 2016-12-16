@@ -95,28 +95,35 @@ class MineSupplyOrDemandViewController: UIViewController,UITableViewDelegate,UIT
         if cell == nil {
             cell = UITableViewCell(style: .Default, reuseIdentifier: cellId)
             ZMDTool.configTableViewCellDefault(cell!)
-            for title in titles {
-                index = index + 1
-                let btn = ZMDTool.getButton(CGRect(x: kScreenWidth-zoom(12)-CGFloat(index)*zoom(10+85)-width, y: zoom(10), width: width, height: zoom(34)), textForNormal: title, fontSize: 13, backgroundColor: UIColor.clearColor(), blockForCli: { (sender) -> Void in
-                    let data = self.dataArray[indexPath.section]
-                    if (sender as! UIButton).titleLabel?.text == "查看详情" {
-                        //详情
-                        let vc = SupplyDemandDetailViewController.CreateFromMainStoryboard() as! SupplyDemandDetailViewController
-                        vc.data = data as! ZMDSupplyProduct
-                        vc.type = self.contentType == .Supply ? 1 : 2
-                        self.pushToViewController(vc, animated: true, hideBottom: true)
-                    }else{
-                        //修改
-                        let vc = PublishSupplyViewController.CreateFromMainStoryboard() as! PublishSupplyViewController
-                        vc.data = data as! ZMDSupplyProduct
-                        self.pushToViewController(vc, animated: true, hideBottom: true)
-                    }
-                })
-                btn.tag = 1000+index
-                ZMDTool.configViewLayer(btn)
-                ZMDTool.configViewLayerFrameWithColor(btn, color: defaultLineColor)
-                cell?.contentView.addSubview(btn)
+
+        }
+        for subView in (cell?.contentView.subviews)! {
+            if subView is UIButton {
+                subView.removeFromSuperview()
             }
+        }
+        for title in titles {
+            index = index + 1
+            let btn = ZMDTool.getButton(CGRect(x: kScreenWidth-zoom(12)-CGFloat(index)*zoom(10+85)-width, y: zoom(10), width: width, height: zoom(34)), textForNormal: title, fontSize: 13, backgroundColor: UIColor.clearColor(), blockForCli: { (sender) -> Void in
+                let data = self.dataArray[indexPath.section]
+                if (sender as! UIButton).titleLabel?.text == "查看详情" {
+                    //详情
+                    let vc = SupplyDemandDetailViewController.CreateFromMainStoryboard() as! SupplyDemandDetailViewController
+                    vc.data = data as! ZMDSupplyProduct
+                    vc.type = self.contentType == .Supply ? 1 : 2
+                    self.pushToViewController(vc, animated: true, hideBottom: true)
+                }else{
+                    //修改
+                    let vc = PublishSupplyViewController.CreateFromMainStoryboard() as! PublishSupplyViewController
+                    vc.data = data as! ZMDSupplyProduct
+                    vc.contentType = self.contentType == .Supply ? .Supply : .Demand
+                    self.pushToViewController(vc, animated: true, hideBottom: true)
+                }
+            })
+            btn.tag = 1000+index
+            ZMDTool.configViewLayer(btn)
+            ZMDTool.configViewLayerFrameWithColor(btn, color: defaultLineColor)
+            cell?.contentView.addSubview(btn)
         }
         return cell!
     }
@@ -291,7 +298,7 @@ class DemandDetailCell : UITableViewCell {
         cell.beginLbl.text = data.CreateOn
         let endTime = data.EndTime.componentsSeparatedByString("T").first
         let days = QNFormatTool.getDaysWithDateString(endTime!)
-        cell.endLbl.text = days == "0" ? endTime! : endTime! + "(剩余\(days)天)"
+        cell.endLbl.text = (days as NSString).integerValue <= 0 ? endTime! + "(已过期)" : endTime! + "(剩余\(days)天)"
     }
 }
 

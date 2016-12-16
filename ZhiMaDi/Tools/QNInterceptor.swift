@@ -110,7 +110,7 @@ class ZMDInterceptor : NSObject {
                         }
                         
                         // 设置tabBar隐藏
-                        if viewController is HomePageViewController || viewController is SortViewController2 || viewController is ShoppingCartViewController || viewController is MineHomeViewController {
+                        if viewController is HomePageViewController || viewController is SortViewController2 || (viewController is ShoppingCartViewController && (viewController as! ShoppingCartViewController).tabBarHidden == false) || viewController is MineHomeViewController {
                             APP_DELEGATE.tabBar.hyTabBarHidden(false, animated: true)
                         }else{
                             APP_DELEGATE.tabBar.hyTabBarHidden(true, animated: true)

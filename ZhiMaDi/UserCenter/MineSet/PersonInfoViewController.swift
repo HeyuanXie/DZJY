@@ -10,13 +10,14 @@ import UIKit
 import SDWebImage
 //账户设置
 class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableViewDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate,ZMDInterceptorProtocol,ZMDInterceptorNavigationBarShowProtocol,ZMDInterceptorMoreProtocol,HZQDatePickerViewDelegate {
-    enum UserCenterCellType{
-        case Head
-        case Name
+    enum UserCenterCellType : String {
+        case Head = "Head"
+        case Name = "Name"
         case Gender
         case BirthDay
         case Location
         
+        case QQ
         case WeiXin
         case Email
         case Phone
@@ -44,6 +45,8 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
             case .Location:
                 return "所在地"
                 
+            case .QQ:
+                return "QQ号"
             case .WeiXin:
                 return "微信号"
             case .Email:
@@ -75,12 +78,14 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
             case .Location:
                 return "广东 - 东莞"
                 
+            case .QQ:
+                return "请填写"
             case .WeiXin:
                 return "请填写"
             case .Email:
                 return "请填写"
             case .Phone:
-                return "已绑定153****9415"
+                return "请填写"
                 
             default:
                 return ""
@@ -226,6 +231,26 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
             cell?.textLabel!.font = defaultSysFontWithSize(15)
             let rightLbl = cell?.contentView.viewWithTag(10000) as! UILabel
             rightLbl.text = content.text
+            switch content {
+            case .Name:
+                rightLbl.text = getObjectFromUserDefaults("realName") as? String
+            case .Gender:
+                rightLbl.text = getObjectFromUserDefaults("gender") as? String
+            case .BirthDay:
+                rightLbl.text = getObjectFromUserDefaults("birthDay") as? String
+            case .Location:
+                rightLbl.text = getObjectFromUserDefaults("location") as? String
+            case .QQ:
+                rightLbl.text = getObjectFromUserDefaults("qq") as? String
+            case .WeiXin:
+                rightLbl.text = getObjectFromUserDefaults("weiXin") as? String
+            case .Phone:
+                rightLbl.text = getObjectFromUserDefaults("phone") as? String
+            case .Email:
+                rightLbl.text = getObjectFromUserDefaults("email") as? String
+            default:
+                break
+            }
             return cell!
         }
     }
@@ -291,6 +316,7 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
                     let cell = tableView.cellForRowAtIndexPath(NSIndexPath(forRow: 2, inSection: 0))
                     let rightLbl = cell?.contentView.viewWithTag(10000) as! UILabel
                     rightLbl.text = title
+                    saveObjectToUserDefaults("gender", value: title)
                 }))
             }
             sheet.addAction(UIAlertAction(title: "取消", style: .Cancel, handler: nil))
@@ -302,7 +328,7 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
             self.pickerView.backgroundColor = UIColor.clearColor()
             self.pickerView.delegate = self
             self.pickerView.type = DateType.init(0)
-            self.pickerView.datePickerView?.minimumDate = NSDate()
+            self.pickerView.datePickerView.maximumDate = NSDate()
             self.view.addSubview(self.pickerView)
             break
         case .Location:
@@ -311,6 +337,7 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
                 let cell = tableView.cellForRowAtIndexPath(NSIndexPath(forRow: 4, inSection: 0))
                 let rightLbl = cell?.contentView.viewWithTag(10000) as! UILabel
                 rightLbl.text = text
+                saveObjectToUserDefaults("location", value: text)
             }
             self.presentViewController(vc, animated: true, completion: nil)
             return
@@ -324,6 +351,20 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
             vc.finished = {(string)->Void in
                 let rightLbl = cell?.contentView.viewWithTag(10000) as! UILabel
                 rightLbl.text = string
+                switch type {
+                case .Name:
+                    saveObjectToUserDefaults("realName", value: string)
+                case .Phone:
+                    saveObjectToUserDefaults("phone", value: string)
+                case .WeiXin:
+                    saveObjectToUserDefaults("weiXin", value: string)
+                case .QQ:
+                    saveObjectToUserDefaults("qq", value: string)
+                case .Email:
+                    saveObjectToUserDefaults("email", value: string)
+                default:
+                    break
+                }
             }
             self.pushToViewController(vc, animated: true, hideBottom: true)
         }
@@ -334,6 +375,7 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
         let cell = self.tableView.cellForRowAtIndexPath(NSIndexPath(forRow: 3, inSection: 0))
         let rightLbl = cell?.contentView.viewWithTag(10000) as! UILabel
         rightLbl.text = date
+        saveObjectToUserDefaults("birthDay", value: date)
     }
 
     //MARK: - UIImagePickerControllerDelegate

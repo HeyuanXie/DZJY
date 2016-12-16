@@ -24,10 +24,12 @@ class ShoppingCartViewController: UIViewController,UITableViewDataSource,UITable
     
     var isAllSelected = false
     
+    var tabBarHidden = false
     var hiddenLbl : UILabel!        //是否登陆的label
+    
+    //MARK: - LifeCircle
     override func viewDidLoad() {
         super.viewDidLoad()
-
         self.initUI()
     }
     override func viewWillAppear(animated: Bool) {
@@ -272,10 +274,10 @@ class ShoppingCartViewController: UIViewController,UITableViewDataSource,UITable
     func initUI() {
         self.currentTableView.backgroundColor = tableViewdefaultBackgroundColor
         ZMDTool.configViewLayerWithSize(settlementBtn,size: 16)
+        
+        
         let rightBtn = ZMDTool.getButton(CGRect(x: 0, y: 0, width: 65, height: 44), textForNormal: "删除", fontSize: 16,backgroundColor: UIColor.clearColor(), blockForCom: nil)
         rightBtn.setImage(UIImage(named: "common_delete"), forState: .Normal)
-        //        rightBtn.titleEdgeInsets = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 0)
-        //        rightBtn.imageEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right:0)
         rightBtn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
             if self.scis.count != 0 {
                 self.deleteCartItem()

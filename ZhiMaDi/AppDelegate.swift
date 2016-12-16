@@ -186,7 +186,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let cancelBtn = UIButton(frame: CGRect(x: 0, y: 0, width: width, height: width))
             let point = CGPoint(x: kScreenWidth/2, y: kScreenHeight-40*zoom)
             cancelBtn.center = point
-            cancelBtn.setImage(UIImage(named: "home_new"), forState: .Normal)
+            cancelBtn.setImage(UIImage(named: "publish_close"), forState: .Normal)
             cancelBtn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
                 view.removePop()
                 return RACSignal.empty()
@@ -194,7 +194,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             view.addSubview(cancelBtn)
             
             let titles = ["发布供应","发布求购"]
-            let images = ["葫芦堡图标.jpg","葫芦堡图标.jpg"]
+            let images = ["fabu_gy","fabu_qg"]
             let titles2 = ["好货源,生意滚滚来!","坐等商机到碗里来!"]
             let btnPadding = (kScreenWidth - 2*(40+80)*zoom)
             for i in 0..<2 {
