@@ -212,7 +212,7 @@ class CashierViewController: UIViewController,UITableViewDataSource,UITableViewD
     //支付宝支付
     private func submitAliOrder(orderString: String,isPayed: Bool){
         //应用注册scheme,在AlixPayDemo-Info.plist定义URL types
-        let appScheme: String = "alisdkforJNNT"
+        let appScheme: String = "alisdkforDZJY"
         let vc = OrderPaySucceedViewController()
         vc.isPayed = isPayed
         vc.total = self.total

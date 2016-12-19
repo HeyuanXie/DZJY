@@ -116,45 +116,6 @@ class LoginViewController: UIViewController , ZMDInterceptorNavigationBarHiddenP
         }
     
         self.view.addGestureRecognizer(tap)
-        
-        let xhyThirdView = UIView(frame:self.thirdView.frame)
-        self.view.addSubview(xhyThirdView)
-        let xhyThirdLabel = UILabel(frame: self.thirdLabel.frame)
-        xhyThirdLabel.textAlignment = .Center
-        xhyThirdLabel.center.x = self.view.center.x
-        xhyThirdLabel.textColor = defaultTextColor
-        xhyThirdLabel.text = "第三方登陆"
-        self.view.addSubview(xhyThirdLabel)
-        
-        let thirdTitle = ["微信","微博","QQ"]
-        let thirdImage = ["common_share_wechat","common_share_weibo","common_share_qq"]
-        var i = CGFloat(0)
-        for title in thirdTitle {
-            //105 50 50 
-            let width = CGFloat(50),height = CGFloat(75)
-            let x = 25+width*i + 50*i
-            //ZMDTool.getBtn得到图和文字垂直的自定义btn
-            let btn = ZMDTool.getBtn(CGRect(x: x, y: 0, width: width, height: height))
-            btn.setImage(UIImage(named:thirdImage[Int(i)]), forState: .Normal)
-            btn.setTitle(title, forState: .Normal)
-            btn.setTitleColor(defaultTextColor, forState: .Normal)
-            btn.titleLabel?.font = defaultSysFontWithSize(15)
-            btn.tag = 100 + Int(i)
-            xhyThirdView.addSubview(btn)
-            if btn.tag == 101 {
-                btn.center.x = self.view.center.x
-            }
-            if btn.tag == 102 {
-                let secondBtn = xhyThirdView.viewWithTag(101) as! UIButton
-                btn.frame = CGRect(x: CGRectGetMaxX(secondBtn.frame) + CGRectGetMinX(secondBtn.frame) - 25 - width, y: 0, width: width, height: height)
-            }
-            btn.rac_signalForControlEvents(UIControlEvents.TouchUpInside).subscribeNext({ (sender) -> Void in
-                let thirdLoginHelper = ShareSDKThirdLoginHelper() 
-                thirdLoginHelper.delegate = self
-                ShareSDKThirdLoginHelper().loginWithIndex(sender.tag - 100)
-            })
-            i++
-        }
     }
     
     func login() {

@@ -47,7 +47,7 @@ class ResisterViewController: UIViewController, UITextFieldDelegate,ZMDIntercept
         if self.agreeBtn.selected {
             self.login()
         } else {
-            ZMDTool.showPromptView("请先同意葫芦堡用户注册协议")
+            ZMDTool.showPromptView("请先同意疆南大宗交易用户注册协议")
         }
     }
     @IBAction func agreeBtnCli(sender: UIButton) {

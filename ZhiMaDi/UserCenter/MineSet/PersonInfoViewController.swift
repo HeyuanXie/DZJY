@@ -328,7 +328,7 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
             self.pickerView.backgroundColor = UIColor.clearColor()
             self.pickerView.delegate = self
             self.pickerView.type = DateType.init(0)
-            self.pickerView.datePickerView.maximumDate = NSDate()
+            self.pickerView.datePickerView?.maximumDate = NSDate()
             self.view.addSubview(self.pickerView)
             break
         case .Location:
