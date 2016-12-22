@@ -67,11 +67,11 @@ class MineCollectionViewController: UIViewController,UITableViewDataSource, UITa
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        if indexPath.section == 1 {
-            let item = self.data[indexPath.row] as? ZMDShoppingItem
+        if self.statu == .Product {
+            let item = self.data[indexPath.section] as? ZMDShoppingItem
             let vc = HomeBuyGoodsDetailViewController.CreateFromMainStoryboard() as! HomeBuyGoodsDetailViewController
             vc.productId = item?.ProductId.integerValue
-            self.navigationController?.pushViewController(vc, animated: true)
+            self.pushToViewController(vc, animated: true, hideBottom: true)
         }
     }
     //MARK: - **************TableViewCell****************
@@ -89,7 +89,7 @@ class MineCollectionViewController: UIViewController,UITableViewDataSource, UITa
         //        let freightLbl = cell?.viewWithTag(tag++) as! UILabel
         let cancelBtn = cell?.viewWithTag(tag++) as! UIButton
         
-        if let item = self.data[indexPath.row] as? ZMDShoppingItem {
+        if let item = self.data[indexPath.section] as? ZMDShoppingItem {
             if let imgUrl = item.Picture?.ImageUrl {
                 imgV.sd_setImageWithURL(NSURL(string: kImageAddressMain+imgUrl))
             }
@@ -98,10 +98,10 @@ class MineCollectionViewController: UIViewController,UITableViewDataSource, UITa
             //            goodsPriceLbl.text = item.SubTotal
             goodsPriceLbl.attributedText = "\(item.SubTotal) 原价:\(item.UnitPrice)".AttributeText([item.SubTotal,"原价:\(item.UnitPrice)"], colors: [RGB(235,61,61,1),UIColor.lightGrayColor()], textSizes: [14,12])
             //            freightLbl.text = "不包邮"
-            cancelBtn.rac_signalForControlEvents(.TouchUpInside).subscribeNext { (sender) -> Void in
-                // 取消收藏
-                self.deleteCartItem("\(item.Id)")
-            }
+            cancelBtn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
+                self.deleteCartItem("\(item.Id.integerValue)")
+                return RACSignal.empty()
+            })
         }
         return cell!
     }

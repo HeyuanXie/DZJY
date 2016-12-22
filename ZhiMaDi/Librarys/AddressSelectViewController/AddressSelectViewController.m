@@ -82,7 +82,7 @@
     [baseView addGestureRecognizer:baseViewTap];
     [self.view addSubview:baseView];
 //    [self.view.window addSubview:baseView];
-    _pickerView = [[UIView alloc] initWithFrame:CGRectMake(30, (kScreenHeight-245)/2, kScreenWidth-60, 245)];
+    _pickerView = [[UIView alloc] initWithFrame:CGRectMake(30, (kScreenHeight-300)/2, kScreenWidth-60, 300)];
     _pickerView.backgroundColor = [UIColor whiteColor];
     _pickerView.layer.cornerRadius = 9.0;
     
@@ -96,7 +96,7 @@
     
     //取消
     UIButton *cancleBt = [UIButton buttonWithType:UIButtonTypeCustom];
-    cancleBt.frame = CGRectMake(0, 190+10, btnWhidth, 35);
+    cancleBt.frame = CGRectMake(0, 240+10, btnWhidth, 35);
     [cancleBt setTitle:@"取消" forState:UIControlStateNormal];
     [cancleBt addTarget:self action:@selector(cancleAction:) forControlEvents:UIControlEventTouchUpInside];
     [cancleBt setTitleColor:[self colorWithHexString:@"#141414"] forState:UIControlStateNormal];
@@ -105,13 +105,13 @@
     //确定
     UIButton *confirmBt = [UIButton buttonWithType:UIButtonTypeCustom];
     [confirmBt addTarget:self action:@selector(confirmAction:) forControlEvents:UIControlEventTouchUpInside];
-    confirmBt.frame = CGRectMake(btnWhidth, 190+10, btnWhidth, 35);
+    confirmBt.frame = CGRectMake(btnWhidth, 240+10, btnWhidth, 35);
     [confirmBt setTitle:@"确定" forState:UIControlStateNormal];
     [confirmBt setTitleColor:[self colorWithHexString:@"#141414"] forState:UIControlStateNormal];
     [_pickerView addSubview:confirmBt];
     
     //picker
-    picker = [[UIPickerView alloc] initWithFrame: CGRectMake(0, 10, kScreenWidth-60, 190)];
+    picker = [[UIPickerView alloc] initWithFrame: CGRectMake(0, 10, kScreenWidth-60, 250)];
     picker.dataSource = self;
     picker.delegate = self;
     picker.showsSelectionIndicator = YES;

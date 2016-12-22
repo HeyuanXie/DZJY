@@ -80,7 +80,7 @@ class SupplyDemandListViewController: UIViewController ,ZMDInterceptorProtocol, 
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cellId = "goodsCell"
         let cell = tableView.dequeueReusableCellWithIdentifier(cellId) as! SupplyDemandListCell
-
+        
         //singleCell的收藏
         cell.contentView.bringSubviewToFront(cell.isCollectionBtnLeft)
         cell.isCollectionBtnLeft.setImage(UIImage(named: "collect01"), forState: UIControlState.Normal)
@@ -107,7 +107,7 @@ class SupplyDemandListViewController: UIViewController ,ZMDInterceptorProtocol, 
     func pushDetailVc(product : ZMDSupplyProduct) {
         let vc = SupplyDemandDetailViewController.CreateFromMainStoryboard() as! SupplyDemandDetailViewController
         vc.hidesBottomBarWhenPushed = true
-        vc.data = product
+        vc.supplyProductId = product.Id.integerValue
         vc.type = self.type
         self.navigationController?.pushViewController(vc, animated: true)
     }

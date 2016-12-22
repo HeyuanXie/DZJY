@@ -73,30 +73,29 @@ class ShareView: UIView ,UICollectionViewDelegate, UICollectionViewDataSource{
         self.shareTypeArray.removeAll(keepCapacity: false)
         
     //判断是否安装客户端再是否显示shareItem
-//        if WXApi.isWXAppInstalled() {
-//            shareAdd("朋友圈", "Share_WXFriends", 23)
-//            shareAdd("微信好友", "Share_WX", 22)
-//        }
+        if WXApi.isWXAppInstalled() {
+            shareAdd("朋友圈", "Share_WXFriends", 23)
+            shareAdd("微信好友", "Share_WX", 22)
+        }
+        
+        if TencentOAuth.iphoneQQInstalled() {
+            shareAdd("QQ好友", "Share_QQ", 24)
+            shareAdd("QQ空间", "Share_QQSpace", 6)
+        }
+
+        if WeiboSDK.isWeiboAppInstalled() {
+            shareAdd("腾讯微博", "Share_TXWeibo", 2)
+        }
+        
+//        shareAdd("朋友圈","Share_WXFriends",23)
+//        shareAdd("微信好友","Share_WX",22)
 //        
-//        if TencentOAuth.iphoneQQInstalled() {
-//            shareAdd("QQ好友", "Share_QQ", 24)
-//            shareAdd("QQ空间", "Share_QQSpace", 6)
-//        }
-//
-//        if WeiboSDK.isWeiboAppInstalled() {
-//            shareAdd("新浪微博", "Share_Sina", 1)
-//            shareAdd("腾讯微博", "Share_TXWeibo", 2)
-//        }
-        
-        shareAdd("朋友圈","Share_WXFriends",23)
-        shareAdd("微信好友","Share_WX",22)
-        
-        shareAdd("QQ好友","Share_QQ",24)
-        shareAdd("QQ空间","Share_QQSpace",6)
+//        shareAdd("QQ好友","Share_QQ",24)
+//        shareAdd("QQ空间","Share_QQSpace",6)
+//        
+//        shareAdd("腾讯微博", "Share_TXWeibo", 2)
         
         shareAdd("新浪微博", "Share_Sina", 1)
-        shareAdd("腾讯微博", "Share_TXWeibo", 2)
-        
         shareAdd("邮件", "Share_Email", 18)
         shareAdd("短信", "Share_SMS", 19)
         shareAdd("复制链接","common_share_link",1000)
@@ -228,11 +227,11 @@ class ShareView: UIView ,UICollectionViewDelegate, UICollectionViewDataSource{
             let image = data.image
             let url = data.url
             let title = data.title!
-            let description = data.description
+            var description = data.description
             
             //设置分享参数
             let shareParames = NSMutableDictionary()
-            shareParames.SSDKSetupShareParamsByText("葫芦堡",
+            shareParames.SSDKSetupShareParamsByText(description,
                 images : image,
                 url : NSURL(string: url),
                 title : title,
@@ -243,51 +242,23 @@ class ShareView: UIView ,UICollectionViewDelegate, UICollectionViewDataSource{
                 let tmp = UIPasteboard()
                 tmp.string = url
             } else if url != "" {
-                let shareType = self.shareTypeArray[index]
+                let shareType = SSDKPlatformType(rawValue: UInt(self.shareTypeArray[index]))
                 self.disMissShareView()
-                if (shareType == 4/*ShareTypeSinaWeibo*/) && ShareSDK.hasAuthorized(SSDKPlatformType.TypeSinaWeibo) { // 新浪微博需要UI提示
+                if description.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 120 {
+                    description = (description as NSString).substringToIndex(110) + "..."
+                }
+                if (shareType == SSDKPlatformType.TypeSinaWeibo) && ShareSDK.hasAuthorized(SSDKPlatformType.TypeSinaWeibo) {
+                    shareParames.SSDKSetupSinaWeiboShareParamsByText(description, title: title, image: image, url: NSURL(string: url), latitude: 0, longitude: 0, objectID: nil, type: SSDKContentType.Auto)
+                    // 新浪微博需要UI提示
                     ZMDTool.showActivityView("正在分享...", inView: nil, 3)
                 }
-                
-                shareParames.SSDKEnableUseClientShare()     //允许通过客户端分享
-                
-                //开始分享
-                var sharePlatformType: SSDKPlatformType!
-                switch index {
-                case 0:
-                    sharePlatformType = SSDKPlatformType.TypeWechat
-                    break
-                case 1:
-                    sharePlatformType = SSDKPlatformType.SubTypeWechatSession
-                    shareParames.SSDKSetupWeChatParamsByText(description, title: title, url: NSURL(string: url), thumbImage: image, image: image, musicFileURL: nil, extInfo: nil, fileData: nil, emoticonData: nil, type: .Auto, forPlatformSubType: .SubTypeWechatSession)
-                    break
-                case 2:
-                    sharePlatformType = SSDKPlatformType.TypeQQ
-                    break
-                case 3:
-                    sharePlatformType = SSDKPlatformType.SubTypeQZone
-                    break
-                case 4:
-                    sharePlatformType = SSDKPlatformType.TypeSinaWeibo
-                    shareParames.SSDKSetupSinaWeiboShareParamsByText(description, title: title, image: image, url: NSURL(string: url), latitude: 0, longitude: 0, objectID: nil, type: .Auto)
-                    break
-                case 5:
-                    sharePlatformType = SSDKPlatformType.TypeTencentWeibo
-                    break
-                case 6:
-                    sharePlatformType = SSDKPlatformType.TypeMail
-                    break
-                case 7:
-                    sharePlatformType = SSDKPlatformType.TypeSMS
-                    break
-                case 8:
-                    sharePlatformType = SSDKPlatformType.TypeCopy
-                    break
-                default: 
-                    break
+                if (shareType == SSDKPlatformType.SubTypeWechatSession) {
+                    shareParames.SSDKSetupWeChatParamsByText(description, title: title, url: NSURL(string: url), thumbImage: image, image: image, musicFileURL: nil, extInfo: nil, fileData: nil, emoticonData: nil, type: SSDKContentType.Auto, forPlatformSubType: SSDKPlatformType.SubTypeWechatSession)
                 }
-
-                ShareSDK.share(sharePlatformType, parameters: shareParames) { (state : SSDKResponseState, userData : [NSObject : AnyObject]!, contentEntity :SSDKContentEntity!, error : NSError!) -> Void in
+                
+                //允许通过客户端分享
+                shareParames.SSDKEnableUseClientShare()
+                ShareSDK.share(shareType!, parameters: shareParames) { (state : SSDKResponseState, userData : [NSObject : AnyObject]!, contentEntity :SSDKContentEntity!, error : NSError!) -> Void in
                 
                     switch state{
                         

@@ -10,7 +10,7 @@ import UIKit
 //首页
 class HomePageViewController: UIViewController,UITableViewDataSource,UITableViewDelegate,UISearchBarDelegate,UIScrollViewDelegate,CycleScrollViewDelegate,ZMDInterceptorProtocol,UITextFieldDelegate {
     
-    let specialHeights : [String:CGFloat] = ["supplyDetailCell":324,"fruitDetailCell":515]
+    let specialHeights : [String:CGFloat] = ["supplyDetailCell":324,"fruitDetailCell":100]
     
     //首页section的枚举
     enum UserCenterCellType{
@@ -37,6 +37,8 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
             case .HomeContentTypeAd :
                 return 0
             case .HomeContentTypeMenu :
+                return 0
+            case .HomeContentTypeFruitDetail:
                 return 0
             default :
                 return 12
@@ -202,10 +204,13 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
     
     @IBOutlet weak var currentTableView: UITableView!
     
-    var userCenterData = [[UserCenterCellType.HomeContentTypeAd],[.HomeContentTypeMenu,.HomeContentTypeState],[.HomeContentTypeDoubleGood,.HomeContentTypeMulityGood,.HomeContentTypeRecommend],[.HomeContentTypeMiniAd],[.HomeContentTypeSupplyHead,.HomeContentTypeSupplyDetail,.HomeContentTypeSupplyFoot],[.HomeContentTypeFruitHead,.HomeContentTypeFruitSort,.HomeContentTypeFruitDetail]]
+    var userCenterData = [[UserCenterCellType.HomeContentTypeAd],[.HomeContentTypeMenu,.HomeContentTypeState],[.HomeContentTypeDoubleGood,.HomeContentTypeMulityGood,.HomeContentTypeRecommend],[.HomeContentTypeSupplyHead,.HomeContentTypeSupplyDetail,.HomeContentTypeSupplyFoot]]
     
     var searchTypes : [SearchType]!
     var searchType : SearchType = .kSupply
+    var timer : NSTimer!
+    var selectView : UIView!    //搜索下拉View
+    let topAdName = "mb_index_top_banner"          //顶部轮播图广告名
     
     var fruitSelectIndex = 0       //水果蔬菜section 删选按钮选中记录
     var orderbySalesUp = true      //水果蔬菜section 按销量排序
@@ -216,11 +221,17 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
     var menuType: [MenuType]!
     var 下拉视窗 : UIView!
     var categories = NSMutableArray()
-    var advertisementAll : ZMDAdvertisementAll!
+    var advertisementAll : ZMDAdvertisementAll! //top、icon、guess、topic。。。
     var textInput: UITextField!
     
-    var history = NSMutableArray()
-    var newProducts = NSMutableArray()
+    var topAdArray = NSMutableArray()   //顶部轮播图
+    var dongTaiIndex = 0    //用于取得交易动态当前动态
+    var dongTaiArray = NSMutableArray()    //交易动态
+    var enterpriseArray = NSMutableArray() //5个企业部分
+    var recommendArray = NSMutableArray()   //推荐部分
+    var supplyDemandArray = NSMutableArray()    //供求大厅
+    var supplyType = 1  //1为供应、2为求购
+    var productsArray = NSMutableArray() //水果蔬菜
     
     var navBackView : UIView!
     var navLine : UIView!
@@ -239,12 +250,21 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
             self.checkUpdate()
         }
 //        self.fetchData()
+        if let timer = self.timer {
+            timer.fireDate = NSDate.distantPast()
+        }
         self.navigationController?.setNavigationBarHidden(true, animated: false)
     }
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(true)
         APP_LAUNCHEDTIME = APP_LAUNCHEDTIME + 1
         self.navigationController?.setNavigationBarHidden(false, animated: true)
+        if let selectView = self.selectView {
+            selectView.removeFromSuperview()
+        }
+        if let timer = self.timer {
+            timer.fireDate = NSDate.distantFuture()
+        }
     }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -281,6 +301,10 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
     
     //MARK:- UITableViewDataSource,UITableViewDelegate
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        let cellType = self.userCenterData[section][0]
+        if cellType == .HomeContentTypeFruitDetail {
+            return self.productsArray.count
+        }
         return self.userCenterData[section].count
     }
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
@@ -299,16 +323,20 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
         return headView
     }
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+        if self.userCenterData[indexPath.section][0] == .HomeContentTypeFruitDetail {
+            return self.specialHeights["fruitDetailCell"]!
+        }
         let cellType = self.userCenterData[indexPath.section][indexPath.row]
         if cellType == .HomeContentTypeSupplyDetail {
-            return self.specialHeights["supplyDetailCell"]!
-        }
-        if cellType == .HomeContentTypeFruitDetail {
-            return self.specialHeights["fruitDetailCell"]!
+//            return self.specialHeights["supplyDetailCell"]!
+            return self.supplyDemandArray.count == 0 ? 0 : CGFloat(self.supplyDemandArray.count)*38+20
         }
         return cellType.height
     }
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        if self.userCenterData[indexPath.section][0] == .HomeContentTypeFruitDetail {
+            return self.cellForHomeFruitDetail(tableView, indexPath: indexPath)
+        }
         switch  self.userCenterData[indexPath.section][indexPath.row] {
         case .HomeContentTypeAd :
             return self.cellForHomeAd(tableView, indexPath: indexPath)
@@ -335,27 +363,29 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
         case .HomeContentTypeFruitSort:
             return self.cellForHomeFruitSort(tableView, IndexPath: indexPath)
         case .HomeContentTypeFruitDetail:
-            return self.cellForHomeFruitDetail(tableView, IndexPath: indexPath)
+            return self.cellForHomeFruitDetail(tableView, indexPath: indexPath)
         }
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        if indexPath.section == self.userCenterData.count-1 {
-            if let advertisementAll = self.advertisementAll,topic = advertisementAll.topic {
-                let advertisement = topic[indexPath.row]
-                self.advertisementClick(advertisement)
-            }
+        let cellType = self.userCenterData[indexPath.section][indexPath.row]
+        if cellType == .HomeContentTypeState {
+            let tradeProduct = self.dongTaiArray[self.dongTaiIndex] as! ZMDTradeProduct
+            let vc = HomeBuyGoodsDetailViewController.CreateFromMainStoryboard() as! HomeBuyGoodsDetailViewController
+            vc.productId = tradeProduct.ProductId.integerValue
+            self.pushToViewController(vc, animated: true, hideBottom: true)
         }
     }
     
     //MARK: ***************代理方法*************
-    //MARK: 触摸代理
-//    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
-//        if self.advertisementAll == nil {
-//            self.fetchData()
-//        }
-//    }
-    
+    //MARK: ScrollViewDelegate
+    func scrollViewDidScroll(scrollView: UIScrollView) {
+        let rightBtn = self.view.viewWithTag(666)
+        if scrollView == self.currentTableView {
+            rightBtn?.hidden = scrollView.contentOffset.y > 64 ? true : false
+        }
+    }
+
     //MARK: TextFieldDelegate
     func textFieldShouldReturn(textField: UITextField) -> Bool {
         self.view.endEditing(true)
@@ -369,8 +399,10 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
                 (viewController as! StoreShowListViewController).titleForFilter = text
             case .kSupply:
                 (viewController as! SupplyDemandListViewController).type = 1
+                (viewController as! SupplyDemandListViewController).q = text
             default :
                 (viewController as! SupplyDemandListViewController).type = 2
+                (viewController as! SupplyDemandListViewController).q = text
             }
             self.pushToViewController(viewController, animated: true, hideBottom: true)
         }
@@ -500,15 +532,14 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
         cycleScroll.autoTime = 2.5
         let imgUrls = NSMutableArray()
         
-        if self.advertisementAll != nil && self.advertisementAll.top != nil {
-            for id in self.advertisementAll.top! {
-                var url = kImageAddressNew + (id.ResourcesCDNPath ?? "")
-                if id.ResourcesCDNPath!.hasPrefix("http") {
-                    url = id.ResourcesCDNPath!
-                }
-                url = url.stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLQueryAllowedCharacterSet())!
-                imgUrls.addObject(NSURL(string: url)!)
+        for id in self.topAdArray {
+            let advertisement = id as! ZMDAdvertisement
+            var url = kImageAddressMain+advertisement.ResourcesCDNPath!
+            if advertisement.ResourcesCDNPath!.hasPrefix("http") {
+                url = advertisement.ResourcesCDNPath!
             }
+            url = url.stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLQueryAllowedCharacterSet())!
+            imgUrls.addObject(NSURL(string: url)!)
             if imgUrls.count != 0 {
                 cycleScroll.urlArray = imgUrls as [AnyObject]
             }
@@ -560,20 +591,16 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
                 switch menuType {
                 case .kFeature :
                     if let url = NSURL(string: "appJNNT://") {
-                        if UIApplication.sharedApplication().canOpenURL(url) {
-                            UIApplication.sharedApplication().openURL(url)
-                        }else{
-                            ZMDTool.showPromptView("您还未安装“疆南农特”App")
-                        }
+                        UIApplication.sharedApplication().openURL(url)
+                    }else{
+                        ZMDTool.showPromptView("您还未安装“疆南农特”App")
                     }
                     break
                 case .kECommerce :
                     if let url = NSURL(string: "appJNNZ://") {
-                        if UIApplication.sharedApplication().canOpenURL(url) {
-                            UIApplication.sharedApplication().openURL(url)
-                        }else{
-                            ZMDTool.showPromptView("您还未安装“咔村网”App")
-                        }
+                        UIApplication.sharedApplication().openURL(url)
+                    }else{
+                        ZMDTool.showPromptView("您还未安装“咔村网”App")
                     }
                     break
                 default :
@@ -588,6 +615,20 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
         return cell!
     }
     /// 交易动态cell
+    func changeDongTai() {
+        if self.dongTaiArray.count == 0 {
+            return
+        }
+        self.dongTaiIndex = (self.dongTaiIndex+1)%self.dongTaiArray.count
+        let product = self.dongTaiArray[self.dongTaiIndex] as! ZMDTradeProduct
+        if let cell = self.currentTableView.cellForRowAtIndexPath(NSIndexPath(forRow: 1, inSection: 1)) {
+            let detailLbl = cell.contentView.viewWithTag(10000) as! UILabel
+            UIView.animateWithDuration(1) { () -> Void in
+                detailLbl.text = product.ProductName + "  " + "\(product.Quantity)\(product.QuantityUnit)"
+                detailLbl.textColor = defaultTextColor
+            }
+        }
+    }
     func cellForHomeState(tableView: UITableView,IndexPath:NSIndexPath)-> UITableViewCell {
         //cellHeight = 40
         let cellId = "stateCell"
@@ -603,31 +644,36 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
             cell?.contentView.addSubview(imgView)
             
             let text2 = "[xj**12] 新疆吐鲁番无核白葡萄 8吨"
-            let detailLbl = ZMDTool.getLabel(CGRect(x: zoom(10+68+10), y: 10*kScreenWidth/375, width: kScreenWidth-zoom((12+68+10)-20), height: zoom(14)), text: text2, fontSize: 13, textColor: UIColor.whiteColor(), textAlignment: .Left)
+            let detailLbl = ZMDTool.getLabel(CGRect(x: zoom(10+68+10), y: 10*kScreenWidth/375, width: kScreenWidth-zoom((10+68+10)+20), height: zoom(14)), text: text2, fontSize: 12, textColor: UIColor.whiteColor(), textAlignment: .Left)
+            detailLbl.tag = 10000
             detailLbl.attributedText = text2.AttributedMutableText(["[xj**12]","新疆吐鲁番无核白葡萄 8吨"], colors: [appThemeColorNew,defaultTextColor])
             cell?.contentView.addSubview(detailLbl)
             imgView.set("cy", value: zoom(20))
             detailLbl.set("cy", value: zoom(20))
         }
+        
         return cell!
     }
     
     //MARK: cellFor商品section
-    ///商品 cell  offer（已抛弃）
-    func cellForHomeGoods(tableView: UITableView,indexPath: NSIndexPath)-> UITableViewCell {
-        let cellId = "goodsCell"
-        let cell = tableView.dequeueReusableCellWithIdentifier(cellId) as! AdvertisementOfferCell
-        if  self.advertisementAll != nil {
-            AdvertisementOfferCell.configCell(cell, advertisementAll: self.advertisementAll.offer)
-        }
-        return cell
-    }
     ///商品DoubleGoodCell
     func cellForHomeDoubleGood(tableView: UITableView,IndexPath:NSIndexPath)-> UITableViewCell {
         //cellHeight = 98
         let cellId = "doubleGoodCell"
         let cell = tableView.dequeueReusableCellWithIdentifier(cellId) as! HomeDoubleGoodCell
         ZMDTool.configTableViewCellDefault(cell)
+        cell.addLine()
+        HomeDoubleGoodCell.configCell(cell, datas: self.enterpriseArray)
+        if self.enterpriseArray.count > 1 {
+            for i in 0..<2 {
+                cell.btns[i].rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
+                    let vc = EnterpriseDetailViewController.CreateFromMainStoryboard() as! EnterpriseDetailViewController
+                    vc.enterpriseId = (self.enterpriseArray[i] as! ZMDEnterprise).Id.integerValue
+                    self.pushToViewController(vc, animated: true, hideBottom: true)
+                    return RACSignal.empty()
+                })
+            }
+        }
         return cell
     }
     ///商品MulityGoodCell
@@ -635,7 +681,19 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
         //cellHeigth = 110
         let cellId = "multiGoodCell"
         let cell = tableView.dequeueReusableCellWithIdentifier(cellId) as! HomeMultiGoodCell
+        cell.addLine()
         ZMDTool.configTableViewCellDefault(cell)
+        HomeMultiGoodCell.configCell(cell, datas: self.enterpriseArray)
+        if self.enterpriseArray.count > 4 {
+            for i in 2..<5 {
+                cell.btns[i-2].rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
+                    let vc = EnterpriseDetailViewController.CreateFromMainStoryboard() as! EnterpriseDetailViewController
+                    vc.enterpriseId = (self.enterpriseArray[i] as! ZMDEnterprise).Id.integerValue
+                    self.pushToViewController(vc, animated: true, hideBottom: true)
+                    return RACSignal.empty()
+                })
+            }
+        }
         return cell
     }
     ///推荐 cell
@@ -696,7 +754,7 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
         
         if self.advertisementAll != nil && self.advertisementAll.top != nil {
             for id in self.advertisementAll.top! {
-                var url = kImageAddressNew + (id.ResourcesCDNPath ?? "")
+                var url = kImageAddressMain + (id.ResourcesCDNPath ?? "")
                 if id.ResourcesCDNPath!.hasPrefix("http") {
                     url = id.ResourcesCDNPath!
                 }
@@ -724,17 +782,51 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
             
             let customJumpBtn = CustomJumpBtns(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 44*kScreenWidth/375), menuTitle: ["供应大厅","求购大厅"], textColorForNormal: defaultTextColor, textColorForSelect: appThemeColorNew, IsLineAdaptText: true)
             customJumpBtn.finished = {(index:Int) -> Void in
-                
+                self.supplyType = index + 1
+                self.fetchSupplyDemand()
             }
             cell?.contentView.addSubview(customJumpBtn)
         }
         return cell!
     }
-    /// 供求详情cell
+    /// 供求Listcell
     func cellForHomeSupplyDetail(tableView: UITableView,IndexPath:NSIndexPath)-> UITableViewCell {
-        let cell = UITableViewCell()
-        cell.addLine()
-        return cell
+        let cellId = "supplyDetailCell"
+        var cell = tableView.dequeueReusableCellWithIdentifier(cellId)
+        if cell == nil {
+            cell = UITableViewCell(style: .Default, reuseIdentifier: cellId)
+            ZMDTool.configTableViewCellDefault(cell!)
+            cell!.addLine()
+            
+            for i in 0..<self.supplyDemandArray.count {
+                let view = UIView(frame: CGRect(x: 0, y: 10+CGFloat(i)*(38), width: kScreenWidth, height: 38))
+                let leftLbl = ZMDTool.getLabel(CGRect(x: 10, y: 10, width: kScreenWidth-64, height: 18), text: "", fontSize: 16, textColor: defaultTextColor, textAlignment: .Left)
+                let rightLbl = ZMDTool.getLabel(CGRect(x: kScreenWidth-64, y: 10, width: 53, height: 18), text: "", fontSize: 13, textColor: defaultDetailTextColor, textAlignment: .Right)
+                leftLbl.tag = 10000
+                rightLbl.tag = 10001
+                view.addSubview(leftLbl)
+                view.addSubview(rightLbl)
+                view.tag = 20000+i
+                cell?.contentView.addSubview(view)
+            }
+        }
+        var index = -1
+        for item in self.supplyDemandArray {
+            let supplyItem = item as! ZMDSupplyProduct
+            index = index + 1
+            let view = cell?.contentView.viewWithTag(20000+index)
+            let leftLbl = view?.viewWithTag(10000) as! UILabel
+            let rightLbl = view?.viewWithTag(10001) as! UILabel
+            let typeText = self.supplyType == 1 ? "供应" : "求购"
+            leftLbl.text = typeText + "  " + supplyItem.Title
+            leftLbl.attributedText = leftLbl.text?.AttributedText(typeText, color: appThemeColor)
+            if let arr = supplyItem.CreatedOn.componentsSeparatedByCharactersInSet(NSCharacterSet(charactersInString: "T:")) as? NSArray where arr.count == 4 {
+                let time = (arr[1] as! String) + ":" + (arr[2] as! String)
+                rightLbl.text = time
+            }
+            
+        }
+        return cell!
     }
     /// 供求底部cell
     func cellForHomeSupplyFoot(tableView: UITableView,IndexPath:NSIndexPath)-> UITableViewCell {
@@ -746,7 +838,9 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
             cell!.contentView.backgroundColor = UIColor.whiteColor()
             
             let btn = ZMDTool.getButton(CGRect(x: 0, y: 0, width: 160, height: 50*kScreenWidth/375), textForNormal: "查看全部", fontSize: 15, textColorForNormal: defaultTextColor, backgroundColor: UIColor.clearColor(), blockForCli: { (sender) -> Void in
-                print("查看全部")
+                let vc = SupplyDemandListViewController.CreateFromMainStoryboard() as! SupplyDemandListViewController
+                vc.type = self.supplyType
+                self.pushToViewController(vc, animated: true, hideBottom: true)
             })
             btn.setImage(UIImage(named: "view-all"), forState: .Normal)
             btn.set("cx",value:kScreenWidth/2)
@@ -765,14 +859,19 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
             cell = UITableViewCell(style: .Default, reuseIdentifier: cellId)
             cell!.selectionStyle = .None
             cell!.contentView.backgroundColor = UIColor.whiteColor()
-            
-            let customJumpBtn = CustomJumpBtns(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 44*kScreenWidth/375), menuTitle: ["水果","蔬菜"], textColorForNormal: defaultTextColor, textColorForSelect: appThemeColorNew, IsLineAdaptText: true)
+            let titles = NSMutableArray()
+            for category in self.categories {
+                titles.addObject((category as! ZMDXHYCategory).Name)
+            }
+            let customJumpBtn = CustomJumpBtns(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 44*kScreenWidth/375), menuTitle: titles as! [String], textColorForNormal: defaultTextColor, textColorForSelect: appThemeColorNew, IsLineAdaptText: true)
             customJumpBtn.finished = {(index:Int) -> Void in
                 
             }
             cell?.contentView.addSubview(customJumpBtn)
             cell?.addLine()
         }
+
+
         return cell!
     }
     /// 水果蔬菜删选cell
@@ -818,7 +917,6 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
                     }
                     
                     self.pageIndex = 1
-                    self.requestFruitData(self.orderby)
 
                     return RACSignal.empty()
                 })
@@ -866,8 +964,19 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
         return cell!
     }
     /// 水果蔬菜详情cell
-    func cellForHomeFruitDetail(tableView: UITableView,IndexPath:NSIndexPath)-> UITableViewCell {
-        return UITableViewCell()
+    func cellForHomeFruitDetail(tableView: UITableView,indexPath:NSIndexPath)-> UITableViewCell {
+        let cellId = "fruitDetailCell"
+        let cell = tableView.dequeueReusableCellWithIdentifier(cellId)
+        cell?.addLine()
+        ZMDTool.configTableViewCellDefault(cell!)
+        let product = self.productsArray[indexPath.row] as! ZMDProduct
+        let imgView = cell?.contentView.viewWithTag(10000) as! UIImageView
+        let titleLbl = cell?.contentView.viewWithTag(10001) as! UILabel
+        let priceLbl = cell?.contentView.viewWithTag(10002) as! UILabel
+        imgView.sd_setImageWithURL(NSURL(string: kImageAddressMain+(product.DefaultPictureModel?.ImageUrl)!), placeholderImage: nil)
+        titleLbl.text = product.Name
+        priceLbl.text = "¥"+(product.ProductPrice?.Price)!
+        return cell!
     }
 
     //MARK: **************PrivateMethod*************
@@ -985,44 +1094,115 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
         }
     }
     
-    func fetchNewProucts(){
-        QNNetworkTool.fetchNewProduct { (products, dictionary, error) in
-            if let products = products {
-                self.history.removeAllObjects()
-                self.history.addObjectsFromArray(products as [AnyObject])
+    //MARK: NetWork
+    func fetchData() {
+        self.fetchTop()
+        self.fetchDongTai()
+        self.fetchEnterprise()
+        self.fetchRecommend()
+        self.fetchSupplyDemand()
+        self.fetchProducts()
+    }
+    
+    //MARK: 获取轮播图
+    func fetchTop() {
+        QNNetworkTool.fetchHomeMiniAd(self.topAdName) { (success, products, error) -> Void in
+            if success! {
+                self.topAdArray.removeAllObjects()
+                self.topAdArray.addObjectsFromArray(products as! [AnyObject])
                 self.currentTableView.reloadData()
-            }else{
-                ZMDTool.showErrorPromptView(nil, error: error)
+            }
+        }
+    }
+    //MARK: 获取交易动态
+    func fetchDongTai() {
+        QNNetworkTool.fetchHomeDongTai { (history, dictionary, error) -> Void in
+            if let history = history {
+                self.dongTaiArray.removeAllObjects()
+                self.dongTaiArray.addObjectsFromArray(history as [AnyObject])
+                self.currentTableView.reloadData()
             }
         }
     }
     
-    func fetchData(){
-        QNNetworkTool.categories { (categories, error, dictionary) -> Void in
-            if let categories = categories {
-                self.categories.removeAllObjects()
-                self.categories.addObjectsFromArray(categories as [AnyObject])
-
+    //MARK: 获取交易企业
+    func fetchEnterprise() {
+        QNNetworkTool.fetchHomeEnterprise { (success, enterprises, error) -> Void in
+            if success {
+                self.enterpriseArray.removeAllObjects()
+                self.enterpriseArray.addObjectsFromArray(enterprises as! [AnyObject])
                 self.currentTableView.reloadData()
-            } else {
-                ZMDTool.showErrorPromptView(nil, error: error)
             }
         }
+    }
+    
+    //MARK: 获取推荐
+    func fetchRecommend() {
         
-        //获取浏览历史
-        /*QNNetworkTool.fetchCustomerHistory { (history, dictionary, error) in
-            if let history = history {
-                self.history.removeAllObjects()
-                self.history.addObjectsFromArray(history as [AnyObject])
-                
-                if self.history.count == 0 {
-                    self.fetchNewProucts()
-                    return
-                }
+    }
+    
+    //MARK: 获取供求大厅
+    func fetchSupplyDemand() {
+        QNNetworkTool.supplyDemandSearch(nil, page: 1, pageSize: 8, check: 0, q: "", type: self.supplyType, orderBy: 16, fromPrice: nil, toPrice: nil) { (error, products) -> Void in
+            if let products = products {
+                self.supplyDemandArray.removeAllObjects()
+                self.supplyDemandArray.addObjectsFromArray(products as [AnyObject])
                 self.currentTableView.reloadData()
             }
-        }*/
+        }
+    }
+    
+    //MARK: 获取最下面商品部分
+    func fetchProducts() {
+        //现获取所有的分类Id,然后遍历id取商品
+        self.fetchCategories()
+    }
+
+    
+    func fetchCategories(){
+        let queue1 = dispatch_queue_create("categoryQueue", DISPATCH_QUEUE_CONCURRENT)
+        dispatch_async(queue1) { () -> Void in
+            QNNetworkTool.fetchMainCategories { (categories, error) -> Void in
+                if let categories = categories {
+                    self.categories.removeAllObjects()
+                    self.categories.addObjectsFromArray(categories as [AnyObject])
+                    self.currentTableView.reloadData()
+                    self.userCenterData = [[UserCenterCellType.HomeContentTypeAd],[.HomeContentTypeMenu,.HomeContentTypeState],[.HomeContentTypeDoubleGood,.HomeContentTypeMulityGood,.HomeContentTypeRecommend],[.HomeContentTypeSupplyHead,.HomeContentTypeSupplyDetail,.HomeContentTypeSupplyFoot],[.HomeContentTypeFruitHead]]
+                    self.fetchProducts(self.categories)
+                }else{
+                    ZMDTool.showErrorPromptView(nil, error: error)
+                    
+                }
+            }
+        }
+    }
+    
+    func fetchProducts(categories:NSArray) {
+        self.productsArray.removeAllObjects()
+        let group = dispatch_group_create()
+        for category in categories {
+            let category = category as! ZMDXHYCategory
+            dispatch_group_enter(group)
+            sleep(1)
+            QNNetworkTool.fetchProductsInCategory(5, categoryId: category.Id.integerValue, completion: { (products, WidgetName, error) -> Void in
+                if let products = products {
+                    self.productsArray.removeAllObjects()
+                    self.productsArray.addObject(products)
+                    self.userCenterData = [[UserCenterCellType.HomeContentTypeAd],[.HomeContentTypeMenu,.HomeContentTypeState],[.HomeContentTypeDoubleGood,.HomeContentTypeMulityGood,.HomeContentTypeRecommend],[.HomeContentTypeSupplyHead,.HomeContentTypeSupplyDetail,.HomeContentTypeSupplyFoot],[.HomeContentTypeFruitHead],[.HomeContentTypeFruitDetail]]
+                    self.currentTableView.reloadData()
+                }
+            })
+            
+        }
         
+        dispatch_group_notify(group, dispatch_get_main_queue()) { () -> Void in
+            ZMDTool.hiddenActivityView()
+            self.currentTableView.reloadData()
+        }
+    }
+
+    
+    func fetchData2(){
         QNNetworkTool.fetchMainPageInto { (advertisementAll, error, dictionary) -> Void in
             if advertisementAll != nil {
                 self.advertisementAll = advertisementAll
@@ -1031,19 +1211,15 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
         }
     }
     
-    func requestFruitData(orderby:Int) {
-        //...请求数据
-//        self.currentTableView.reloadSections(NSIndexSet(index: 5), withRowAnimation: .None)
-        self.currentTableView.reloadData()
-    }
-    
     private func dataInit(){
         self.menuType = [.kFeature,.kECommerce,.kSupply,.kDemand,.kEnterprise]
         self.searchTypes = [.kSupply,.kDemand,.kGood,.kStore]
+        self.timer = NSTimer.scheduledTimerWithTimeInterval(1.5, target: self, selector: Selector("changeDongTai"), userInfo: nil, repeats: true)
     }
     
     func updateUI() {
         self.currentTableView.backgroundColor = tableViewdefaultBackgroundColor
+        self.currentTableView.scrollsToTop = false
         self.viewForSearch()
         self.configRightItem()
     }
@@ -1071,10 +1247,10 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
             (sender as!UIButton).selected = !(sender as!UIButton).selected
             self.view.endEditing(true)
             self.textInput.resignFirstResponder()
-            let selectView = UIView(frame: CGRect(x: 12*kScreenWidth/375, y: 32*kScreenWidth/375, width: 60*kScreenWidth/375, height: 36*4*kScreenWidth/375))
-            selectView.backgroundColor = RGB(253,124,76,1.0)
-            selectView.alpha = 1.0
-            ZMDTool.configViewLayer(selectView)
+            self.selectView = UIView(frame: CGRect(x: 12*kScreenWidth/375, y: 32*kScreenWidth/375, width: 60*kScreenWidth/375, height: 36*4*kScreenWidth/375))
+            self.selectView.backgroundColor = RGB(253,124,76,1.0)
+            self.selectView.alpha = 1.0
+            ZMDTool.configViewLayer(self.selectView)
             for i in 0..<self.searchTypes.count {
                 let searchType = self.searchTypes[i]
                 let btn = UIButton(frame: CGRect(x: 0, y: 36*CGFloat(i)*kScreenWidth/375, width: 60*kScreenWidth/375, height: 36*kScreenWidth/375))
@@ -1085,14 +1261,14 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
                 btn.backgroundColor = UIColor.clearColor()
                 btn.addSubview(ZMDTool.getLine(CGRect(x: 0, y: btn.frame.height-0.5, width: btn.frame.width, height: 0.5), backgroundColor: UIColor.whiteColor()))
                 btn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
-                    selectView.removeFromSuperview()
+                    self.selectView.removeFromSuperview()
                     leftViewBtn.setTitle((sender as! UIButton).titleLabel?.text, forState: .Normal)
                     self.searchType = self.searchTypes[(sender as! UIButton).tag-1000]
                     return RACSignal.empty()
                 })
-                selectView.addSubview(btn)
+                self.selectView.addSubview(btn)
             }
-            selectView.showAsPop(setBgColor: false)
+            self.selectView.showAsPop(setBgColor: false)
             return RACSignal.empty()
         })
         
@@ -1106,14 +1282,14 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
     //MAKR: UINavigationRightItem
     func configRightItem() {
         let rightBtn = UIButton(frame: CGRect(x: 326, y: 32*kScreenWidth/375, width: 35, height: 35))
-        let image = UIImage(named: "home_page_alock")?.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate)
-        rightBtn.setImage(image, forState: .Normal)
+        rightBtn.setImage(UIImage(named: "message"), forState: .Normal)
         rightBtn.rac_command = RACCommand(signalBlock: { (input) -> RACSignal! in
             let vc = MsgHomeViewController()
             vc.hidesBottomBarWhenPushed = true
-            self.navigationController?.pushViewController(vc, animated: false)
+            self.navigationController?.pushViewController(vc, animated: true)
             return RACSignal.empty()
         })
+        rightBtn.tag = 666
         self.view.addSubview(rightBtn)
     }
     

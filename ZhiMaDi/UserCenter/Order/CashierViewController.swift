@@ -198,6 +198,7 @@ class CashierViewController: UIViewController,UITableViewDataSource,UITableViewD
                 
                 //多店支付
                 let dic = self.marks //self.marks中已经添加了"customerId":g_customerId
+                dic.setValue(self.selectPayMethod.PaymentMethodSystemName, forKey: "Paymentmethod")
                 QNNetworkTool.confirmOrderWithStores(dic, completion: { (succeed, dictionary, error) -> Void in
                     self.respondForPostOrder(succeed, dictionary: dictionary, error: error)
                 })

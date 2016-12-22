@@ -21,6 +21,8 @@ class SortViewController2: UIViewController,UITableViewDataSource, UITableViewDe
     var dataArray2 = NSMutableArray()  //小分类的二维数组
     var dataArray3 = NSMutableArray()   //大分类的Id
     
+    var dataArray = NSMutableArray()
+    
     var storeId : Int!
     var isTabBar = true
     override func viewDidLoad() {
@@ -42,7 +44,7 @@ class SortViewController2: UIViewController,UITableViewDataSource, UITableViewDe
         }
     }
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return self.dataArray1.count
+        return self.dataArray.count + 1
     }
     func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         if section == 0 || section == 1 {
@@ -62,9 +64,9 @@ class SortViewController2: UIViewController,UITableViewDataSource, UITableViewDe
         } else {
             var x = CGFloat(12)
             var y = 30
-            let categories = self.dataArray2[indexPath.section-1] as! [ZMDStoreCategory]
+            let categories = (self.dataArray[indexPath.section-1] as! ZMDSortCategory).SubCategories
             for item in categories {
-                let item = item.Text.componentsSeparatedByString(" > ").last
+                let item = item.Name
                 let sizeTmp = item!.sizeWithFont(UIFont.systemFontOfSize(15), maxWidth: 120) //名宽度
                 let xTmp = x + sizeTmp.width + 20
                 if xTmp > kScreenWidth {
@@ -105,7 +107,7 @@ class SortViewController2: UIViewController,UITableViewDataSource, UITableViewDe
                     cell?.selectionStyle = .None
                     
                     let cellHeight = 40
-                    let text = self.dataArray1[indexPath.section] as! String
+                    let text = (self.dataArray[indexPath.section-1] as! ZMDSortCategory).Name
                     let size = "食品/饮料".sizeWithFont(UIFont.systemFontOfSize(15), maxWidth: CGFloat(200))
                     let leftBtn = UIButton(frame: CGRect(x: MarginLeft, y: cellHeight/4, width: Int(size.width)+10, height: cellHeight/2))
                     leftBtn.backgroundColor = UIColor(red: 62/255, green: 182/255, blue: 35/255, alpha: 1.0)
@@ -120,8 +122,8 @@ class SortViewController2: UIViewController,UITableViewDataSource, UITableViewDe
                         let vc = HomeBuyListViewController.CreateFromMainStoryboard() as! HomeBuyListViewController
                         vc.titleForFilter = text
                         vc.As = "true"
-                        vc.Cid = self.dataArray3[indexPath.section] as! String
-                        vc.titleForFilter = self.dataArray1[indexPath.section] as! String
+                        vc.Cid = "\((self.dataArray[indexPath.section-1] as! ZMDSortCategory).Id)"
+                        vc.titleForFilter = (self.dataArray[indexPath.section-1] as! ZMDSortCategory).Name
                         vc.hidesBottomBarWhenPushed = true
                         self.navigationController?.pushViewController( vc, animated: true)
                         return RACSignal.empty()
@@ -151,12 +153,11 @@ class SortViewController2: UIViewController,UITableViewDataSource, UITableViewDe
                     
                     btn.rac_signalForControlEvents(.TouchUpInside).subscribeNext({ (sender) -> Void in
                         //得到btn上的标题，通过标题进入对应的HomeBuyListViewController更新UI
-                        let arr = self.dataArray2[indexPath.section-1] as! NSArray
-                        let title = (arr[index] as! ZMDStoreCategory).Text.componentsSeparatedByString(">")[1]
+                        let subCategory = (self.dataArray[indexPath.section-1] as! ZMDSortCategory).SubCategories[index]
                         let homeBuyListViewController = HomeBuyListViewController.CreateFromMainStoryboard() as! HomeBuyListViewController
                         homeBuyListViewController.As = "true"
-                        homeBuyListViewController.Cid = (arr[index] as! ZMDStoreCategory).Value
-                        homeBuyListViewController.titleForFilter = title
+                        homeBuyListViewController.Cid = "\(subCategory.Id)"
+                        homeBuyListViewController.titleForFilter = subCategory.Name
                         homeBuyListViewController.hidesBottomBarWhenPushed = true
                         self.navigationController?.pushViewController(homeBuyListViewController, animated: true)
                     })
@@ -165,9 +166,9 @@ class SortViewController2: UIViewController,UITableViewDataSource, UITableViewDe
                 var x = CGFloat(12)
                 var y = 2
                 var index = 0
-                let categories = self.dataArray2[indexPath.section-1] as! [ZMDStoreCategory]
+                let categories = (self.dataArray[indexPath.section-1] as! ZMDSortCategory).SubCategories
                 for item in categories {
-                    let item = item.Text.componentsSeparatedByString(" > ").last
+                    let item = item.Name
                     let sizeTmp = item!.sizeWithFont(UIFont.systemFontOfSize(15), maxWidth: 100) //名宽度
                     //xTmp用于判断当前btn是否跑出屏幕外
                     let xTmp = x + sizeTmp.width + 20   //sizeTmp.width为btn.width
@@ -198,14 +199,14 @@ class SortViewController2: UIViewController,UITableViewDataSource, UITableViewDe
         if indexPath.section == 0 {
             let homeBuyListViewController = HomeBuyListViewController.CreateFromMainStoryboard() as! HomeBuyListViewController
             homeBuyListViewController.titleForFilter = ""
-//            homeBuyListViewController.storeId = self.storeId
             homeBuyListViewController.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(homeBuyListViewController, animated: true)
         }else if indexPath.row == 0 {
+            let sortCategory = self.dataArray[indexPath.section-1] as! ZMDSortCategory
             let vc = HomeBuyListViewController.CreateFromMainStoryboard() as! HomeBuyListViewController
-            vc.titleForFilter = self.dataArray1[indexPath.section] as! String
+            vc.titleForFilter = sortCategory.Name
             vc.As = "true"
-            vc.Cid = self.dataArray3[indexPath.section] as! String
+            vc.Cid = "\(sortCategory.Id.integerValue)"
             vc.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController( vc, animated: true)
         }
@@ -214,16 +215,13 @@ class SortViewController2: UIViewController,UITableViewDataSource, UITableViewDe
     //MARK:getCategories
     func getCategories() {
         ZMDTool.showActivityView(nil)
-        QNNetworkTool.fetchStoreHomePages(12, pageNumber: 1, StoreId: 0, orderBy: 0, Q: "", isNew: false) { (store, products, categories, error, dictionary) -> Void in
+        QNNetworkTool.sortCategories({ (categories, error, dictionary) -> Void in
             ZMDTool.hiddenActivityView()
             if let categories = categories {
-                self.categories.addObjectsFromArray(categories as [AnyObject])
-                self.dataInit()
+                self.dataArray.addObjectsFromArray(categories as [AnyObject])
                 self.currentTableView.reloadData()
-            }else{
-                ZMDTool.showErrorPromptView(dictionary, error: error)
             }
-        }
+        })
     }
 
     

@@ -12,6 +12,7 @@ class EnterpriseDetailViewController: UIViewController,ZMDInterceptorProtocol,UI
     
     @IBOutlet weak var currentTableView : UITableView!
     
+    var enterpriseId : NSInteger!
     var detailCellHeight : CGFloat = 270
     override func viewDidLoad() {
         super.viewDidLoad()

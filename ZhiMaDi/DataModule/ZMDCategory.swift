@@ -33,3 +33,25 @@ class ZMDStoreCategory: NSObject {
     var Group: String?
 }
 
+
+
+// 新的分类模型
+class ZMDSortCategory : NSObject {
+    var Name : String!
+    var FullName : String!
+    var Id : NSNumber!
+    var Description : String!
+    var BottomDescription : String!
+    var SubCategories : [ZMDSubCategory]!
+    
+    override static func mj_objectClassInArray() -> [NSObject : AnyObject]! {
+        return ["SubCategories":ZMDSubCategory.classForCoder()]
+    }
+}
+
+class ZMDSubCategory: NSObject {
+    var Name : String!
+    var SeName : String!
+    var Id : NSNumber!
+}
+

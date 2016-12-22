@@ -332,14 +332,24 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
             self.view.addSubview(self.pickerView)
             break
         case .Location:
-            let vc = AddressSelectViewController()
-            vc.finished = {(text)->Void in
+            self.view.endEditing(true)
+            let areaView = ZMDAreaView(frame: CGRect(x: 0, y: kScreenHeight-400, width: kScreenWidth, height: 400))
+            areaView.finished = { (address,addressId) ->Void in
                 let cell = tableView.cellForRowAtIndexPath(NSIndexPath(forRow: 4, inSection: 0))
                 let rightLbl = cell?.contentView.viewWithTag(10000) as! UILabel
+                
+                var text = address
+                if let arr = address.componentsSeparatedByString("市辖区") as? NSArray where arr.count == 2 {
+                    text = (arr[0] as! String)+(arr[1] as! String)
+                }
+                if let arr = address.componentsSeparatedByString("市辖县") as? NSArray where arr.count == 2 {
+                    text = (arr[0] as! String)+(arr[1] as! String)
+                }
                 rightLbl.text = text
                 saveObjectToUserDefaults("location", value: text)
+                self.dismissPopupView(areaView)
             }
-            self.presentViewController(vc, animated: true, completion: nil)
+            self.viewShowWithBg(areaView,showAnimation: .SlideInFromBottom,dismissAnimation: .SlideOutToBottom)
             return
         case .Address:
             type.didSelect(self.navigationController!)

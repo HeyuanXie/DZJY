@@ -21,7 +21,7 @@ extension UITableView {
     }
     
     func addFooterRefresh() {
-        let footer = MJRefreshAutoNormalFooter { () -> Void in
+        let footer = MJRefreshAutoFooter { () -> Void in
             (self.delegate as! UIViewController).customFooterRefresh()
         }
         self.mj_footer = footer

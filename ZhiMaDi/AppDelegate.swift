@@ -180,13 +180,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         tabBar.centerItemImage = UIImage(named: "btn_release")
         tabBar.centerBtnClickBlock = {() -> Void in
             let view = UIView(frame: UIScreen.mainScreen().bounds)
-            view.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.8)
-            let zoom = kScreenWidth/375
-            let width = 50*zoom
+            view.backgroundColor = UIColor.whiteColor()
+            view.alpha = 1.0
+//            view.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.8)
+            let zoom = kScreenWidth/375.0
+            let width = 80*zoom
             let cancelBtn = UIButton(frame: CGRect(x: 0, y: 0, width: width, height: width))
             let point = CGPoint(x: kScreenWidth/2, y: kScreenHeight-40*zoom)
             cancelBtn.center = point
             cancelBtn.setImage(UIImage(named: "publish_close"), forState: .Normal)
+            cancelBtn.imageView?.contentMode = UIViewContentMode.ScaleAspectFill
             cancelBtn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
                 view.removePop()
                 return RACSignal.empty()

@@ -8,7 +8,7 @@
 
 import UIKit
 //发布供应/发布求购
-class PublishSupplyViewController: UIViewController,ZMDInterceptorProtocol,UITableViewDelegate,UITableViewDataSource,UITextFieldDelegate ,HZQDatePickerViewDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate {
+class PublishSupplyViewController: UIViewController,ZMDInterceptorProtocol,UITableViewDelegate,UITableViewDataSource,UITextFieldDelegate ,HZQDatePickerViewDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate,UITextViewDelegate {
     enum ContentType {
         case Supply,Demand
     }
@@ -111,14 +111,22 @@ class PublishSupplyViewController: UIViewController,ZMDInterceptorProtocol,UITab
     }
     var contentType = ContentType.Supply
     var cellTypes = [CellType.kPicture,.kName,.kSupplyQuantity,.kMiniQuantity,.kSupplyPrice,.kEndTime,.kLocation,.kContactName,.kContactPhone,.kDescription]
-    var id : Int = 0    // id == nil 表示新增，id!= nil表示修改
+    var id : Int = 0    // id == 0 表示新增，id != 0表示修改,默认为新增
     var data : ZMDSupplyProduct!
-    var images = NSMutableArray()
+    
+    var pictures = NSMutableArray() //修改供应时已经上传过的图片
+    var images = NSMutableArray()   //从本地选择的照片
     
     @IBOutlet weak var currentTableView : UITableView!
+    @IBOutlet weak var publishBtn: UIButton!
+    var descriptionCellHeight = zoom(200)
     @IBAction func publishAction(sender: AnyObject) {
         if self.checkData() {
-            self.publishSupplyOrDemand()
+            if self.id == 0 {
+                self.publishSupplyOrDemand()
+            }else{
+                self.updateSupplyOrDemand()
+            }
         }
     }
     var pickerView : HZQDatePickerView!
@@ -128,6 +136,7 @@ class PublishSupplyViewController: UIViewController,ZMDInterceptorProtocol,UITab
     var priceUnit = "吨"
     var minQuantityUnit = "吨"
     
+    //MARK: - LifeCircle
     override func viewDidLoad() {
         super.viewDidLoad()
     
@@ -143,12 +152,13 @@ class PublishSupplyViewController: UIViewController,ZMDInterceptorProtocol,UITab
         if self.contentType == .Demand {
             self.cellTypes = [CellType.kName,.kDemandQuantity,.kDemandPrice,.kEndTime,.kLocation,.kContactName,.kContactPhone,.kDescription]
         }
-        self.data = self.data == nil ? ZMDSupplyProduct() : self.data
+//        self.data = self.data == nil ? ZMDSupplyProduct() : self.data
+        self.data = ZMDSupplyProduct()
         
     }
     func initUI() {
         self.title = self.contentType == .Supply ? "发布供应" : "发布求购"
-        
+        self.publishBtn.setTitle(self.id == 0 ? "发布" : "修改", forState: .Normal)
     }
     
     func fetchData() {
@@ -159,6 +169,10 @@ class PublishSupplyViewController: UIViewController,ZMDInterceptorProtocol,UITab
         QNNetworkTool.supplyDemandDetail(self.id) { (success, supplyProduct, error) -> Void in
             if success! {
                 self.data = supplyProduct
+                if let pictures = self.data.SupplyDemandPictures {
+                    self.pictures.addObjectsFromArray(pictures)
+                }
+                self.currentTableView.reloadData()
             }else{
                 ZMDTool.showErrorPromptView(nil, error: error)
             }
@@ -226,13 +240,26 @@ class PublishSupplyViewController: UIViewController,ZMDInterceptorProtocol,UITab
         }
     }
     
+    func updateSupplyOrDemand() {
+        ZMDTool.showActivityView(nil)
+        QNNetworkTool.supplyDemandAmend(self.data) { (success, errorMsg, supplyDemandsId) -> Void in
+            ZMDTool.hiddenActivityView()
+            if success! {
+                ZMDTool.showPromptView((self.contentType == .Supply ? "供应" : "求购") + "修改成功")
+                self.uploadSupplyImages(supplyDemandsId!)
+            }else{
+                ZMDTool.showErrorPromptView(nil, error: nil, errorMsg: errorMsg)
+            }
+        }
+    }
+    
     func uploadSupplyImages(id:Int) {
         var index = -1
         for image in self.images {
             index = index + 1
             let size = CGSizeMake(image.size.width, image.size.height)
             let headImageData = UIImageJPEGRepresentation(self.imageWithImageSimple(image as! UIImage, scaledSize: size), 0.125) //压缩
-            QNNetworkTool.supplyPublishUploadImage(headImageData!, fileName: "image\(index)", completion: { (success, error) -> Void in
+            QNNetworkTool.supplyPublishUploadImage(id,file: headImageData!, fileName: "image\(index)", completion: { (success, error) -> Void in
                 if success == true {
                     
                 }else{
@@ -265,9 +292,9 @@ class PublishSupplyViewController: UIViewController,ZMDInterceptorProtocol,UITab
         let cellType = self.cellTypes[indexPath.section]
         switch cellType {
         case .kPicture:
-            return self.images.count != 0 ? 241 : 97
+            return self.images.count+self.pictures.count != 0 ? 241 : 97
         case .kDescription:
-            return indexPath.row == 0 ? 42 : 200
+            return indexPath.row == 0 ? 42 : self.descriptionCellHeight
         default:
             return indexPath.row == 0 ? 42 : 52
         }
@@ -327,12 +354,19 @@ class PublishSupplyViewController: UIViewController,ZMDInterceptorProtocol,UITab
         scrollView.showsHorizontalScrollIndicator = false
         let addBtn = cell?.contentView.viewWithTag(10001) as! UIButton
         ZMDTool.configViewLayer(addBtn)
+        if self.images.count+self.pictures.count == 5 {
+            addBtn.backgroundColor = defaultGrayColor
+            addBtn.userInteractionEnabled = false
+        }else{
+            addBtn.backgroundColor = appThemeColor
+            addBtn.userInteractionEnabled = true
+        }
         let countLbl = cell?.contentView.viewWithTag(10002) as! UILabel
         for subView in scrollView.subviews {
             subView.removeFromSuperview()
         }
         
-        if self.images.count == 0 {
+        if self.images.count == 0 && self.pictures.count == 0 {
             scrollView.snp_updateConstraints(closure: { (make) -> Void in
                 make.top.equalTo(0)
                 make.height.equalTo(0)
@@ -344,8 +378,17 @@ class PublishSupplyViewController: UIViewController,ZMDInterceptorProtocol,UITab
                 make.right.equalTo(0)
                 make.height.equalTo(135)
             })
-            scrollView.contentSize = CGSizeMake(12+CGFloat(self.images.count)*(135+10)+12, 0)
+            scrollView.contentSize = CGSizeMake(12+CGFloat(self.images.count+self.pictures.count)*(135+10)+12, 0)
             var index = -1
+            for item in self.pictures {
+                index = index + 1
+                let picture = item as! ZMDSupplyPicture
+                let view = UIView(frame: CGRect(x: 12+CGFloat(index)*(135+10), y: 0, width: 135, height: 135))
+                let imgView = UIImageView(frame: CGRect(x: 0, y: 0, width: 135, height: 135))
+                imgView.sd_setImageWithURL(NSURL(string: kImageAddressMain+picture.PictureUrl), placeholderImage: nil)
+                view.addSubview(imgView)
+                scrollView.addSubview(view)
+            }
             for image in self.images {
                 index = index + 1
                 let view = UIView(frame: CGRect(x: 12+CGFloat(index)*(135+10), y: 0, width: 135, height: 135))
@@ -388,11 +431,29 @@ class PublishSupplyViewController: UIViewController,ZMDInterceptorProtocol,UITab
             actionSheet.showInView(self.view)
             return RACSignal.empty()
         })
-        countLbl.text = "(还可上传\(5-self.images.count)张,最多可上传5张)"
+        countLbl.text = "(还可上传\(5-self.images.count-self.pictures.count)张,最多可上传5张)"
+        
         return cell!
     }
     func cellForDescription(tableView:UITableView,indexPath:NSIndexPath) -> UITableViewCell {
-        return UITableViewCell()
+        let cellId = "descriptionCell"
+        var cell = tableView.dequeueReusableCellWithIdentifier(cellId)
+        if cell == nil {
+            cell = UITableViewCell(style: .Default, reuseIdentifier: cellId)
+            ZMDTool.configTableViewCellDefault(cell!)
+            
+            let textView = ZMDTool.getTextView(CGRect(x: zoom(10), y: zoom(10), width: kScreenWidth-zoom(20), height: zoom(180)), placeholder: "", fontSize: 14)
+            ZMDTool.configViewLayerFrameWithColor(textView, color: defaultLineColor)
+            ZMDTool.configViewLayerWithSize(textView, size: 2)
+            textView.tag = 10000+indexPath.section
+            textView.delegate = self
+            cell?.contentView.addSubview(textView)
+        }
+        if let data = self.data {
+            let textView = cell?.contentView.viewWithTag(10000+indexPath.section) as! UITextView
+            textView.text = data.Description
+        }
+        return cell!
     }
     
     func cellForHead(tableView:UITableView,indexPath:NSIndexPath) -> UITableViewCell {
@@ -522,10 +583,46 @@ class PublishSupplyViewController: UIViewController,ZMDInterceptorProtocol,UITab
         return cell
     }
     
+    //MARK: - UITextViewDelegate
+    func textViewDidBeginEditing(textView: UITextView) {
+        let btn = UIButton(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: kScreenHeight))
+        btn.tag = 100
+        self.view.addSubview(btn)
+        btn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
+            //移除灰色背景btn
+            btn.removeFromSuperview()
+            textView.resignFirstResponder()
+            return RACSignal.empty()
+        })
+    }
+
+//    func textView(textView: UITextView, shouldChangeTextInRange range: NSRange, replacementText text: String) -> Bool {
+//        let section = textView.tag - 10000
+//        let size = textView.text.sizeWithFont(UIFont.systemFontOfSize(14), maxWidth: kScreenWidth-zoom(20))
+//        if size.height > zoom(30) && self.descriptionCellHeight != zoom(50) + size.height-zoom(30) + 10 {
+//            self.descriptionCellHeight = zoom(50) + size.height-zoom(30) + 10
+//            textView.set("h", value: zoom(30)+size.height-zoom(30) + 10)
+//            self.currentTableView.reloadSections(NSIndexSet(index: ), withRowAnimation: .None)
+//        }else if self.descriptionCellHeight != zoom(50) {
+//            self.descriptionCellHeight = zoom(50)
+//            textView.set("h", value: zoom(30))
+//            self.currentTableView.reloadSections(NSIndexSet(index: section), withRowAnimation: .None)
+//        }
+//        return true
+//    }
+    
+    func textViewDidEndEditing(textView: UITextView) {
+        if let btn = self.view.viewWithTag(100) as? UIButton {
+            btn.removeFromSuperview()
+        }
+        if self.data == nil {
+            self.data = ZMDSupplyProduct()
+        }
+        self.data.Description = textView.text
+    }
     
     //MARK: - UITextFieldDelegate
     func textFieldDidBeginEditing(textField: UITextField) {
-        print(textField.tag-10000)
         let btn = UIButton(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: kScreenHeight))
         btn.tag = 100
         self.view.addSubview(btn)
@@ -538,6 +635,9 @@ class PublishSupplyViewController: UIViewController,ZMDInterceptorProtocol,UITab
     }
     
     func textFieldDidEndEditing(textField: UITextField) {
+        if let btn = self.view.viewWithTag(100) as? UIButton {
+            btn.removeFromSuperview()
+        }
         let text = textField.text
         if text == "" {
             return

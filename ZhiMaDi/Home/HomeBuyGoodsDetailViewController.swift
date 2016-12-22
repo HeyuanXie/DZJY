@@ -1134,7 +1134,7 @@ class ContentTypeDetailCell: UITableViewCell {
         cell.isFreeLbl.font = UIFont.systemFontOfSize(16)
         cell.soldCountLbl.font = UIFont.systemFontOfSize(16)
         if product.IsFreeShipping?.integerValue == 1 {
-            cell.isFreeLbl.attributedText = "是否免邮:  包邮".AttributedMutableText(["是否包邮:","包邮"], colors: [defaultTextColor,defaultSelectColor])
+            cell.isFreeLbl.attributedText = "是否免邮: 包邮".AttributedMutableText(["是否包邮:","包邮"], colors: [defaultTextColor,defaultSelectColor])
             cell.soldCountLbl.text = "销售量:  \(product.Sold.integerValue)件"
         }else{
             cell.isFreeLbl.text = "销售量:  \(product.Sold.integerValue)件"

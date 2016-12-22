@@ -112,7 +112,7 @@ class SupplyDemandDetailViewController: UIViewController,UITableViewDataSource,U
         let cellType = self.goodsCellTypes[indexPath.section]
         switch cellType {
         case .HomeContentTypeAd :
-            return 286*kScreenWidth/375 //image是236
+            return self.imageArray.count == 0 ? 0 : 286*kScreenWidth/375 //image是236
         case .HomeContentTypeDetail :
             return 127
         case .HomeContentTypeDistribution :
@@ -174,14 +174,19 @@ class SupplyDemandDetailViewController: UIViewController,UITableViewDataSource,U
     //分享的body，返回一个data，通过data.image可以取到image
     func qnShareView(view: ShareView) -> (image: UIImage, url: String, title: String?, description: String)? {
         if let data = self.data {
-            let imgUrl = kImageAddressMain + (data.SupplyDemandPictures[0].PictureUrl)
-            let image = UIImage(data: NSData(contentsOfURL: NSURL(string: imgUrl)!)!)
+            var image : UIImage!
+            if let pics = data.SupplyDemandPictures where pics.count != 0 {
+                let imgUrl = kImageAddressMain + (data.SupplyDemandPictures[0].PictureUrl)
+                image = UIImage(data: NSData(contentsOfURL: NSURL(string: imgUrl)!)!)
+            }else{
+                image = UIImage(named: "ksnongte_icon")
+            }
             let title = data.Title
-            let url = "\(kImageAddressMain)/\(data.Id.integerValue)"
+            let url = "http://ksnongpi.com/Plugins/SmartStore.SupplyDemand/Detail?id="+"\(data.Id.integerValue)"
             let description = data.Description ?? ""
             return (image!,url,title,description)
         }else{
-            return (UIImage(named: "Share_Icon")!, kImageAddressMain, self.title ?? "", "疆南市场,物美价廉!")
+            return nil
         }
     }
     
@@ -262,15 +267,17 @@ class SupplyDemandDetailViewController: UIViewController,UITableViewDataSource,U
             //提前告诉有多少页
             self.pageFlowView.orginPageCount = self.imageArray.count;
             self.pageFlowView.isOpenAutoScroll = true
+//            self.pageFlowView.page
 
             //初始化pageControl
-            let pageControl = UIPageControl(frame: CGRect(x: 0, y: (236+14+13)*kScreenWidthZoom6, width: kScreenWidth-24-8, height: 8))
+            let pageControl = UIPageControl(frame: CGRect(x: 0, y: (236+14+13)*kScreenWidthZoom6, width: cell!.contentView.frame.width, height: 8))
+            pageControl.currentPage = self.pageFlowView.currentPageIndex
             cell?.contentView.addSubview(pageControl)
             pageControl.tag = 10002
-            pageControl.currentPageIndicatorTintColor = appThemeColorNew
+            pageControl.currentPageIndicatorTintColor = appThemeColor
             pageControl.pageIndicatorTintColor = RGB(209,210,211,1.0)
             self.pageFlowView.pageControl = pageControl
-            
+            pageControl.hidden = self.imageArray.count == 1
             scrollView.addSubview(self.pageFlowView)
         }
         
@@ -380,7 +387,20 @@ class SupplyDemandDetailViewController: UIViewController,UITableViewDataSource,U
     //MARK: - ************PrivateMethod*************
     //MARK: fetchData
     func fetchData() {
-        
+        QNNetworkTool.supplyDemandDetail(self.supplyProductId) { (success, supplyProduct, error) -> Void in
+            if success! {
+                self.data = supplyProduct
+                if let data = self.data, pictures = data.SupplyDemandPictures {
+                    self.imageArray.removeAllObjects()
+                    for pic in pictures
+                    {
+                        let imgUrl = kImageAddressMain + (pic.PictureUrl ?? "")
+                        self.imageArray.addObject(NSURL(string: imgUrl)!)
+                    }
+                }
+                self.currentTableView.reloadData()
+            }
+        }
     }
     //MARK: setupNavigation
     func setupNavigation() {
@@ -392,15 +412,20 @@ class SupplyDemandDetailViewController: UIViewController,UITableViewDataSource,U
         for i in 0..<3 {
             let btn = UIButton(frame: CGRect(x: CGFloat(i)*(25+3), y: (height-25)/2.0, width: 25, height: 25))
             btn.setImage(UIImage(named: images[i])?.imageWithRenderingMode(UIImageRenderingMode.AlwaysOriginal), forState: .Normal)
+            if i == 0 {
+                btn.setImage(UIImage(named: "collect02"), forState: .Selected)
+            }
             rightView.addSubview(btn)
             btn.tag = 1000 + i
             btn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
                 switch (sender as! UIButton).tag {
                 case 1000:
-                    
+                    (sender as! UIButton).selected = !(sender as! UIButton).selected
                     break
                 case 1001:
-//                    ZMDShareSDKTool.
+                    let shareView = ShareView()
+                    shareView.delegate = self
+                    shareView.showShareView()
                     break
                 default:
                     break
@@ -415,14 +440,6 @@ class SupplyDemandDetailViewController: UIViewController,UITableViewDataSource,U
         self.goodsCellTypes = [.HomeContentTypeAd,.HomeContentTypeDetail,.HomeContentTypeDistribution,.HomeContentTypeSeller,.HomeContentTypeIntroductionHead,.HomeContentTypeIntroductionDetail]
         if self.type == 2 {
             self.goodsCellTypes = [.HomeContentTypeDetail,.HomeContentTypeDistribution,.HomeContentTypeSeller,.HomeContentTypeIntroductionHead,.HomeContentTypeIntroductionDetail]
-        }
-        if let data = self.data, pictures = data.SupplyDemandPictures {
-            self.imageArray.removeAllObjects()
-            for pic in pictures
-            {
-                let imgUrl = kImageAddressMain + (pic.PictureUrl ?? "")
-                self.imageArray.addObject(NSURL(string: imgUrl)!)
-            }
         }
     }
     

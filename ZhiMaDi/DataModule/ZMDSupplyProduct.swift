@@ -43,7 +43,7 @@ class ZMDSupplyProduct : NSObject {
     var MinQuantity : NSNumber!
     var Price : NSNumber!
     var PriceUnit : String!
-    var CreateOn : String!
+    var CreatedOn : String!
     var EndTime : String!
     var CustomerId : NSNumber!
     var Description : String?
@@ -68,7 +68,7 @@ class ZMDSupplyProduct : NSObject {
         self.MinQuantity = 0
         self.Price = 0
         self.PriceUnit = "吨"
-        self.CreateOn = ""
+        self.CreatedOn = ""
         self.EndTime = ""
         self.CustomerId = 0
         self.Description = ""

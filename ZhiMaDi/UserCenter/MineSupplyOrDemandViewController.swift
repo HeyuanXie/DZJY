@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import MJRefresh
 //我的供应（我的求购）
 class MineSupplyOrDemandViewController: UIViewController,UITableViewDelegate,UITableViewDataSource,ZMDInterceptorProtocol,ZMDInterceptorMoreProtocol {
     
@@ -18,6 +19,7 @@ class MineSupplyOrDemandViewController: UIViewController,UITableViewDelegate,UIT
     }
     @IBOutlet weak var currentTableView : UITableView!
     @IBOutlet weak var currentTableViewTopConstraint : NSLayoutConstraint!
+    var footer : MJRefreshAutoFooter!
     
     var dataArray = NSMutableArray()
     var pageIndex = 1
@@ -64,7 +66,7 @@ class MineSupplyOrDemandViewController: UIViewController,UITableViewDelegate,UIT
                 if let des = data.Description where des != "" {
                     return 320
                 }else{
-                    return 235
+                    return 240
                 }
             }else{
                 if let des = data.Description where des != "" {
@@ -105,17 +107,18 @@ class MineSupplyOrDemandViewController: UIViewController,UITableViewDelegate,UIT
         for title in titles {
             index = index + 1
             let btn = ZMDTool.getButton(CGRect(x: kScreenWidth-zoom(12)-CGFloat(index)*zoom(10+85)-width, y: zoom(10), width: width, height: zoom(34)), textForNormal: title, fontSize: 13, backgroundColor: UIColor.clearColor(), blockForCli: { (sender) -> Void in
-                let data = self.dataArray[indexPath.section]
+                let data = self.dataArray[indexPath.section] as! ZMDSupplyProduct
                 if (sender as! UIButton).titleLabel?.text == "查看详情" {
                     //详情
                     let vc = SupplyDemandDetailViewController.CreateFromMainStoryboard() as! SupplyDemandDetailViewController
-                    vc.data = data as! ZMDSupplyProduct
+                    vc.supplyProductId = data.Id.integerValue
                     vc.type = self.contentType == .Supply ? 1 : 2
                     self.pushToViewController(vc, animated: true, hideBottom: true)
                 }else{
                     //修改
                     let vc = PublishSupplyViewController.CreateFromMainStoryboard() as! PublishSupplyViewController
-                    vc.data = data as! ZMDSupplyProduct
+//                    vc.data = data
+                    vc.id = data.Id.integerValue
                     vc.contentType = self.contentType == .Supply ? .Supply : .Demand
                     self.pushToViewController(vc, animated: true, hideBottom: true)
                 }
@@ -139,14 +142,14 @@ class MineSupplyOrDemandViewController: UIViewController,UITableViewDelegate,UIT
     }
     func cellForSupplyDetail(tableView:UITableView,indexPath:NSIndexPath) -> UITableViewCell {
         let cellId = "supplyDetailCell"
-        var cell = tableView.dequeueReusableCellWithIdentifier(cellId) as! SupplyDetailCell
+        let cell = tableView.dequeueReusableCellWithIdentifier(cellId) as! SupplyDetailCell
         ZMDTool.configTableViewCellDefault(cell)
         cell.addLine()
         
         let data = self.dataArray[indexPath.section] as! ZMDSupplyProduct
         if let pictures = data.SupplyDemandPictures where pictures.count != 0 {
             cell.scrollView.snp_updateConstraints { (make) -> Void in
-                make.top.equalTo(0)
+                make.top.equalTo(12)
                 make.left.equalTo(0)
                 make.right.equalTo(0)
                 make.height.equalTo(115)
@@ -160,6 +163,9 @@ class MineSupplyOrDemandViewController: UIViewController,UITableViewDelegate,UIT
         
         cell.detailLblWidthConstraint.constant = data.Description == "" ? 0 : 60
         cell.detailLblBotConstraint.constant = data.Description == "" ? 0 : 10
+        for subView in cell.scrollView.subviews {
+            subView.removeFromSuperview()
+        }
         cell.configCell(cell, data: data)
         return cell
     }
@@ -168,7 +174,8 @@ class MineSupplyOrDemandViewController: UIViewController,UITableViewDelegate,UIT
     func initUI() {
         self.currentTableView.backgroundColor = tableViewdefaultBackgroundColor
         self.currentTableViewTopConstraint.constant = zoom(60)
-        self.currentTableView.addFooterRefresh()
+        let footer = MJRefreshAutoNormalFooter(refreshingTarget: self, refreshingAction: Selector("footerRefresh"))
+        self.currentTableView.mj_footer = footer
         self.viewForSearch()
         let segmentView = viewForSegment()
         self.view.addSubview(segmentView)
@@ -191,10 +198,13 @@ class MineSupplyOrDemandViewController: UIViewController,UITableViewDelegate,UIT
                 if self.pageIndex == 1 {
                     self.dataArray.removeAllObjects()
                 }
+                self.pageIndex = self.pageIndex + 1
                 if products.count == 12 {
                     self.haveNext = true
+                    self.currentTableView.mj_footer.endRefreshing()
                 }else{
                     self.haveNext = false
+                    self.currentTableView.mj_footer.endRefreshingWithNoMoreData()
                 }
                 self.dataArray.addObjectsFromArray(products as [AnyObject])
                 self.currentTableView.reloadData()
@@ -260,17 +270,15 @@ class MineSupplyOrDemandViewController: UIViewController,UITableViewDelegate,UIT
         return view
     }
     
-    
+    func footerRefresh() {
+        if self.haveNext {
+            self.fetchData(self.statu, keyword: self.keyword)
+        }else{
+            self.currentTableView.mj_footer.endRefreshingWithNoMoreData()
+        }
+    }
     
     //MARK: - ***************Override****************
-    override func customFooterRefresh() {
-        if !self.haveNext {
-            self.currentTableView.mj_footer.endRefreshingWithNoMoreData()
-            return
-        }
-        self.pageIndex = self.pageIndex + 1
-        self.fetchData(self.statu, keyword: self.keyword)
-    }
     override func gotoMore() {
         
     }
@@ -295,7 +303,7 @@ class DemandDetailCell : UITableViewCell {
         cell.detailLbl.text = data.Description
         cell.quantityLbl.text = "\(data.Quantity.integerValue)"+"/\(data.QuantityUnit)"
         cell.priceLbl.text = "\(data.Price.floatValue)/\(data.PriceUnit)"
-        cell.beginLbl.text = data.CreateOn
+        cell.beginLbl.text = data.CreatedOn
         let endTime = data.EndTime.componentsSeparatedByString("T").first
         let days = QNFormatTool.getDaysWithDateString(endTime!)
         cell.endLbl.text = (days as NSString).integerValue <= 0 ? endTime! + "(已过期)" : endTime! + "(剩余\(days)天)"
@@ -314,24 +322,25 @@ class SupplyDetailCell : UITableViewCell {
     @IBOutlet weak var detailLblBotConstraint : NSLayoutConstraint!
     
     func configCell(cell:SupplyDetailCell,data:ZMDSupplyProduct) {
+        cell.scrollView.showsHorizontalScrollIndicator = false
         cell.nameLbl.text = data.Title
         cell.detailLbl.text = data.Description
         cell.quantityLbl.text = "\(data.Quantity.integerValue)"+"/\(data.QuantityUnit)"
         cell.priceLbl.text = "\(data.Price.floatValue)/\(data.PriceUnit)"
-        cell.beginLbl.text = data.CreateOn
+        cell.beginLbl.text = data.CreatedOn
         let endTime = data.EndTime.componentsSeparatedByString("T").first
         let days = QNFormatTool.getDaysWithDateString(endTime!)
         cell.endLbl.text = days == "0" ? endTime!+"(已过期)" : endTime! + "(剩余\(days)天)"
         
         if let pictures = data.SupplyDemandPictures {
-            cell.scrollView.contentSize = CGSizeMake(12+CGFloat(pictures.count)*(135+10), 0)
-            for item in data.SupplyDemandPictures {
+            cell.scrollView.contentSize = CGSizeMake(12+CGFloat(pictures.count)*(115+10), 0)
+            for _ in data.SupplyDemandPictures {
                 var index = -1
                 for pic in pictures {
                     index = index + 1
-                    let view = UIView(frame: CGRect(x: 12+CGFloat(index)*(135+10), y: 0, width: 135, height: 135))
-                    let imgView = UIImageView(frame: CGRect(x: 0, y: 0, width: 135, height: 135))
-                    imgView.sd_setImageWithURL(NSURL(string: kImageAddressMain+(pic as! ZMDSupplyPicture).PictureUrl), placeholderImage: nil)
+                    let view = UIView(frame: CGRect(x: 12+CGFloat(index)*(115+10), y: 0, width: 115, height: 115))
+                    let imgView = UIImageView(frame: CGRect(x: 0, y: 0, width: 115, height: 115))
+                    imgView.sd_setImageWithURL(NSURL(string: kImageAddressMain+pic.PictureUrl), placeholderImage: nil)
                     view.addSubview(imgView)
                     cell.scrollView.addSubview(view)
                 }

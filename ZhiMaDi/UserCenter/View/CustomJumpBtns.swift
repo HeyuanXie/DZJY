@@ -21,6 +21,7 @@ class CustomJumpBtns: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
     }
+    
     init(frame: CGRect,menuTitle:[String],textColorForNormal:UIColor = defaultTextColor,textColorForSelect:UIColor = RGB(235,61,61,1.0),IsLineAdaptText : Bool = true) {
         self.menuTitle = menuTitle
         self.textColorForNormal = textColorForNormal
@@ -32,6 +33,11 @@ class CustomJumpBtns: UIView {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    func setMenuTitles(menuTitles:[String]) {
+        self.updateUI(menuTitles)
+    }
+    
     func updateUI(menuTitle:[String]) {
         redLine = ZMDTool.getLine(CGRect(x: 0, y: CGRectGetHeight(self.frame) - 2, width: kScreenWidth/CGFloat(menuTitle.count), height: 2))
         redLine.backgroundColor = textColorForSelect

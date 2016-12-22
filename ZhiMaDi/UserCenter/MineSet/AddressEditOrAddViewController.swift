@@ -209,7 +209,7 @@ class AddressEditOrAddViewController: UIViewController,UITableViewDataSource,UIT
             if self.areaLbl == nil {
                 self.areaLbl = ZMDTool.getLabel( CGRect(x: zoom(20) + size.width, y: 0, width: kScreenWidth - zoom(20) - size.width - zoom(12), height: zoom(50)), text: "", fontSize: 14)
                 areaLbl.text  = "省/市/区"
-                areaLbl.textColor = defaultTextColor
+                areaLbl.textColor = defaultDetailTextColor
                 cell?.contentView.addSubview(self.areaLbl)
             }
             if self.address != nil {

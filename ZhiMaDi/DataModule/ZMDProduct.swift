@@ -50,4 +50,32 @@ class ZMDProductForOrderDetail: NSObject {
 }
 
 
+//首页交易动态商品
+/*
+"Sku": null,
+"ProductId": 639,
+"ProductName": " （预售）老科曼石榴原汁 100%纯石榴汁",
+"ProductSeName": "-100-3",
+"ProductUrl": null,
+"PictureUrl": null,
+"ProductType": 5,
+"UnitPrice": null,
+"SubTotal": null,
+"Quantity": 1,
+"QuantityUnit": "",
+"AttributeInfo": "",
+"BundlePerItemPricing": false,
+"BundlePerItemShoppingCart": false,
+"BundleItems": [],
+"Id": 251,
+"CustomProperties": {}
+*/
+class ZMDTradeProduct : NSObject {
+    var ProductId : NSNumber!
+    var ProductName : String!
+    var Quantity : NSNumber!
+    var QuantityUnit : String!
+}
+
+
 

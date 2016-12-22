@@ -138,11 +138,39 @@ class HomeDoubleGoodCell : UITableViewCell {
     @IBOutlet weak var leftView : UIView!
     @IBOutlet weak var rightView : UIView!
     
+    @IBOutlet var btns: [UIButton]!
     override func awakeFromNib() {
         self.rightView.addSubview(ZMDTool.getLine(CGRect(x: 0, y: 0, width: 0.5, height: 98*kScreenWidth/375), backgroundColor: defaultLineColor))
     }
     
-    
+    class func configCell(cell:HomeDoubleGoodCell,datas:NSArray) {
+        if datas.count > 0 {
+            let data = datas[0] as! ZMDEnterprise
+            (cell.leftView.viewWithTag(10000) as! UILabel).text = data.Name
+            (cell.leftView.viewWithTag(10001) as! UILabel).text = ""
+            var url = ""
+            if data.EnterprisePicture?.hasPrefix("/Media") == false {
+                url = "/Media"+data.EnterprisePicture!
+            }else{
+                url = data.EnterprisePicture!
+            }
+            url = url.stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLQueryAllowedCharacterSet())!
+            (cell.leftView.viewWithTag(10002) as! UIImageView).sd_setImageWithURL(NSURL(string: kImageAddressMain + url), placeholderImage: nil)
+        }
+        if datas.count > 1 {
+            let data = datas[1] as! ZMDEnterprise
+            (cell.rightView.viewWithTag(10000) as! UILabel).text = data.Name
+            (cell.rightView.viewWithTag(10001) as! UILabel).text = ""
+            var url = ""
+            if data.EnterprisePicture?.hasPrefix("/Media") == false {
+                url = "/Media"+data.EnterprisePicture!
+            }else{
+                url = data.EnterprisePicture!
+            }
+            url = url.stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLQueryAllowedCharacterSet())!
+            (cell.rightView.viewWithTag(10002) as! UIImageView).sd_setImageWithURL(NSURL(string: kImageAddressMain + url), placeholderImage: nil)
+        }
+    }
 }
 
 //MARK: 首页multiGoodCell
@@ -151,9 +179,53 @@ class HomeMultiGoodCell : UITableViewCell {
     @IBOutlet weak var centerView : UIView!
     @IBOutlet weak var rightView : UIView!
     
+    @IBOutlet var btns: [UIButton]!
     override func awakeFromNib() {
         self.frame = CGRect(x: 0, y: 0, width: kScreenWidth, height: 110*kScreenWidth/375)
         self.centerView.addSubview(ZMDTool.getLine(CGRect(x: 0, y: 0, width: 0.5, height: 110*kScreenWidth/375), backgroundColor: defaultLineColor))
         self.rightView.addSubview(ZMDTool.getLine(CGRect(x: 0, y: 0, width: 0.5, height: 110*kScreenWidth/375), backgroundColor: defaultLineColor))
     }
+    
+    class func configCell(cell:HomeMultiGoodCell,datas:NSArray) {
+        if datas.count > 2 {
+            let data = datas[2] as! ZMDEnterprise
+            (cell.leftView.viewWithTag(10000) as! UILabel).text = data.Name
+            (cell.leftView.viewWithTag(10001) as! UILabel).text = ""
+            var url = ""
+            if data.EnterprisePicture?.hasPrefix("/Media") == false {
+                url = "/Media"+data.EnterprisePicture!
+            }else{
+                url = data.EnterprisePicture!
+            }
+            url = url.stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLQueryAllowedCharacterSet())!
+            (cell.leftView.viewWithTag(10002) as! UIImageView).sd_setImageWithURL(NSURL(string: kImageAddressMain + url), placeholderImage: nil)
+        }
+        if datas.count > 3 {
+            let data = datas[3] as! ZMDEnterprise
+            (cell.centerView.viewWithTag(10000) as! UILabel).text = data.Name
+            (cell.centerView.viewWithTag(10001) as! UILabel).text = ""
+            var url = ""
+            if data.EnterprisePicture?.hasPrefix("/Media") == false {
+                url = "/Media"+data.EnterprisePicture!
+            }else{
+                url = data.EnterprisePicture!
+            }
+            url = url.stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLQueryAllowedCharacterSet())!
+            (cell.centerView.viewWithTag(10002) as! UIImageView).sd_setImageWithURL(NSURL(string: kImageAddressMain + url), placeholderImage: nil)
+        }
+        if datas.count > 4 {
+            let data = datas[4] as! ZMDEnterprise
+            (cell.rightView.viewWithTag(10000) as! UILabel).text = data.Name
+            (cell.rightView.viewWithTag(10001) as! UILabel).text = ""
+            var url = ""
+            if data.EnterprisePicture?.hasPrefix("/Media") == false {
+                url = "/Media"+data.EnterprisePicture!
+            }else{
+                url = data.EnterprisePicture!
+            }
+            url = url.stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLQueryAllowedCharacterSet())!
+            (cell.rightView.viewWithTag(10002) as! UIImageView).sd_setImageWithURL(NSURL(string: kImageAddressMain + url), placeholderImage: nil)
+        }
+    }
+
 }

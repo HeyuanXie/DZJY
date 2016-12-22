@@ -148,8 +148,9 @@ private extension QNNetworkTool {
                         return
                     }
                     completionHandler(request: $0!, response: $1, data: $2, dictionary: nil, error: NSError(domain: "返回的为array", code: 10086, userInfo: nil));
+                }else{
+                    completionHandler(request: $0!, response: $1, data: $2, dictionary: dictionary, error: nil)
                 }
-                completionHandler(request: $0!, response: $1, data: $2, dictionary: dictionary, error: nil)
             }
             catch {
                 completionHandler(request: $0!, response: $1, data: $2, dictionary: nil, error: NSError(domain: "JSON解析错误", code: 10086, userInfo: nil));
@@ -194,7 +195,7 @@ extension QNNetworkTool {
         // 定制一post方式上传数据，数据格式必须和下面方式相同
         let boundary = "abcdefg"
         request.setValue(String(format: "multipart/form-data;boundary=%@", boundary), forHTTPHeaderField: "Content-Type")
-        let str1 = NSMutableString(format: "--%@\r\nContent-Disposition: form-data; name=\"%@\"\r\n\r\n%d\r\n",boundary, "customerId",customerId)
+        let str1 = NSMutableString(format: "--%@\r\nContent-Disposition: form-data; name=\"%@\"\r\n\r\n%d\r\n",boundary, "SupplyDemandsId",customerId)
         let str = NSMutableString(format: "%@--%@\r\nContent-Disposition: form-data; name=\"%@\";filename=\"%@\"\r\nContent-Type: %@\r\nContent-Transfer-Encoding: binary\r\n\r\n",str1,boundary, "file", fileName, "image/jpeg")  //  application/octet-stream
         // 配置内容
         let bodyData = str.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false) as! NSMutableData
@@ -396,17 +397,21 @@ extension QNNetworkTool {
             parms.setValue(toPrice, forKey: "toPrice")
         }
         requestPOST(kServerAddress+"/api/v1/extend/SupplyDemand/Search", parameters: parms as? [String : AnyObject]) { (request, response, data, dictionary, error) -> Void in
-            if let data = data {
+            if data != nil{
                 do {
                     let jsonObject: AnyObject? = try NSJSONSerialization.JSONObjectWithData(data as! NSData, options: NSJSONReadingOptions.MutableContainers)
-                    let productsArray = ZMDSupplyProduct.mj_objectArrayWithKeyValuesArray(jsonObject as? NSArray)
-                    completion(error: nil, products: productsArray)
+                    guard let array = jsonObject as? NSArray else {
+                        completion(error: error, products: nil)
+                        return
+                    }
+                    guard let products = ZMDSupplyProduct.mj_objectArrayWithKeyValuesArray(array) else {
+                        completion(error: error, products: nil)
+                        return
+                    }
+                    completion(error: nil, products: products)
+                } catch {
+                    println("Json解析过程出错")
                 }
-                catch {
-                    print("JSON解析错误")
-                }
-            }else{
-                completion(error: error, products: nil)
             }
         }
     }
@@ -436,22 +441,6 @@ extension QNNetworkTool {
         }
     }
     
-    ///发布供应时图片上传
-    class func supplyPublishUploadImage(file: NSData, fileName: String, completion:(success:Bool?,error:NSError?)->Void) {
-        let url = NSURL(string: kServerAddress+"/api/v1/extend/SupplyDemand/UploadImage")
-        request(self.productUploadRequest( url, method: "POST", data: file, fileName: fileName)).response{
-            do {
-                let jsonObject: AnyObject? = try NSJSONSerialization.JSONObjectWithData($2!, options: NSJSONReadingOptions.MutableContainers)
-                guard let data = jsonObject as? NSArray,dic = data[0] as? NSDictionary,url = dic["ImageUrl"] as? String else {
-                    completion(success: false, error: $3)
-                    return
-                }
-                println(url)
-                completion(success: true, error: $3)
-            } catch {}
-        }
-    }
-    
     ///修改供求信息
     class func supplyDemandAmend(supplyProduct:ZMDSupplyProduct,completion:(success:Bool?,errorMsg:String?,supplyDemandsId:Int?)->Void) {
         let dic = supplyProduct.mj_keyValues()
@@ -461,6 +450,24 @@ extension QNNetworkTool {
                 return
             }
             completion(success: true, errorMsg: nil, supplyDemandsId: dictionary!["supplyDemandsId"] as? Int)
+        }
+    }
+    
+    ///发布供应时图片上传
+    class func supplyPublishUploadImage(SupplyDemandsId:Int,file: NSData, fileName: String, completion:(success:Bool?,error:NSError?)->Void) {
+        let url = NSURL(string: kServerAddress+"/api/v1/extend/SupplyDemand/UploadImage")
+        request(self.uploadRequestWithParams(url, method: "POST", data: file, fileName: fileName,params: ["SupplyDemandsId":SupplyDemandsId])).response{
+            do {
+                let jsonObject: AnyObject? = try NSJSONSerialization.JSONObjectWithData($2!, options: NSJSONReadingOptions.MutableContainers)
+                guard let data = jsonObject as? NSArray where data.count != 0 else {
+                    completion(success: false, error: $3)
+                    return
+                }
+                if let dic = data[0] as? NSDictionary,url = dic["ImageUrl"] {
+                    println(url)
+                }
+                completion(success: true, error: $3)
+            } catch {}
         }
     }
     
@@ -482,6 +489,54 @@ extension QNNetworkTool {
             }else {
                 completion(success: false, error: error)
             }
+        }
+    }
+    
+}
+
+
+//MARK: 疆南农资首页相关数据
+extension QNNetworkTool {
+    ///首页类别
+    class func fetchMainCategories(completion:(categories:NSArray?,error:NSError?)-> Void) {
+        requestGET(kServerAddress+"/api/v1/extend/product/HomepageCategories", parameters: nil) { (request, response, data, dictionary, error) -> Void in
+            if data != nil {
+                do {
+                    let jsonObject : AnyObject? = try NSJSONSerialization.JSONObjectWithData(data as! NSData, options: NSJSONReadingOptions.MutableContainers)
+                    guard let array = jsonObject as? NSArray else {
+                        completion(categories: nil, error: error)
+                        return
+                    }
+                    let categories = ZMDXHYCategory.mj_objectArrayWithKeyValuesArray(array)
+                    completion(categories: categories, error: nil)
+                }catch{
+                    println("JSON解析失败")
+                }
+            }else{
+                completion(categories: nil, error: error)
+            }
+        }
+    }
+    
+    ///首页类别对应产品获取
+    class func fetchProductsInCategory(pageSize:Int,categoryId:Int,completion:(products:NSArray?,WidgetName:String?,error:NSError?) -> Void) {
+        requestPOST(kServerAddress+"/api/v1/extend/product/CatalogHomepageProducts", parameters: ["customerId":g_customerId ?? 1,"pageSize":pageSize,"catalogId":categoryId]) { (request, response, data, dictionary, error) -> Void in
+            guard let dic = dictionary, products = ZMDProduct.mj_objectArrayWithKeyValuesArray(dic["Products"]), WidgetName = dic["WidgetName"] as? String else {
+                completion(products: nil, WidgetName: nil, error: error)
+                return
+            }
+            completion(products: products, WidgetName: WidgetName, error: nil)
+        }
+    }
+    
+    ///首页类别对应小广告(图文产品)获取
+    class func fetchAdInCategory(widgetName:String,completion:(advertisements:NSArray?,error:NSError?) -> Void) {
+        requestGET(kServerAddress+"/api/v1/Advertisement/\(widgetName)", parameters: nil) { (request, response, data, dictionary, error) -> Void in
+            guard let dic = dictionary,advertisements = ZMDAdvertisement.mj_objectArrayWithKeyValuesArray(dic["zones"]) else {
+                completion(advertisements: nil, error: error)
+                return
+            }
+            completion(advertisements: advertisements, error: nil)
         }
     }
     
@@ -571,7 +626,7 @@ extension QNNetworkTool {
                         completion(categories:nil,error: error,dictionary:nil)
                         return
                     }
-                    let categories = ZMDXHYCategory.mj_objectArrayWithKeyValuesArray(array)
+                    let categories = ZMDSortCategory.mj_objectArrayWithKeyValuesArray(array)
                     completion(categories:categories,error: nil,dictionary:nil)
                 } catch {
                     println("Json解析过程出错")
@@ -623,6 +678,65 @@ extension QNNetworkTool {
         }
     }
     
+    //MARK: 首页获取各部分小广告1
+    class func fetchHomeMiniAd(adName:String,completion:(success:Bool?,products:NSArray?,error:NSError?)->Void) {
+        let url = kServerAddress+"/api/v1/Advertisement/"+adName
+        requestGET(url, parameters: nil) { (request, response, data, dictionary, error) -> Void in
+            if let dic = dictionary ,array = ZMDAdvertisement.mj_objectArrayWithKeyValuesArray(dic["zones"]) {
+                completion(success: true, products: array, error: nil)
+            }else{
+                completion(success: false, products: nil, error: error)
+            }
+        }
+    }
+    
+    
+    //MARK: 首页交易企业
+    class func fetchHomeEnterprise(completion:(success:Bool,enterprises:NSArray?,error:NSError?)->Void) {
+        requestPOST(kServerAddress+"/api/v1/extend/StoreExtend/HomePageStores", parameters: nil) { (request, response, data, dictionary, error) -> Void in
+            if data != nil {
+                do {
+                    let jsonObject : AnyObject = try NSJSONSerialization.JSONObjectWithData(data as! NSData, options: .MutableContainers)
+                    guard let array = jsonObject as? NSArray else {
+                        completion(success: false, enterprises: nil, error: error)
+                        return
+                    }
+                    let arr = ZMDEnterprise.mj_objectArrayWithKeyValuesArray(array)
+                    completion(success: true, enterprises: arr, error: nil)
+                }
+                catch{
+                    
+                }
+            }else{
+                completion(success: false, enterprises: nil, error: error)
+            }
+        }
+    }
+    //MARK: 首页交易动态(成交记录)
+    class func fetchHomeDongTai(completion:(history:NSArray?,dictionary:NSDictionary?,error:NSError?)->Void) {
+        requestPOST(kServerAddress+"/api/v1/extend/order/History", parameters: nil) { (request, response, data, dictionary, error) -> Void in
+            if data != nil {
+                do {
+                    let jsonObject : AnyObject = try NSJSONSerialization.JSONObjectWithData(data as! NSData, options: .MutableContainers)
+                    guard let array = jsonObject as? NSArray else {
+                        completion(history: nil, dictionary: nil, error: error)
+                        return
+                    }
+                    let history = ZMDTradeProduct.mj_objectArrayWithKeyValuesArray(array)
+                    completion(history: history, dictionary: dictionary, error: nil)
+                }
+                catch{
+                    
+                }
+            }else{
+                completion(history: nil, dictionary: nil, error: error)
+            }
+        }
+    }
+    //MARK: 首页推荐
+    class func fetchHomeRecommend() {
+        
+    }
     //MARK: 首页猜你喜欢
     class func fetchCustomerHistory(completion:(history:NSArray?,dictionary:NSDictionary?,error:NSError?)->Void) {
         requestPOST(kServerAddress+"/api/v1/extend/product/HistoryProducts", parameters: ["customerId":g_customerId ?? 0]) { (request, response, data, dictionary, error) in
@@ -639,6 +753,8 @@ extension QNNetworkTool {
                 catch{
                     
                 }
+            }else{
+                completion(history: nil, dictionary: nil, error: error)
             }
         }
     }
@@ -1119,7 +1235,7 @@ extension QNNetworkTool {
     //*****************未登录时，查看购物车跳转到登陆页面
     class func fetchShoppingCart(carttype:Int,completion: (shoppingItems : NSArray?,dictionary:NSDictionary?,error: NSError?) -> Void) {
         if g_isLogin! {
-            requestPOST(kServerAddress + "/api/v1/extend/ShoppingCart/Cart", parameters: ["customerId":g_customerId!,"cartType":carttype]) { (_, _, _, dictionary, error) -> Void in
+            requestPOST(kServerAddress + "/api/v1/extend/ShoppingCart/Cart", parameters: ["customerId":g_customerId!,"CartType":carttype]) { (_, _, _, dictionary, error) -> Void in
             guard let Items = dictionary?["Items"],let shoppingItems = ZMDShoppingItem.mj_objectArrayWithKeyValuesArray(Items) else {
                 completion(shoppingItems:nil,dictionary: dictionary, error: error)
                     return
@@ -1137,7 +1253,7 @@ extension QNNetworkTool {
      */
     class func deleteCartItem(SciIds:String,carttype:Int,completion: (succeed : Bool!,dictionary:NSDictionary?,error: NSError?) -> Void) {
         requestPOST(kServerAddress + "/api/v1/extend/ShoppingCart/DeleteCartItems", parameters: ["customerId":g_customerId!,"SciIds":SciIds,"carttype":carttype]) { (_, _, _, dictionary, error) -> Void in
-            guard let success = dictionary?["success"] as? NSNumber where success.boolValue else {
+            guard let success = dictionary?["success"] as? NSNumber where success.integerValue == 1 else {
                 completion(succeed:false,dictionary: dictionary, error: error)
                 return
             }
