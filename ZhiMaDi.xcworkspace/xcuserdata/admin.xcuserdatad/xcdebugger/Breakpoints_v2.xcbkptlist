@@ -52,7 +52,7 @@
                   moduleName = "ZhiMaDi"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/admin/Desktop/DZJY/ZhiMaDi/Tools/QNNetworkTool.swift"
-                  timestampString = "504104944.739128"
+                  timestampString = "504105166.742811"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "1030"
@@ -67,7 +67,7 @@
                   moduleName = "ZhiMaDi"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/admin/Desktop/DZJY/ZhiMaDi/Tools/QNNetworkTool.swift"
-                  timestampString = "504104944.7394"
+                  timestampString = "504105166.74306"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "1030"
@@ -122,6 +122,22 @@
             startingLineNumber = "350"
             endingLineNumber = "350"
             landmarkName = "tableView(_:cellForRowAtIndexPath:)"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ZhiMaDi/Home/HomePageViewController.swift"
+            timestampString = "504105253.788641"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "969"
+            endingLineNumber = "969"
+            landmarkName = "cellForHomeFruitDetail(_:indexPath:)"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
