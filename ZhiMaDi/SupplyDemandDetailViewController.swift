@@ -43,6 +43,7 @@ class SupplyDemandDetailViewController: UIViewController,UITableViewDataSource,U
     var shoppingItemId: NSNumber!
     var data : ZMDSupplyProduct!    //从SupplyList传过来的product
     var imageArray = NSMutableArray()
+    var desCellHeight:CGFloat = 20
     
     //MARK: - *************LiftCircle**************
     override func viewDidLoad() {
@@ -98,7 +99,7 @@ class SupplyDemandDetailViewController: UIViewController,UITableViewDataSource,U
         case .HomeContentTypeIntroductionHead :
             return 11*kScreenWidth/375
         case .HomeContentTypeSeller :
-            return g_isLogin! ? 0 : 34*kScreenWidth/375
+            return g_isLogin! ? zoom(11) : 34*kScreenWidth/375
         default :
             return 0
         }
@@ -118,11 +119,11 @@ class SupplyDemandDetailViewController: UIViewController,UITableViewDataSource,U
         case .HomeContentTypeDistribution :
             return 54
         case .HomeContentTypeSeller :
-            return 154*kScreenWidth/375
+            return g_isLogin! ? 103*kScreenWidth/375 : 0
         case .HomeContentTypeIntroductionHead :
-            return 54
+            return zoom(54)
         case .HomeContentTypeIntroductionDetail :
-            return 214*kScreenWidth/375
+            return self.desCellHeight //214*kScreenWidth/375
         }
     }
     
@@ -345,10 +346,10 @@ class SupplyDemandDetailViewController: UIViewController,UITableViewDataSource,U
             cell!.selectionStyle = .None
             cell!.contentView.backgroundColor = UIColor.whiteColor()
             
-            let colorLbl = ZMDTool.getLine(CGRect(x: 12, y: 0, width: 5, height: 19), backgroundColor: appThemeColorNew)
-            colorLbl.set("cy", value: 54/2)
-            let textLbl = ZMDTool.getLabel(CGRect(x: CGRectGetMaxX(colorLbl.frame)+5, y: 0, width: 100, height: 20), text: "产品说明", fontSize: 15)
-            textLbl.set("cy", value: 54/2)
+            let colorLbl = ZMDTool.getLine(CGRect(x: 12, y: 0, width: 5, height: zoom(19)), backgroundColor: appThemeColorNew)
+            colorLbl.set("cy", value: zoom(54/2))
+            let textLbl = ZMDTool.getLabel(CGRect(x: CGRectGetMaxX(colorLbl.frame)+5, y: 0, width: 100, height: zoom(20)), text: "产品说明", fontSize: 15)
+            textLbl.set("cy", value: zoom(54/2))
             cell?.contentView.addSubview(colorLbl)
             cell?.contentView.addSubview(textLbl)
         }
@@ -362,25 +363,15 @@ class SupplyDemandDetailViewController: UIViewController,UITableViewDataSource,U
             cell = UITableViewCell(style: .Default, reuseIdentifier: cellId)
             cell!.selectionStyle = .None
             cell!.contentView.backgroundColor = UIColor.whiteColor()
-            
-            let wkUserContentController = WKUserContentController()
-            let jScript = "var meta = document.createElement('meta'); meta.setAttribute('name', 'viewport'); meta.setAttribute('content', 'width=device-width'); document.getElementsByTagName('head')[0].appendChild(meta);"
-            let wkUScript = WKUserScript(source: jScript, injectionTime: .AtDocumentEnd, forMainFrameOnly: true)
-            wkUserContentController.addUserScript(wkUScript)
-            let wkWebConfig = WKWebViewConfiguration()
-            wkWebConfig.userContentController = wkUserContentController
-            
-            let webView = WKWebView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 214*kScreenWidth/375), configuration: wkWebConfig)
-            webView.scrollView.showsVerticalScrollIndicator = false
-            webView.scrollView.showsHorizontalScrollIndicator = false
-            webView.tag = 1000
-            cell?.contentView.addSubview(webView)
         }
-        if let data = self.data {
-            let webView = cell?.contentView.viewWithTag(1000) as! WKWebView
-            let webUrl = kImageAddressMain + "/\(data.Id.integerValue)"
-            webView.loadRequest(NSURLRequest(URL: NSURL(string: webUrl)!))
+        if let label = cell?.contentView.viewWithTag(10000) {
+            label.removeFromSuperview()
         }
+        let des = self.data.Description ?? "暂无简介"
+        let size = des.sizeWithFont(UIFont.systemFontOfSize(14), maxWidth: kScreenWidth-20)
+        let label = ZMDTool.getLabel(CGRect(x: 10, y: 0, width: kScreenWidth-20, height: 10+size.height), text: des, fontSize: 14, textColor: defaultTextColor, textAlignment: .Left)
+        label.numberOfLines = 0
+        cell?.contentView.addSubview(label)
         return cell!
     }
     
@@ -398,6 +389,9 @@ class SupplyDemandDetailViewController: UIViewController,UITableViewDataSource,U
                         self.imageArray.addObject(NSURL(string: imgUrl)!)
                     }
                 }
+                let description = self.data.Description ?? "暂无说明"
+                let size = description.sizeWithFont(UIFont.systemFontOfSize(14), maxWidth: kScreenWidth-20)
+                self.desCellHeight = size.height + 10
                 self.currentTableView.reloadData()
             }
         }
@@ -407,22 +401,16 @@ class SupplyDemandDetailViewController: UIViewController,UITableViewDataSource,U
         self.title = "详情"
         
         let height = (self.navigationController?.navigationBar.frame.height)!
-        let rightView = UIView(frame: CGRect(x: 0, y: 0, width: 85, height: height))
-        let images = ["collect01","分享","common_more"]
-        for i in 0..<3 {
+        let rightView = UIView(frame: CGRect(x: 0, y: 0, width: 60, height: height))
+        let images = ["分享","common_more"]
+        for i in 0..<2 {
             let btn = UIButton(frame: CGRect(x: CGFloat(i)*(25+3), y: (height-25)/2.0, width: 25, height: 25))
             btn.setImage(UIImage(named: images[i])?.imageWithRenderingMode(UIImageRenderingMode.AlwaysOriginal), forState: .Normal)
-            if i == 0 {
-                btn.setImage(UIImage(named: "collect02"), forState: .Selected)
-            }
             rightView.addSubview(btn)
             btn.tag = 1000 + i
             btn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
                 switch (sender as! UIButton).tag {
                 case 1000:
-                    (sender as! UIButton).selected = !(sender as! UIButton).selected
-                    break
-                case 1001:
                     let shareView = ShareView()
                     shareView.delegate = self
                     shareView.showShareView()
@@ -444,6 +432,8 @@ class SupplyDemandDetailViewController: UIViewController,UITableViewDataSource,U
     }
     
     func updateUI() {
+        self.view.backgroundColor = tableViewdefaultBackgroundColor
+        self.currentTableView.backgroundColor = tableViewdefaultBackgroundColor
         let tableViewFooterView = UIView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 57*kScreenWidth/375))
         tableViewFooterView.backgroundColor = RGB(239,240,241,1.0)
         let label = ZMDTool.getLabel(CGRect(x: 0, y: 0, width: kScreenWidth, height: 57*kScreenWidth/375), text: "- 已经到底了 -", fontSize: 15, textColor: RGB(172,173,174,1.0), textAlignment: .Center)
@@ -579,7 +569,6 @@ class DZContentDetailCell : UITableViewCell {
 class DZContentSellerCell : UITableViewCell {
     @IBOutlet weak var phoneLbl : UILabel!
     @IBOutlet weak var qqLbl : UILabel!
-    @IBOutlet weak var weixinLbl : UILabel!
     
     override func awakeFromNib() {
         self.frame = CGRect(x: 0, y: 0, width: kScreenWidth, height: 154*kScreenWidth/375)
@@ -595,7 +584,6 @@ class DZContentSellerCell : UITableViewCell {
         let weixinText = "微信号: 就不告诉你"
         cell.phoneLbl.attributedText = phoneText.AttributedText("手机号:", color: RGB(173,174,175,1.0))
         cell.qqLbl.attributedText = qqText.AttributedText("QQ号:", color: RGB(173,174,175,1.0))
-        cell.weixinLbl.attributedText = weixinText.AttributedText("微信号:", color: RGB(173,174,175,1.0))
     }
 }
 

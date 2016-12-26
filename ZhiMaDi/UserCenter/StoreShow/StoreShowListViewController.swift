@@ -52,9 +52,9 @@ class StoreShowListViewController: UIViewController,UITableViewDataSource,UITabl
     }
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
         if indexPath.row == 0 {
-            return 78*kScreenWidthZoom6
+            return 80
         } else {
-            return 128*kScreenWidthZoom6
+            return 128
         }
     }
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
@@ -194,6 +194,7 @@ class StoreShowListViewController: UIViewController,UITableViewDataSource,UITabl
                 self.updateData(self.orderBy)
             })
         }
+        view.addSubview(ZMDTool.getLine(CGRect(x: 0, y: 53.5, width: kScreenWidth, height: 0.5)))
         return view
     }
     
@@ -235,7 +236,7 @@ class StoreShowListViewController: UIViewController,UITableViewDataSource,UITabl
 
 class StoreShowListStoreCell : UITableViewCell {
     override func awakeFromNib() {
-        self.frame = CGRect(x: 0, y: 0, width: kScreenWidth, height: 78*kScreenWidthZoom6)
+        self.frame = CGRect(x: 0, y: 0, width: kScreenWidth, height: 80*kScreenWidthZoom6)
     }
 }
 

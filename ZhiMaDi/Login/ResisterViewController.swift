@@ -133,8 +133,11 @@ class ResisterViewController: UIViewController, UITextFieldDelegate,ZMDIntercept
             QNNetworkTool.registerAndLogin(phone, code: code, psw: psw, completion: { (success, error, dictionary) -> Void in
                 if success! {
                     ZMDTool.showPromptView("成功")
-                    let vc = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController()
-                    ZMDTool.enterRootViewController(vc!)
+                    self.navigationController?.popToRootViewControllerAnimated(true)
+//                    let vc = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController()
+//                    ZMDTool.enterRootViewController(vc!)
+                    saveAccountAndPassword(phone, password: psw)
+                    
                 } else {
                     ZMDTool.showErrorPromptView(nil, error: error, errorMsg: "失败")
                 }

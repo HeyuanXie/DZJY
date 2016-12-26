@@ -475,7 +475,7 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
         self.tableView.tableFooterView = footV
     }
     private func dataInit(){
-        self.userCenterData = [[.Head,.Name,.Gender,.BirthDay,.Location],[.WeiXin,.Email,.Phone],[.PayPassword],[.Address]]
+        self.userCenterData = [[.Head,.Name,.Gender,.BirthDay,.Location],[.WeiXin,.Email,.Phone]/*,[.PayPassword]*/,[.Address]]
     }
     //MARK:创建moreView
     func moreViewUpdate() {

@@ -10,11 +10,12 @@ import UIKit
 // 我的收藏
 class MineCollectionViewController: UIViewController,UITableViewDataSource, UITableViewDelegate,ZMDInterceptorProtocol,ZMDInterceptorMoreProtocol {
     enum StatuType : Int {
-        case Supply = 0,Demand,Product
+//        case Supply = 0,Demand,Product
+        case Store = 0,Product
     }
     var currentTableView: UITableView!
     var data = NSMutableArray()
-    var statu = StatuType.Demand
+    var statu = StatuType.Store
     override func viewDidLoad() {
         super.viewDidLoad()
         self.subViewInit()
@@ -31,13 +32,13 @@ class MineCollectionViewController: UIViewController,UITableViewDataSource, UITa
     }
     //MARK:- UITableViewDataSource,UITableViewDelegate
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.statu == .Product ? 1 : 2
+        return 1
     }
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         return self.data.count
     }
     func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return section == 0 ? 0 : 16
+        return 0
     }
     func tableView(tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         return 0
@@ -46,7 +47,7 @@ class MineCollectionViewController: UIViewController,UITableViewDataSource, UITa
         if self.statu == .Product {
             return 150
         }else{
-            return indexPath.row == 0 ? zoom(234) : zoom(54)
+            return zoom(85)
         }
     }
     func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
@@ -58,21 +59,13 @@ class MineCollectionViewController: UIViewController,UITableViewDataSource, UITa
         if self.statu == .Product {
             return self.cellForProduct(tableView,indexPath:indexPath)
         }else{
-            if indexPath.row == 0 {
-                return self.cellForDetail(tableView,indexPath:indexPath)
-            }else{
-                return self.cellForAction(tableView,indexPath:indexPath)
-            }
+            return self.cellForStore(tableView,indexPath:indexPath)
         }
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        if self.statu == .Product {
-            let item = self.data[indexPath.section] as? ZMDShoppingItem
-            let vc = HomeBuyGoodsDetailViewController.CreateFromMainStoryboard() as! HomeBuyGoodsDetailViewController
-            vc.productId = item?.ProductId.integerValue
-            self.pushToViewController(vc, animated: true, hideBottom: true)
-        }
+        let data = self.data[indexPath.section]
+        self.goToDetail(self.statu,data:data)
     }
     //MARK: - **************TableViewCell****************
     func cellForProduct(tableView:UITableView, indexPath:NSIndexPath) -> UITableViewCell {
@@ -105,6 +98,69 @@ class MineCollectionViewController: UIViewController,UITableViewDataSource, UITa
         }
         return cell!
     }
+    
+    func cellForStore(tableView:UITableView,indexPath:NSIndexPath) -> UITableViewCell {
+        let cellId = "OtherCell"
+        var cell = tableView.dequeueReusableCellWithIdentifier(cellId)
+        let store = self.data[indexPath.section] as! ZMDStoreDetail
+        if cell == nil {
+            cell = UITableViewCell(style: .Subtitle, reuseIdentifier: cellId)
+            cell?.accessoryType = UITableViewCellAccessoryType.None
+            cell!.selectionStyle = .None
+            
+            ZMDTool.configTableViewCellDefault(cell!)
+            var tag = 10000
+            let imgV = UIImageView(frame: CGRect(x: zoom(12), y: zoom(12), width: zoom(60), height: zoom(60)))
+            imgV.backgroundColor = UIColor.clearColor()
+            imgV.tag = tag++
+            cell?.contentView.addSubview(imgV)
+            
+            let storeLbl = ZMDTool.getLabel(CGRect(x: zoom(12+60+10), y: zoom(20), width: kScreenWidth - 82-75-10, height: zoom(15)), text: "", fontSize: 15)
+            storeLbl.tag = tag++
+            cell?.contentView.addSubview(storeLbl)
+            
+            let storeGoodsLbl = ZMDTool.getLabel(CGRect(x: zoom(12+60+10), y: zoom(85-35), width: kScreenWidth - 82-75-10, height: zoom(15)), text: "", fontSize: 15,textColor: defaultDetailTextColor)
+            storeGoodsLbl.tag = tag++
+            cell?.contentView.addSubview(storeGoodsLbl)
+            
+            let goToBtn = ZMDTool.getButton(CGRect(x: kScreenWidth - 75, y: zoom(20), width: zoom(75), height: zoom(15)), textForNormal: "进入店铺", fontSize: 14, backgroundColor: UIColor.clearColor(), blockForCli: { (sender) -> Void in
+                let vc = StoreShowHomeViewController.CreateFromMainStoryboard() as! StoreShowHomeViewController
+                if let storeId = store.Id {
+                    vc.storeId = storeId
+                    self.pushToViewController(vc, animated: true, hideBottom: true)
+                }else{
+                    print("店铺Id为空")
+                }
+            })
+            goToBtn.tag = tag++
+            cell?.contentView.addSubview(goToBtn)
+            
+            let cancelBtn = ZMDTool.getButton(CGRect(x: kScreenWidth - 75, y: zoom(85-20-15), width: zoom(75), height: zoom(15)), textForNormal: "取消关注", fontSize: 14,textColorForNormal:defaultTextColor, backgroundColor: UIColor.clearColor(), blockForCli: { (sender) -> Void in
+                self.cancelCollect(store)
+            })
+            cancelBtn.tag = tag++
+            cell?.contentView.addSubview(cancelBtn)
+            cell?.addLine()
+        }
+        var tag = 10000
+        let imgV = cell?.viewWithTag(tag++) as! UIImageView
+        let storeLbl = cell?.viewWithTag(tag++) as! UILabel
+        let storeGoodsLbl = cell?.viewWithTag(tag++) as! UILabel
+        let cancelBtn = cell?.viewWithTag(tag++) as! UIButton
+        let goToBtn = cell?.viewWithTag(tag++) as! UIButton
+        
+        if let urlStr = store.PictureUrl, url = NSURL(string: kImageAddressMain+urlStr) {
+            imgV.sd_setImageWithURL(url, placeholderImage: nil)
+        }
+        if let name = store.Name {
+            storeLbl.text = name
+        }
+        if let host = store.Host {
+            storeGoodsLbl.text = "主营: \(host)"
+        }
+        return cell!
+    }
+
     func cellForDetail(tableView:UITableView, indexPath:NSIndexPath) -> UITableViewCell {
         let cellId = "detailCell"
         var cell = tableView.dequeueReusableCellWithIdentifier(cellId)
@@ -161,30 +217,44 @@ class MineCollectionViewController: UIViewController,UITableViewDataSource, UITa
     }
     func dataUpdate() {
         ZMDTool.showActivityView(nil)
-        QNNetworkTool.fetchShoppingCart(2){ (shoppingItems, dictionary, error) -> Void in
-            ZMDTool.hiddenActivityView()
-            if shoppingItems != nil {
-                self.data = NSMutableArray(array: shoppingItems!)
-                self.currentTableView.reloadData()
-            } else {
-                ZMDTool.showErrorPromptView(dictionary, error: error, errorMsg: nil)
+        if self.statu == .Product {
+            QNNetworkTool.fetchShoppingCart(2){ (shoppingItems, dictionary, error) -> Void in
+                ZMDTool.hiddenActivityView()
+                if shoppingItems != nil {
+                    self.data = NSMutableArray(array: shoppingItems!)
+                    self.currentTableView.reloadData()
+                } else {
+                    ZMDTool.showErrorPromptView(dictionary, error: error, errorMsg: nil)
+                }
             }
+        }else{
+            QNNetworkTool.collectStoresList({ (success, stores, error) -> Void in
+                ZMDTool.hiddenActivityView()
+                if success {
+                    self.data = NSMutableArray(array: stores!)
+                    self.currentTableView.reloadData()
+                }else{
+                    ZMDTool.showErrorPromptView(nil, error: error)
+                }
+            })
         }
+
     }
     
     func viewForSegment() -> UIView {
         let view = UIView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: zoom(60)))
         view.backgroundColor = defaultGrayColor
-        let bgV = UIView(frame: CGRect(x: zoom(75), y: zoom(12), width: kScreenWidth-zoom(150), height: zoom(36)))
+        let bgV = UIView(frame: CGRect(x: zoom(100), y: zoom(12), width: kScreenWidth-zoom(200), height: zoom(36)))
         bgV.backgroundColor = UIColor.clearColor()
         ZMDTool.configViewLayer(bgV)
         ZMDTool.configViewLayerFrameWithColor(bgV, color: defaultDetailTextColor)
-        let titles = ["供应信息","求购信息","商品"]
+//        let titles = ["供应信息","求购信息","商品"]
+        let titles = ["店铺","商品"]
         let btnArray = NSMutableArray()
         let (titleNormalColor,bgNormalColor) = (defaultTextColor,UIColor.clearColor())
         let (titleSelectColor,bgSelectColor) = (UIColor.whiteColor(),appThemeColor)
         var index = -1
-        let width = (kScreenWidth-zoom(150.0))/3
+        let width = (kScreenWidth-zoom(200.0))/2
         for title in titles {
             index = index + 1
             let btn = ZMDTool.getButton(CGRect(x:CGFloat(index) * width, y: 0, width: width, height: zoom(36)), textForNormal: title, fontSize: 14, backgroundColor: UIColor.clearColor(), blockForCli: { (sender) -> Void in
@@ -215,6 +285,7 @@ class MineCollectionViewController: UIViewController,UITableViewDataSource, UITa
         return view
     }
     
+    //取消收藏商品
     func deleteCartItem(id:String) {
         if g_isLogin! {
             QNNetworkTool.deleteCartItem(id,carttype: 2,completion: { (succeed, dictionary, error) -> Void in
@@ -228,6 +299,44 @@ class MineCollectionViewController: UIViewController,UITableViewDataSource, UITa
             })
         }
     }
+    
+    //取消收藏店铺
+    func cancelCollect(store:ZMDStoreDetail) {
+        if store.Id == nil {
+            ZMDTool.showPromptView("店铺Id为空")
+            return
+        }
+        QNNetworkTool.cancelCollectStores(store.Id.integerValue) { (succeed, error, dictionary) -> Void in
+            if succeed! {
+                ZMDTool.showPromptView("取消关注成功")
+                self.dataUpdate()
+            }else{
+                ZMDTool.showPromptView("取消关注失败")
+            }
+        }
+    }
+    
+    //进入商品详情或店铺详情
+    func goToDetail(statu:StatuType,data:AnyObject) {
+        if statu == .Product {
+            if let productId = (data as! ZMDProduct).Id {
+                let vc = HomeBuyGoodsDetailViewController.CreateFromMainStoryboard() as! HomeBuyGoodsDetailViewController
+                vc.productId = productId.integerValue
+                self.pushToViewController(vc, animated: true, hideBottom: true)
+            }else{
+                print("商品Id为空")
+            }
+        }else{
+            if let storeId = (data as! ZMDStoreDetail).Id {
+                let vc = StoreShowHomeViewController.CreateFromMainStoryboard() as! StoreShowHomeViewController
+                vc.storeId = storeId
+                self.pushToViewController(vc, animated: true, hideBottom: true)
+            }else{
+                print("店铺Id为空")
+            }
+        }
+    }
+
 }
 // 收藏商品  cell
 class CollectionGoodsCell : UITableViewCell {

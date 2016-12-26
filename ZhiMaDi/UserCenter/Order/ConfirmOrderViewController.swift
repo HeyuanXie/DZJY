@@ -165,6 +165,8 @@ class ConfirmOrderViewController: UIViewController,UITableViewDataSource,UITable
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
         if indexPath.row > 0 && indexPath.row <= self.storeArray[indexPath.section - 1].count {
             return 110
+        }else if indexPath.row > 0 && indexPath.row == self.storeArray[indexPath.section - 1].count + 2 {
+            return 0
         }else{
             return 56
         }
@@ -240,6 +242,7 @@ class ConfirmOrderViewController: UIViewController,UITableViewDataSource,UITable
                 (cell?.contentView.viewWithTag(10000) as! UILabel).text = self.singleTotalArray.count == 0 ? "" : (self.singleTotalArray[indexPath.section-1] as!ZMDSingleStoreTotal).Shipping
                 return cell!
             }else if indexPath.row == self.storeArray[indexPath.section - 1].count + 2 {
+                return UITableViewCell()
                 //是否开发票
                 let cellId = "InvoiceCell\(indexPath.section)"
                 var cell = tableView.dequeueReusableCellWithIdentifier(cellId)

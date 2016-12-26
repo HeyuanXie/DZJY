@@ -28,4 +28,32 @@ class ZMDEnterprise: NSObject {
     var Id : NSNumber!
     var Name : String!
     var EnterprisePicture : String!
+    var AreaName : String!
+    var Description : String!
+    var Products : [ZMDEnterpriseProduct]!
+    var SotreId : NSNumber!
+    
+    override static func mj_objectClassInArray() -> [NSObject : AnyObject]! {
+        return ["Products":ZMDEnterpriseProduct.classForCoder()]
+    }
+}
+
+class ZMDEnterpriseProduct: NSObject {
+    /*
+    "ProductName": "新鲜绿葡萄",
+    "SeName": "746",
+    "ProudctId": 746,
+    "ProductUrl": null,
+    "ImgUrl": "/Media/Thumbs/0002/0002486-150.jpg",
+    "Price": "0.01",
+    "Id": 0,
+    "CustomProperties": {}
+    */
+    var ProductName : String!
+    var SeName : String!
+    var ProductId : NSNumber!
+    var ProductUrl : String!
+    var ImgUrl : String!
+    var Price : String!
+    var Id : NSNumber!
 }

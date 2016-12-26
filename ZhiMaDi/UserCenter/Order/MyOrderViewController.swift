@@ -579,7 +579,7 @@ class MyOrderViewController: UIViewController,UITableViewDataSource,UITableViewD
                             ZMDTool.showErrorPromptView(dictionary, error: error, errorMsg: nil)
                         }
                     })
-                }else if titles[sender.tag-1000] == "付款" {
+                } else if titles[sender.tag-1000] == " 付款 " {
                     if order.OrderStatusId == 40 {
                         ZMDTool.showPromptView("订单已取消,无法付款")
                     } else {

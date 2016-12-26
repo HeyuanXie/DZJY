@@ -31,7 +31,15 @@ class CashierViewController: UIViewController,UITableViewDataSource,UITableViewD
     
     override func viewDidLoad() {
         super.viewDidLoad()
-//        self.selectPayMethod = self.payMethods[1] as! ZMDPaymentMethod
+        
+        let arr = NSMutableArray()
+        arr.addObjectsFromArray(self.payMethods as [AnyObject])
+        for item in arr {
+            let method = item as! ZMDPaymentMethod
+            if method.Name == nil {
+                self.payMethods.removeObject(item)
+            }
+        }
         if self.payMethods.count != 0 {
             self.selectPayMethod = self.payMethods[0] as! ZMDPaymentMethod  //默认选中第一个方法
 //            self.payMethods.removeObject(self.selectPayMethod)

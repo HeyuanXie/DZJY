@@ -13,6 +13,7 @@ class EnterpirseListViewController: UIViewController,ZMDInterceptorProtocol,UITa
     //MARK: - Property
     @IBOutlet weak var currentTableView : UITableView!
     
+    var enterpriseArray = NSMutableArray()
     var selectView : UIView!
     
     var selectBtn1 : UIButton!
@@ -24,6 +25,7 @@ class EnterpirseListViewController: UIViewController,ZMDInterceptorProtocol,UITa
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        self.fetchData()
         self.initUI()
         // Do any additional setup after loading the view.
     }
@@ -36,7 +38,13 @@ class EnterpirseListViewController: UIViewController,ZMDInterceptorProtocol,UITa
     
     //MARK: - PrivateMethod
     func fetchData() {
-        
+        QNNetworkTool.fetchHomeEnterprise { (success, enterprises, error) -> Void in
+            if success {
+                self.enterpriseArray.removeAllObjects()
+                self.enterpriseArray.addObjectsFromArray(enterprises as! [AnyObject])
+                self.currentTableView.reloadData()
+            }
+        }
     }
     func initUI() {
         self.title = "交易企业"
@@ -63,6 +71,19 @@ class EnterpirseListViewController: UIViewController,ZMDInterceptorProtocol,UITa
             let label = ZMDTool.getLabel(CGRect(x: left, y: 0, width: width-zoom(35), height: 46), text: "行业 : 不限", fontSize: 14, textColor: defaultDetailTextColor, textAlignment: .Center)
             label.attributedText = label.text?.AttributedText("行业 :", color: defaultTextColor)
             let btn = ZMDTool.getButton(CGRectMake(width-zoom(35), 0, zoom(35), 46), textForNormal: "", fontSize: 0, backgroundColor: UIColor.clearColor(), blockForCli: { (sender) in
+                
+                //背景btn
+                let btn = UIButton(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: kScreenHeight))
+                btn.tag = 100
+                self.view.addSubview(btn)
+                btn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
+                    //移除灰色背景btn
+                    btn.removeFromSuperview()
+                    self.selectView.removeFromSuperview()
+                    return RACSignal.empty()
+                })
+                
+                
                 let downBtn = sender as! UIButton     //downBtn
                 downBtn.selected = !downBtn.selected
                 if self.selectView != nil {
@@ -75,7 +96,7 @@ class EnterpirseListViewController: UIViewController,ZMDInterceptorProtocol,UITa
                 self.selectView.backgroundColor = RGB(253,124,76,1.0)
                 self.selectView.alpha = 1.0
                 ZMDTool.configViewLayer(self.selectView)
-                let titles = ["菜虫","艾弗森","菜虫"]
+                let titles = ["水果","蔬菜","农产品"]
                 for i in 0..<3 {
                     let title = titles[i]
                     let btn = UIButton(frame: CGRect(x: 0, y: 36*CGFloat(i)*kScreenWidth/375, width: 80*kScreenWidth/375, height: 36*kScreenWidth/375))
@@ -86,6 +107,11 @@ class EnterpirseListViewController: UIViewController,ZMDInterceptorProtocol,UITa
                     btn.backgroundColor = UIColor.clearColor()
                     btn.addSubview(ZMDTool.getLine(CGRect(x: 0, y: btn.frame.height-0.5, width: btn.frame.width, height: 0.5), backgroundColor: UIColor.whiteColor()))
                     btn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
+                        //移除背景btn
+                        if let view = self.view.viewWithTag(100) {
+                            view.removeFromSuperview()
+                        }
+                        //移除selectView
                         self.selectView.removeFromSuperview()
                         if downBtn == self.selectBtn1 {
                             if let title = (sender as! UIButton).titleLabel?.text {
@@ -105,7 +131,7 @@ class EnterpirseListViewController: UIViewController,ZMDInterceptorProtocol,UITa
                 self.selectView.showAsPop(setBgColor: false)
             })
             btn.tag = 10001
-            btn.setImage(UIImage(named: "btn_Arrow_turnDown1"), forState: .Normal)
+            btn.setImage(UIImage(named: "arrow01"), forState: .Normal)
             
             view.addSubview(label)
             view.addSubview(btn)
@@ -117,13 +143,15 @@ class EnterpirseListViewController: UIViewController,ZMDInterceptorProtocol,UITa
             }else{
                 self.selectBtn2 = btn
                 self.selectLbl2 = label
+                self.selectBtn2.hidden = true
+                self.selectLbl2.hidden = true
             }
         }
     }
     
     //MARK: - UITableViewDelegate
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return 1
+        return self.enterpriseArray.count
     }
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 2
@@ -137,7 +165,12 @@ class EnterpirseListViewController: UIViewController,ZMDInterceptorProtocol,UITa
         return view
     }
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-        return indexPath.row == 0 ? 240 : 56
+        let data = self.enterpriseArray[indexPath.section] as! ZMDEnterprise
+        if indexPath.row == 1 {
+            return zoom(56)
+        }else{
+            return data.Products.count == 0 ? 90 : 220
+        }
     }
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         if indexPath.row == 0 {
@@ -151,6 +184,8 @@ class EnterpirseListViewController: UIViewController,ZMDInterceptorProtocol,UITa
     func cellForImageCell(tableView:UITableView, indexPath:NSIndexPath) -> UITableViewCell {
         let cellId = "imageCell"
         let cell = tableView.dequeueReusableCellWithIdentifier(cellId)
+        ZMDTool.configTableViewCellDefault(cell!)
+        cell?.addLine()
         let titleLbl = cell?.contentView.viewWithTag(10000) as! UILabel
         let mainLbl = cell?.contentView.viewWithTag(10001) as! UILabel
         let countLbl1 = cell?.contentView.viewWithTag(10002) as! UILabel
@@ -158,11 +193,31 @@ class EnterpirseListViewController: UIViewController,ZMDInterceptorProtocol,UITa
         let detailBtn = cell?.contentView.viewWithTag(10004) as! UIButton
         let scrollView = cell?.contentView.viewWithTag(10005) as! UIScrollView
 
+        let data = self.enterpriseArray[indexPath.section] as! ZMDEnterprise
+        titleLbl.text = data.Name
+//        mainLbl.text = data.main
+        mainLbl.attributedText = mainLbl.text?.AttributedText("主营产品", color: defaultDetailTextColor)
         detailBtn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
             let vc = EnterpriseDetailViewController.CreateFromMainStoryboard() as! EnterpriseDetailViewController
+            vc.enterpriseId = data.Id.integerValue
             self.pushToViewController(vc, animated: true, hideBottom: true)
             return RACSignal.empty()
         })
+        if data.Products.count == 0 {
+            scrollView.hidden = true
+        }
+        for i in 0..<data.Products.count {
+            let product = data.Products[i]
+            let view = UIView(frame: CGRect(x: 10+CGFloat(i)*(110+10), y: 0, width: 110, height: 150))
+            let imgView = UIImageView(frame: CGRect(x: 0, y: 5, width: 110, height: 110))
+            let lbl = ZMDTool.getLabel(CGRect(x: 0, y: 120, width: 110, height: 18), text: "", fontSize: 14, textColor: appThemeColor, textAlignment: .Left)
+            imgView.sd_setImageWithURL(NSURL(string: kImageAddressMain+product.ImgUrl), placeholderImage: nil)
+            lbl.text = product.Price
+            view.addSubview(imgView)
+            view.addSubview(lbl)
+            scrollView.addSubview(view)
+            scrollView.contentSize = CGSizeMake(CGFloat(data.Products.count*120), 0)
+        }
         return cell!
     }
     func cellForBotCell(tableView:UITableView, indexPath:NSIndexPath) -> UITableViewCell {
@@ -172,27 +227,25 @@ class EnterpirseListViewController: UIViewController,ZMDInterceptorProtocol,UITa
             cell = UITableViewCell(style: .Default, reuseIdentifier: cellId)
             ZMDTool.configTableViewCellDefault(cell!)
             
-            let btn = ZMDTool.getButton(CGRect(x: (kScreenWidth-82)/2, y: 12, width: 82, height: 32), textForNormal: "进入店铺", fontSize: 15, backgroundColor: UIColor.clearColor(), blockForCli: { (sender) -> Void in
-                //...
+            let data = self.enterpriseArray[indexPath.section] as! ZMDEnterprise
+            let btn = ZMDTool.getButton(CGRect(x: (kScreenWidth-82)/2, y: zoom(12), width: 82, height: zoom(32)), textForNormal: "进入店铺", fontSize: 15, backgroundColor: UIColor.clearColor(), blockForCli: { (sender) -> Void in
+                let vc = StoreShowHomeViewController.CreateFromMainStoryboard() as! StoreShowHomeViewController
+                vc.storeId = data.SotreId
+                self.pushToViewController(vc, animated: true, hideBottom: true)
             })
             cell?.contentView.addSubview(btn)
         }
         return cell!
     }
+    
+    
+    //MARK:- OverrideMethod
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
     
 
-    /*
-    // MARK: - Navigation
 
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
 
 }

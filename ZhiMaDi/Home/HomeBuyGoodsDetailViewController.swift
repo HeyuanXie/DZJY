@@ -799,7 +799,7 @@ class HomeBuyGoodsDetailViewController: UIViewController,UITableViewDataSource,U
                     self.editViewShow(self.productDetail, SciId: 0)
                 }
             } else {
-                ZMDTool.showErrorPromptView(nil, error: error)
+                ZMDTool.showErrorPromptView(nil, error: nil, errorMsg: error)
             }
         }
     }

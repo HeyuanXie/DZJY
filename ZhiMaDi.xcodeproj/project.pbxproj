@@ -778,6 +778,10 @@
 		8450A70B1E03CB32005FF74A /* publish@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8450A6FC1E03CB32005FF74A /* publish@3x.png */; };
 		8450A70C1E03CB32005FF74A /* view-all@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8450A6FD1E03CB32005FF74A /* view-all@3x.png */; };
 		8450A70E1E03CB5F005FF74A /* message@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8450A70D1E03CB5F005FF74A /* message@2x.png */; };
+		8459875B1E0D216B00C700BB /* 发布供应@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 845987591E0D216B00C700BB /* 发布供应@2x.png */; };
+		8459875C1E0D216B00C700BB /* 发布供应@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8459875A1E0D216B00C700BB /* 发布供应@3x.png */; };
+		8459875F1E0D217A00C700BB /* 发布求购@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8459875D1E0D217A00C700BB /* 发布求购@2x.png */; };
+		845987601E0D217A00C700BB /* 发布求购@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8459875E1E0D217A00C700BB /* 发布求购@3x.png */; };
 		846426B31E0BDEC5005B2AB8 /* ZMDEnterprise.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846426B21E0BDEC5005B2AB8 /* ZMDEnterprise.swift */; };
 		84683B071D63F9AF003C848F /* Navi_Msg_50*50@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 84683B061D63F9AF003C848F /* Navi_Msg_50*50@2x.png */; };
 		84765FAD1DA8C9A1002F4F80 /* default-image-100.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 84765FAC1DA8C9A1002F4F80 /* default-image-100.jpg */; };
@@ -1720,6 +1724,10 @@
 		8450A6FC1E03CB32005FF74A /* publish@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "publish@3x.png"; sourceTree = "<group>"; };
 		8450A6FD1E03CB32005FF74A /* view-all@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "view-all@3x.png"; sourceTree = "<group>"; };
 		8450A70D1E03CB5F005FF74A /* message@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "message@2x.png"; sourceTree = "<group>"; };
+		845987591E0D216B00C700BB /* 发布供应@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "发布供应@2x.png"; sourceTree = "<group>"; };
+		8459875A1E0D216B00C700BB /* 发布供应@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "发布供应@3x.png"; sourceTree = "<group>"; };
+		8459875D1E0D217A00C700BB /* 发布求购@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "发布求购@2x.png"; sourceTree = "<group>"; };
+		8459875E1E0D217A00C700BB /* 发布求购@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "发布求购@3x.png"; sourceTree = "<group>"; };
 		846426B21E0BDEC5005B2AB8 /* ZMDEnterprise.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZMDEnterprise.swift; sourceTree = "<group>"; };
 		84683B061D63F9AF003C848F /* Navi_Msg_50*50@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Navi_Msg_50*50@2x.png"; sourceTree = "<group>"; };
 		84765FAC1DA8C9A1002F4F80 /* default-image-100.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "default-image-100.jpg"; sourceTree = "<group>"; };
@@ -3572,6 +3580,8 @@
 		84AFD4381DF9540000E03E56 /* @2x */ = {
 			isa = PBXGroup;
 			children = (
+				845987591E0D216B00C700BB /* 发布供应@2x.png */,
+				8459875A1E0D216B00C700BB /* 发布供应@3x.png */,
 				8450A70D1E03CB5F005FF74A /* message@2x.png */,
 				84AFD4391DF9540000E03E56 /* collect01@2x.png */,
 				84DDA44D1DFFEA6A00010CF6 /* addimage@2x.png */,
@@ -3624,6 +3634,8 @@
 		84AFD4541DF9540000E03E56 /* @3x */ = {
 			isa = PBXGroup;
 			children = (
+				8459875D1E0D217A00C700BB /* 发布求购@2x.png */,
+				8459875E1E0D217A00C700BB /* 发布求购@3x.png */,
 				84AFD4551DF9540000E03E56 /* addimage@3x.png */,
 				84DDA4281DFFD5EA00010CF6 /* 分享@3x.png */,
 				8450A6EF1E03CB32005FF74A /* 01nongte@3x.png */,
@@ -4108,6 +4120,7 @@
 				2B5FF40D1CA3F03C0067909D /* common_forward@3x.png in Resources */,
 				2B28F5141CA3DD4E004B8DA4 /* product_shopping-cart@3x.png in Resources */,
 				2B5FF4131CA3F03C0067909D /* common_share_link@3x.png in Resources */,
+				8459875C1E0D216B00C700BB /* 发布供应@3x.png in Resources */,
 				2B68C47F1C7AFAA500B401A9 /* Home_Buy@2x.png in Resources */,
 				2B28F5081CA3DD4E004B8DA4 /* product_collect_03@3x.png in Resources */,
 				2BD96D191CC76A34005DC87F /* list_product02@2x.png in Resources */,
@@ -4307,6 +4320,7 @@
 				2B02B5441CAD18FE0064B47C /* pay_order@3x.png in Resources */,
 				2B197DAE1C84261E006494CF /* Login_Verification.png in Resources */,
 				8414B6141DEC08280062AFF4 /* btn_release@2x.png in Resources */,
+				8459875B1E0D216B00C700BB /* 发布供应@2x.png in Resources */,
 				2B5FF3F61CA3F03C0067909D /* common_more_home@2x.png in Resources */,
 				84AFD4691DF9540000E03E56 /* collect01@2x.png in Resources */,
 				2B02B50D1CABABCF0064B47C /* user_wallet@2x.png in Resources */,
@@ -4325,6 +4339,7 @@
 				2BD96D0C1CC76A34005DC87F /* list_filter_normal@3x.png in Resources */,
 				8450A6DD1E039A2D005FF74A /* arrow02@2x.png in Resources */,
 				8450A7081E03CB32005FF74A /* fabu_qg@3x.png in Resources */,
+				8459875F1E0D217A00C700BB /* 发布求购@2x.png in Resources */,
 				2B02B4F91CABABCF0064B47C /* user_myshop@2x.png in Resources */,
 				84AFD46D1DF9540000E03E56 /* tab bar_cart01@2x.png in Resources */,
 				2BF52F9F1CB3BA2D0099F296 /* bank_zs@2x.png in Resources */,
@@ -4430,6 +4445,7 @@
 				2BF52F7F1CB39B060099F296 /* shop_product_warehouse@3x.png in Resources */,
 				2BDEF3B11C7EE9BE00927F64 /* Home_Buy_PeopleTest.png in Resources */,
 				2BF52F601CB39B060099F296 /* shop_01product@3x.png in Resources */,
+				845987601E0D217A00C700BB /* 发布求购@3x.png in Resources */,
 				2B02B4FC1CABABCF0064B47C /* user_pingfen_unselected@2x.png in Resources */,
 				2BF52F9A1CB3BA2D0099F296 /* bank_ny@3x.png in Resources */,
 				2BF52F711CB39B060099F296 /* shop_add_sale@2x.png in Resources */,
@@ -5045,8 +5061,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: The Wholesale Of Agricultural Commodities Of Jiangnan Kashi Bulk Agricultural Prod (JQV37Q32C9)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: The Wholesale Of Agricultural Commodities Of Jiangnan Kashi Bulk Agricultural Prod (JQV37Q32C9)";
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",

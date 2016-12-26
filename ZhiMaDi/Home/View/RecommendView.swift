@@ -12,6 +12,8 @@ class RecommendView: UIView {
     
     @IBOutlet weak var topLbl : UILabel!
     @IBOutlet weak var botLbl : UILabel!
+    @IBOutlet weak var topBtn : UIButton!
+    @IBOutlet weak var botBtn : UIButton!
 
 }
 

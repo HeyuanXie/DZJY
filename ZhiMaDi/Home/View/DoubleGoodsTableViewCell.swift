@@ -145,27 +145,27 @@ class HomeDoubleGoodCell : UITableViewCell {
     
     class func configCell(cell:HomeDoubleGoodCell,datas:NSArray) {
         if datas.count > 0 {
-            let data = datas[0] as! ZMDEnterprise
-            (cell.leftView.viewWithTag(10000) as! UILabel).text = data.Name
-            (cell.leftView.viewWithTag(10001) as! UILabel).text = ""
+            let data = datas[0] as! ZMDAdvertisement
+            (cell.leftView.viewWithTag(10000) as! UILabel).text = data.Title
+            (cell.leftView.viewWithTag(10001) as! UILabel).text = data.Other3
             var url = ""
-            if data.EnterprisePicture?.hasPrefix("/Media") == false {
-                url = "/Media"+data.EnterprisePicture!
+            if data.ResourcesCDNPath?.hasPrefix("/Media") == false {
+                url = "/Media"+data.ResourcesCDNPath!
             }else{
-                url = data.EnterprisePicture!
+                url = data.ResourcesCDNPath!
             }
             url = url.stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLQueryAllowedCharacterSet())!
             (cell.leftView.viewWithTag(10002) as! UIImageView).sd_setImageWithURL(NSURL(string: kImageAddressMain + url), placeholderImage: nil)
         }
         if datas.count > 1 {
-            let data = datas[1] as! ZMDEnterprise
-            (cell.rightView.viewWithTag(10000) as! UILabel).text = data.Name
-            (cell.rightView.viewWithTag(10001) as! UILabel).text = ""
+            let data = datas[1] as! ZMDAdvertisement
+            (cell.rightView.viewWithTag(10000) as! UILabel).text = data.Title
+            (cell.rightView.viewWithTag(10001) as! UILabel).text = data.Other3
             var url = ""
-            if data.EnterprisePicture?.hasPrefix("/Media") == false {
-                url = "/Media"+data.EnterprisePicture!
+            if data.ResourcesCDNPath?.hasPrefix("/Media") == false {
+                url = "/Media"+data.ResourcesCDNPath!
             }else{
-                url = data.EnterprisePicture!
+                url = data.ResourcesCDNPath!
             }
             url = url.stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLQueryAllowedCharacterSet())!
             (cell.rightView.viewWithTag(10002) as! UIImageView).sd_setImageWithURL(NSURL(string: kImageAddressMain + url), placeholderImage: nil)
@@ -188,40 +188,40 @@ class HomeMultiGoodCell : UITableViewCell {
     
     class func configCell(cell:HomeMultiGoodCell,datas:NSArray) {
         if datas.count > 2 {
-            let data = datas[2] as! ZMDEnterprise
-            (cell.leftView.viewWithTag(10000) as! UILabel).text = data.Name
-            (cell.leftView.viewWithTag(10001) as! UILabel).text = ""
+            let data = datas[2] as! ZMDAdvertisement
+            (cell.leftView.viewWithTag(10000) as! UILabel).text = data.Title
+            (cell.leftView.viewWithTag(10001) as! UILabel).text = data.Other3
             var url = ""
-            if data.EnterprisePicture?.hasPrefix("/Media") == false {
-                url = "/Media"+data.EnterprisePicture!
+            if data.ResourcesCDNPath?.hasPrefix("/Media") == false {
+                url = "/Media"+data.ResourcesCDNPath!
             }else{
-                url = data.EnterprisePicture!
+                url = data.ResourcesCDNPath!
             }
             url = url.stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLQueryAllowedCharacterSet())!
             (cell.leftView.viewWithTag(10002) as! UIImageView).sd_setImageWithURL(NSURL(string: kImageAddressMain + url), placeholderImage: nil)
         }
         if datas.count > 3 {
-            let data = datas[3] as! ZMDEnterprise
-            (cell.centerView.viewWithTag(10000) as! UILabel).text = data.Name
-            (cell.centerView.viewWithTag(10001) as! UILabel).text = ""
+            let data = datas[3] as! ZMDAdvertisement
+            (cell.centerView.viewWithTag(10000) as! UILabel).text = data.Title
+            (cell.centerView.viewWithTag(10001) as! UILabel).text = data.Other3
             var url = ""
-            if data.EnterprisePicture?.hasPrefix("/Media") == false {
-                url = "/Media"+data.EnterprisePicture!
+            if data.ResourcesCDNPath?.hasPrefix("/Media") == false {
+                url = "/Media"+data.ResourcesCDNPath!
             }else{
-                url = data.EnterprisePicture!
+                url = data.ResourcesCDNPath!
             }
             url = url.stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLQueryAllowedCharacterSet())!
             (cell.centerView.viewWithTag(10002) as! UIImageView).sd_setImageWithURL(NSURL(string: kImageAddressMain + url), placeholderImage: nil)
         }
         if datas.count > 4 {
-            let data = datas[4] as! ZMDEnterprise
-            (cell.rightView.viewWithTag(10000) as! UILabel).text = data.Name
-            (cell.rightView.viewWithTag(10001) as! UILabel).text = ""
+            let data = datas[4] as! ZMDAdvertisement
+            (cell.rightView.viewWithTag(10000) as! UILabel).text = data.Title
+            (cell.rightView.viewWithTag(10001) as! UILabel).text = data.Other3
             var url = ""
-            if data.EnterprisePicture?.hasPrefix("/Media") == false {
-                url = "/Media"+data.EnterprisePicture!
+            if data.ResourcesCDNPath?.hasPrefix("/Media") == false {
+                url = "/Media"+data.ResourcesCDNPath!
             }else{
-                url = data.EnterprisePicture!
+                url = data.ResourcesCDNPath!
             }
             url = url.stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLQueryAllowedCharacterSet())!
             (cell.rightView.viewWithTag(10002) as! UIImageView).sd_setImageWithURL(NSURL(string: kImageAddressMain + url), placeholderImage: nil)

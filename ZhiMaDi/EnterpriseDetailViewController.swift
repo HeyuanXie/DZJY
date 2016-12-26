@@ -13,16 +13,35 @@ class EnterpriseDetailViewController: UIViewController,ZMDInterceptorProtocol,UI
     @IBOutlet weak var currentTableView : UITableView!
     
     var enterpriseId : NSInteger!
-    var detailCellHeight : CGFloat = 270
+    var data : ZMDEnterprise!
+    var detailCellHeight : CGFloat = 270    //企业说明cell高度
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        self.fetchData()
         self.initUI()
         // Do any additional setup after loading the view.
     }
     
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(true)
+        self.currentTableView.reloadData()
+    }
     
     //MARK: - PrivateMethod
+    func fetchData() {
+        ZMDTool.showActivityView(nil)
+        QNNetworkTool.fetchEnterpriseDetail(self.enterpriseId) { (success, data, error) -> Void in
+            ZMDTool.hiddenActivityView()
+            if success! {
+                self.data = data
+                let size = data!.Description.sizeWithFont(UIFont.systemFontOfSize(15), maxWidth: kScreenWidth-16)
+                self.detailCellHeight = size.height >= 126 ? 270 : 270-126+size.height
+                self.currentTableView.reloadData()
+            }else{
+                ZMDTool.showErrorPromptView(nil, error: error)
+            }
+        }
+    }
     func initUI() {
         self.title = "企业详情"
         
@@ -30,7 +49,7 @@ class EnterpriseDetailViewController: UIViewController,ZMDInterceptorProtocol,UI
     
     //MARK: - UITableViewDelegate
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return 6
+        return g_isLogin! ? 5 : 3
     }
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return section >= 2 ? 1 : 2
@@ -70,9 +89,17 @@ class EnterpriseDetailViewController: UIViewController,ZMDInterceptorProtocol,UI
         case 0:
             return indexPath.row == 0 ? self.detailCellHeight : 48
         case 1:
-            return indexPath.row == 0 ? 240 : 56
+            if indexPath.row == 1 {
+                return zoom(56)
+            }else{
+                if let data = self.data {
+                    return data.Products.count == 0 ? 90 : 220
+                }else{
+                    return 90
+                }
+            }
         default:
-            return 52
+            return g_isLogin! ? 52 : 0
         }
     }
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
@@ -90,6 +117,7 @@ class EnterpriseDetailViewController: UIViewController,ZMDInterceptorProtocol,UI
     func cellForDetailCell(tableView:UITableView, indexPath:NSIndexPath) -> UITableViewCell {
         let cellId = "detailCell"
         let cell = tableView.dequeueReusableCellWithIdentifier(cellId)
+        ZMDTool.configTableViewCellDefault(cell!)
         cell?.addLine()
         let imgView = cell?.contentView.viewWithTag(10000) as! UIImageView
         let nameLbl = cell?.contentView.viewWithTag(10001) as! UILabel
@@ -99,14 +127,7 @@ class EnterpriseDetailViewController: UIViewController,ZMDInterceptorProtocol,UI
         let moreLbl = cell?.contentView.viewWithTag(10005) as! UILabel
         cell?.contentView.bringSubviewToFront(moreLbl)
         cell?.contentView.bringSubviewToFront(moreBtn)
-        let size = "阿斯顿发沙发沙发沙发沙发都是发放是短发是双方阿斯顿发沙发沙发沙发沙发都是发放是短发是短发是双斯顿发沙发阿斯顿发方阿斯顿发是双斯顿是双斯顿发沙发阿沙发沙发沙发都是发放是短发是短发是双斯顿发沙发阿斯顿发方阿斯顿发是双斯顿是双斯顿发沙发阿斯顿发顿发是双斯顿是双斯顿发沙发阿斯沙发沙发都是发放是短发是短发是双斯顿发沙发阿斯顿发方阿斯顿发是双斯顿是双斯顿发沙发阿沙发沙发沙发都是发放是短发是短发是双斯顿发沙发阿斯顿发方阿斯顿发是双斯顿是双斯顿发沙发阿斯顿发顿发是顿发方阿斯顿发顿发是双斯顿是双斯顿发沙发阿斯顿发方阿斯顿方阿斯顿发沙发发沙发阿斯顿发方阿斯顿发沙发沙发沙沙发沙发沙发沙发都是发放是短发是双方沙发沙发沙发都是发放是短发是双方".sizeWithFont(UIFont.systemFontOfSize(15), maxWidth: kScreenWidth-16)
-        if size.height <= 126 {
-            moreBtn.hidden = true
-            moreLbl.hidden = true
-        }else{
-            moreBtn.hidden = false
-            moreLbl.hidden = false
-        }
+
         moreBtn.setImage(UIImage(named: "btn_Arrow_TurnUp1"), forState: .Selected)
         moreBtn.setImage(UIImage(named: "btn_Arrow_TurnDown1"), forState: .Normal)
         moreBtn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
@@ -117,7 +138,22 @@ class EnterpriseDetailViewController: UIViewController,ZMDInterceptorProtocol,UI
             return RACSignal.empty()
         })
         //更新UI
-        
+        if let data = self.data {
+            if let urlStr = data.EnterprisePicture {
+                imgView.sd_setImageWithURL(NSURL(string: kImageAddressMain+urlStr), placeholderImage: nil)
+            }
+            nameLbl.text = data.Name
+            addressLbl.text = data.AreaName.componentsSeparatedByString(">>").first! + " " + data.AreaName.componentsSeparatedByString(">>").last!
+            detailLbl.text = data.Description
+            let size = data.Description.sizeWithFont(UIFont.systemFontOfSize(15), maxWidth: kScreenWidth-16)
+            if size.height <= 126 {
+                moreBtn.hidden = true
+                moreLbl.hidden = true
+            }else{
+                moreBtn.hidden = false
+                moreLbl.hidden = false
+            }
+        }
         
         return cell!
     }
@@ -139,8 +175,28 @@ class EnterpriseDetailViewController: UIViewController,ZMDInterceptorProtocol,UI
     func cellForImageCell(tableView:UITableView, indexPath:NSIndexPath) -> UITableViewCell {
         let cellId = "imageCell"
         let cell = tableView.dequeueReusableCellWithIdentifier(cellId)
+        ZMDTool.configTableViewCellDefault(cell!)
         cell?.addLine()
         
+        let scrollView = cell?.contentView.viewWithTag(10004) as! UIScrollView
+        for subView in scrollView.subviews {
+            subView.removeFromSuperview()
+        }
+        if self.data == nil {
+            return cell!
+        }
+        for i in 0..<self.data.Products.count {
+            let product = data.Products[i]
+            let view = UIView(frame: CGRect(x: 10+CGFloat(i)*(110+10), y: 0, width: 110, height: 140))
+            let imgView = UIImageView(frame: CGRect(x: 0, y: 5, width: 110, height: 110))
+            let lbl = ZMDTool.getLabel(CGRect(x: 0, y: 120, width: 110, height: 18), text: "", fontSize: 14, textColor: appThemeColor, textAlignment: .Left)
+            imgView.sd_setImageWithURL(NSURL(string: kImageAddressMain+product.ImgUrl), placeholderImage: nil)
+            lbl.text = "¥ " + product.Price
+            view.addSubview(imgView)
+            view.addSubview(lbl)
+            scrollView.addSubview(view)
+            scrollView.contentSize = CGSizeMake(CGFloat(data.Products.count*120), 0)
+        }
         return cell!
     }
     func cellForBotCell(tableView:UITableView, indexPath:NSIndexPath) -> UITableViewCell {
@@ -150,9 +206,12 @@ class EnterpriseDetailViewController: UIViewController,ZMDInterceptorProtocol,UI
             cell = UITableViewCell(style: .Default, reuseIdentifier: cellId)
             ZMDTool.configTableViewCellDefault(cell!)
             
-            let btn = ZMDTool.getButton(CGRect(x: (kScreenWidth-82)/2, y: 12, width: 82, height: 32), textForNormal: "进入店铺", fontSize: 15, backgroundColor: UIColor.clearColor(), blockForCli: { (sender) -> Void in
-                let vc = EnterpriseDetailViewController.CreateFromMainStoryboard() as! EnterpriseDetailViewController
-                self.pushToViewController(vc, animated: true, hideBottom: true)
+            let btn = ZMDTool.getButton(CGRect(x: (kScreenWidth-82)/2, y: zoom(12), width: 82, height: zoom(32)), textForNormal: "进入店铺", fontSize: 15, backgroundColor: UIColor.clearColor(), blockForCli: { (sender) -> Void in
+                if let data = self.data, storeId = data.SotreId {
+                    let vc = StoreShowHomeViewController.CreateFromMainStoryboard() as! StoreShowHomeViewController
+                    vc.storeId = storeId
+                    self.pushToViewController(vc, animated: true, hideBottom: true)
+                }
             })
             cell?.contentView.addSubview(btn)
         }
@@ -170,14 +229,14 @@ class EnterpriseDetailViewController: UIViewController,ZMDInterceptorProtocol,UI
             lbl.tag = 10000
             cell?.contentView.addSubview(lbl)
         }
-        var titles = [("联系人","张三"),("手机号","15377679415"),("QQ号","11135353"),("微信号","就不告诉你")]
+        var titles = [("联系人","张三"),("手机号","15377679415"),("QQ号","11135353")]
         cell?.textLabel?.text = titles[indexPath.section-2].0
         cell?.textLabel?.font = UIFont.systemFontOfSize(15)
         cell?.textLabel?.textColor = defaultDetailTextColor
         
         let lbl = cell?.contentView.viewWithTag(10000) as! UILabel
         lbl.text = titles[indexPath.section-2].1
-        return cell!
+        return !g_isLogin ? UITableViewCell() : cell!
     }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()

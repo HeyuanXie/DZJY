@@ -225,7 +225,6 @@ class MineSupplyOrDemandViewController: UIViewController,UITableViewDelegate,UIT
         self.navigationItem.titleView = searchBar
     }
     
-    
     func viewForSegment() -> UIView {
         let view = UIView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: zoom(60)))
         view.backgroundColor = defaultGrayColor
@@ -303,10 +302,10 @@ class DemandDetailCell : UITableViewCell {
         cell.detailLbl.text = data.Description
         cell.quantityLbl.text = "\(data.Quantity.integerValue)"+"/\(data.QuantityUnit)"
         cell.priceLbl.text = "\(data.Price.floatValue)/\(data.PriceUnit)"
-        cell.beginLbl.text = data.CreatedOn
+        cell.beginLbl.text = "\(data.CreatedOn.componentsSeparatedByString("T").first!)"
         let endTime = data.EndTime.componentsSeparatedByString("T").first
         let days = QNFormatTool.getDaysWithDateString(endTime!)
-        cell.endLbl.text = (days as NSString).integerValue <= 0 ? endTime! + "(已过期)" : endTime! + "(剩余\(days)天)"
+        cell.endLbl.text = (days as NSString).integerValue < 0 ? endTime! + "(已过期)" : endTime! + "(剩余\(days)天)"
     }
 }
 

@@ -153,6 +153,7 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
                 viewController.hidesBottomBarWhenPushed = true
             case .kEnterprise:
                 viewController = EnterpirseListViewController.CreateFromMainStoryboard() as! EnterpirseListViewController
+                viewController.hidesBottomBarWhenPushed = true
             }
             viewController.title = self.title
             return viewController
@@ -204,7 +205,7 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
     
     @IBOutlet weak var currentTableView: UITableView!
     
-    var userCenterData = [[UserCenterCellType.HomeContentTypeAd],[.HomeContentTypeMenu,.HomeContentTypeState],[.HomeContentTypeDoubleGood,.HomeContentTypeMulityGood,.HomeContentTypeRecommend],[.HomeContentTypeSupplyHead,.HomeContentTypeSupplyDetail,.HomeContentTypeSupplyFoot]]
+    var userCenterData = [[UserCenterCellType.HomeContentTypeAd],[.HomeContentTypeMenu,.HomeContentTypeState],[.HomeContentTypeDoubleGood,.HomeContentTypeMulityGood/*,.HomeContentTypeRecommend*/],[.HomeContentTypeSupplyHead,.HomeContentTypeSupplyDetail,.HomeContentTypeSupplyFoot]]
     
     var searchTypes : [SearchType]!
     var searchType : SearchType = .kSupply
@@ -228,10 +229,12 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
     var dongTaiIndex = 0    //用于取得交易动态当前动态
     var dongTaiArray = NSMutableArray()    //交易动态
     var enterpriseArray = NSMutableArray() //5个企业部分
+    var miniProductsArray = NSMutableArray()//5个商品
     var recommendArray = NSMutableArray()   //推荐部分
     var supplyDemandArray = NSMutableArray()    //供求大厅
     var supplyType = 1  //1为供应、2为求购
     var productsArray = NSMutableArray() //水果蔬菜
+    var friutIndex = 0      //记录水果蔬菜index
     
     var navBackView : UIView!
     var navLine : UIView!
@@ -303,7 +306,7 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         let cellType = self.userCenterData[section][0]
         if cellType == .HomeContentTypeFruitDetail {
-            return self.productsArray.count
+            return self.productsArray.count == 0 ? 0 : self.productsArray[0].count
         }
         return self.userCenterData[section].count
     }
@@ -368,8 +371,16 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        //点击底部商品cell
+        if self.userCenterData[indexPath.section][0] == .HomeContentTypeFruitDetail {
+            let product = self.productsArray[self.friutIndex][indexPath.row] as! ZMDProduct
+            let vc = HomeBuyGoodsDetailViewController.CreateFromMainStoryboard() as! HomeBuyGoodsDetailViewController
+            vc.productId = product.Id.integerValue
+            self.pushToViewController(vc, animated: true, hideBottom: true)
+            return
+        }
         let cellType = self.userCenterData[indexPath.section][indexPath.row]
-        if cellType == .HomeContentTypeState {
+        if cellType == .HomeContentTypeState && self.dongTaiArray.count != 0 {
             let tradeProduct = self.dongTaiArray[self.dongTaiIndex] as! ZMDTradeProduct
             let vc = HomeBuyGoodsDetailViewController.CreateFromMainStoryboard() as! HomeBuyGoodsDetailViewController
             vc.productId = tradeProduct.ProductId.integerValue
@@ -424,9 +435,10 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
     //MARK: 广告分区cycleScrollView delegate
     func clickImgAtIndex(index: Int) {
         //点击cycleScrollView中图片，响应事件
-        if let advertisementAll = self.advertisementAll {
-            let advertisement = advertisementAll.top![index]
-            self.advertisementClick(advertisement)
+        if self.topAdArray.count != 0 {
+            if let advertisement = self.topAdArray[index] as? ZMDAdvertisement {
+                self.advertisementClick(advertisement)
+            }
         }
     }
 
@@ -663,13 +675,18 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
         let cell = tableView.dequeueReusableCellWithIdentifier(cellId) as! HomeDoubleGoodCell
         ZMDTool.configTableViewCellDefault(cell)
         cell.addLine()
-        HomeDoubleGoodCell.configCell(cell, datas: self.enterpriseArray)
-        if self.enterpriseArray.count > 1 {
+        HomeDoubleGoodCell.configCell(cell, datas: self.miniProductsArray)
+        if self.miniProductsArray.count > 1 {
             for i in 0..<2 {
                 cell.btns[i].rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
-                    let vc = EnterpriseDetailViewController.CreateFromMainStoryboard() as! EnterpriseDetailViewController
-                    vc.enterpriseId = (self.enterpriseArray[i] as! ZMDEnterprise).Id.integerValue
-                    self.pushToViewController(vc, animated: true, hideBottom: true)
+                    self.advertisementClick(self.miniProductsArray[i] as! ZMDAdvertisement)
+//                    let vc = EnterpriseDetailViewController.CreateFromMainStoryboard() as! EnterpriseDetailViewController
+//                    vc.enterpriseId = (self.enterpriseArray[i] as! ZMDEnterprise).Id.integerValue
+//                    self.pushToViewController(vc, animated: true, hideBottom: true)
+                    
+//                    let vc = HomeBuyGoodsDetailViewController.CreateFromMainStoryboard() as! HomeBuyGoodsDetailViewController
+//                    vc.productId = (self.miniProductsArray[i] as! ZMDAdvertisement).Id.integerValue
+//                    self.pushToViewController(vc, animated: true, hideBottom: true)
                     return RACSignal.empty()
                 })
             }
@@ -683,13 +700,18 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
         let cell = tableView.dequeueReusableCellWithIdentifier(cellId) as! HomeMultiGoodCell
         cell.addLine()
         ZMDTool.configTableViewCellDefault(cell)
-        HomeMultiGoodCell.configCell(cell, datas: self.enterpriseArray)
-        if self.enterpriseArray.count > 4 {
+        HomeMultiGoodCell.configCell(cell, datas: self.miniProductsArray)
+        if self.miniProductsArray.count > 4 {
             for i in 2..<5 {
                 cell.btns[i-2].rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
-                    let vc = EnterpriseDetailViewController.CreateFromMainStoryboard() as! EnterpriseDetailViewController
-                    vc.enterpriseId = (self.enterpriseArray[i] as! ZMDEnterprise).Id.integerValue
-                    self.pushToViewController(vc, animated: true, hideBottom: true)
+                    self.advertisementClick(self.miniProductsArray[i] as! ZMDAdvertisement)
+//                    let vc = EnterpriseDetailViewController.CreateFromMainStoryboard() as! EnterpriseDetailViewController
+//                    vc.enterpriseId = (self.enterpriseArray[i] as! ZMDEnterprise).Id.integerValue
+//                    self.pushToViewController(vc, animated: true, hideBottom: true)
+                    
+//                    let vc = HomeBuyGoodsDetailViewController.CreateFromMainStoryboard() as! HomeBuyGoodsDetailViewController
+//                    vc.productId = (self.miniProductsArray[i] as! ZMDAdvertisement).Id.integerValue
+//                    self.pushToViewController(vc, animated: true, hideBottom: true)
                     return RACSignal.empty()
                 })
             }
@@ -711,22 +733,44 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
             scrollView.tag = 10000
             cell?.contentView.addSubview(scrollView)
             
-            for i in 0..<3 {
-                let width = 280*kScreenWidth/375
+            for i in 0..<5 {
+                let width = 210*kScreenWidth/375
                 let view = NSBundle.mainBundle().loadNibNamed("CommentView", owner: nil, options: nil)[1] as! RecommendView
                 view.frame = CGRect(x: CGFloat(i)*width, y: 0, width: width, height: 70*kScreenWidth/375)
-                view.tag = 10001 + i
+                view.tag = 20001 + i
                 scrollView.addSubview(view)
             }
         }
         let scrollView = cell?.contentView.viewWithTag(10000) as! UIScrollView
-        scrollView.contentSize = CGSizeMake(3*280*kScreenWidth/375, 0)
-        for i in 0..<3 {
-            let view = scrollView.viewWithTag(10001+i) as! RecommendView
-            view.topLbl.attributedText = view.topLbl.text?.AttributedMutableText(["推荐"], colors: [appThemeColorNew])
-            view.botLbl.attributedText = view.botLbl.text?.AttributedMutableText(["推荐"], colors: [appThemeColorNew])
+        if self.enterpriseArray.count == 0 {
+            return cell!
         }
-        
+        let count = self.enterpriseArray.count/2+self.enterpriseArray.count%2
+        scrollView.contentSize = CGSizeMake(CGFloat(count)*210*kScreenWidth/375, 0)
+        for i in 0..<count {
+            let enterprise = self.enterpriseArray[i*2] as! ZMDEnterprise
+            let view = scrollView.viewWithTag(20001+i) as! RecommendView
+            view.topLbl.text = "推荐 "+enterprise.Name
+            view.topLbl.attributedText = view.topLbl.text?.AttributedMutableText(["推荐"], colors: [appThemeColorNew])
+            view.topBtn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
+                let vc = EnterpriseDetailViewController.CreateFromMainStoryboard() as! EnterpriseDetailViewController
+                vc.enterpriseId = enterprise.Id.integerValue
+                self.pushToViewController(vc, animated: true, hideBottom: true)
+                return RACSignal.empty()
+            })
+            
+            if 2*i+1 <= count {
+                let enterprise2 = self.enterpriseArray[2*i+1] as! ZMDEnterprise
+                view.botLbl.text = "推荐 "+enterprise2.Name
+                view.botLbl.attributedText = view.botLbl.text?.AttributedMutableText(["推荐"], colors: [appThemeColorNew])
+                view.botBtn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
+                    let vc = EnterpriseDetailViewController.CreateFromMainStoryboard() as! EnterpriseDetailViewController
+                    vc.enterpriseId = enterprise2.Id.integerValue
+                    self.pushToViewController(vc, animated: true, hideBottom: true)
+                    return RACSignal.empty()
+                })
+            }
+        }
         return cell!
     }
     
@@ -802,10 +846,15 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
                 let view = UIView(frame: CGRect(x: 0, y: 10+CGFloat(i)*(38), width: kScreenWidth, height: 38))
                 let leftLbl = ZMDTool.getLabel(CGRect(x: 10, y: 10, width: kScreenWidth-64, height: 18), text: "", fontSize: 16, textColor: defaultTextColor, textAlignment: .Left)
                 let rightLbl = ZMDTool.getLabel(CGRect(x: kScreenWidth-64, y: 10, width: 53, height: 18), text: "", fontSize: 13, textColor: defaultDetailTextColor, textAlignment: .Right)
+                let btn = ZMDTool.getButton(CGRect(x: 0, y: 0, width: kScreenWidth, height: 38), textForNormal: "", fontSize: 1, backgroundColor: UIColor.clearColor(), blockForCli: { (sender) -> Void in
+                    //...
+                })
                 leftLbl.tag = 10000
                 rightLbl.tag = 10001
+                btn.tag = 10002
                 view.addSubview(leftLbl)
                 view.addSubview(rightLbl)
+                view.addSubview(btn)
                 view.tag = 20000+i
                 cell?.contentView.addSubview(view)
             }
@@ -814,17 +863,25 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
         for item in self.supplyDemandArray {
             let supplyItem = item as! ZMDSupplyProduct
             index = index + 1
-            let view = cell?.contentView.viewWithTag(20000+index)
-            let leftLbl = view?.viewWithTag(10000) as! UILabel
-            let rightLbl = view?.viewWithTag(10001) as! UILabel
-            let typeText = self.supplyType == 1 ? "供应" : "求购"
-            leftLbl.text = typeText + "  " + supplyItem.Title
-            leftLbl.attributedText = leftLbl.text?.AttributedText(typeText, color: appThemeColor)
-            if let arr = supplyItem.CreatedOn.componentsSeparatedByCharactersInSet(NSCharacterSet(charactersInString: "T:")) as? NSArray where arr.count == 4 {
-                let time = (arr[1] as! String) + ":" + (arr[2] as! String)
-                rightLbl.text = time
+            if let view = cell?.contentView.viewWithTag(20000+index) {
+                let leftLbl = view.viewWithTag(10000) as! UILabel
+                let rightLbl = view.viewWithTag(10001) as! UILabel
+                let btn = view.viewWithTag(10002) as! UIButton
+                let typeText = self.supplyType == 1 ? "供应" : "求购"
+                leftLbl.text = typeText + "  " + supplyItem.Title
+                leftLbl.attributedText = leftLbl.text?.AttributedText(typeText, color: appThemeColor)
+                if let arr = supplyItem.CreatedOn.componentsSeparatedByCharactersInSet(NSCharacterSet(charactersInString: "T:")) as? NSArray where arr.count == 4 {
+                    let time = (arr[1] as! String) + ":" + (arr[2] as! String)
+                    rightLbl.text = time
+                }
+                btn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
+                    let vc = SupplyDemandDetailViewController.CreateFromMainStoryboard() as! SupplyDemandDetailViewController
+                    vc.type = self.supplyType
+                    vc.supplyProductId = supplyItem.Id.integerValue
+                    self.pushToViewController(vc, animated: true, hideBottom: true)
+                    return RACSignal.empty()
+                })
             }
-            
         }
         return cell!
     }
@@ -865,7 +922,8 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
             }
             let customJumpBtn = CustomJumpBtns(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 44*kScreenWidth/375), menuTitle: titles as! [String], textColorForNormal: defaultTextColor, textColorForSelect: appThemeColorNew, IsLineAdaptText: true)
             customJumpBtn.finished = {(index:Int) -> Void in
-                
+                self.friutIndex = index
+                self.currentTableView.reloadSections(NSIndexSet(index: 5), withRowAnimation: .None)
             }
             cell?.contentView.addSubview(customJumpBtn)
             cell?.addLine()
@@ -969,62 +1027,59 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
         let cell = tableView.dequeueReusableCellWithIdentifier(cellId)
         cell?.addLine()
         ZMDTool.configTableViewCellDefault(cell!)
-        let product = self.productsArray[indexPath.row] as! ZMDProduct
+        let product = self.productsArray[self.friutIndex][indexPath.row] as! ZMDProduct
         let imgView = cell?.contentView.viewWithTag(10000) as! UIImageView
         let titleLbl = cell?.contentView.viewWithTag(10001) as! UILabel
         let priceLbl = cell?.contentView.viewWithTag(10002) as! UILabel
         imgView.sd_setImageWithURL(NSURL(string: kImageAddressMain+(product.DefaultPictureModel?.ImageUrl)!), placeholderImage: nil)
         titleLbl.text = product.Name
-        priceLbl.text = "¥"+(product.ProductPrice?.Price)!
+        priceLbl.text = (product.ProductPrice?.Price)!
         return cell!
     }
 
     //MARK: **************PrivateMethod*************
     //MARK:点击广告的响应方法
     func advertisementClick(advertisement: ZMDAdvertisement){
-        if let other1 = advertisement.Other1,let other2 = advertisement.Other2,let linkUrl = advertisement.LinkUrl{
+        if let other1 = advertisement.Other1, let other2 = advertisement.Other2 {
             let other1 = other1 as String
-            let other2 = other2 as String   //最终参数
-            let linkUrl = linkUrl as String //用于获取临时参数
+            let other2 = other2   //最终参数
             switch other1{
             case "Product":
                 let vc = HomeBuyGoodsDetailViewController.CreateFromMainStoryboard() as! HomeBuyGoodsDetailViewController
-                let arr = linkUrl.componentsSeparatedByString("/")
-                vc.hidesBottomBarWhenPushed = true
-                vc.productId = (arr[3] as NSString).integerValue
-                self.navigationController?.pushViewController(vc, animated: false)
+                vc.productId = (other2 as NSString).integerValue
+                self.pushToViewController(vc, animated: true, hideBottom: true)
                 break
             case "Seckill":
                 break
             case "Topic":
-                let vc = HomeBuyGoodsDetailViewController.CreateFromMainStoryboard() as! HomeBuyGoodsDetailViewController
-                vc.productId = 8803
-                vc.hidesBottomBarWhenPushed = true
-                self.navigationController?.pushViewController(vc, animated: false)
+                let vc = HomeBuyListViewController.CreateFromMainStoryboard() as! HomeBuyListViewController
+                vc.Cid = other2
+                self.pushToViewController(vc, animated: true, hideBottom: true)
                 break
+            case "Supply":
+                let vc = SupplyDemandDetailViewController.CreateFromMainStoryboard() as! SupplyDemandDetailViewController
+                vc.supplyProductId = (other2 as NSString).integerValue
+                vc.type = 1
+                self.pushToViewController(vc, animated: true, hideBottom: true)
+            case "Demand":
+                let vc = SupplyDemandDetailViewController.CreateFromMainStoryboard() as! SupplyDemandDetailViewController
+                vc.supplyProductId = (other2 as NSString).integerValue
+                vc.type = 2
+                self.pushToViewController(vc, animated: true, hideBottom: true)
+            case "Enterprise":
+                let vc = EnterpriseDetailViewController.CreateFromMainStoryboard() as! EnterpriseDetailViewController
+                vc.enterpriseId = (other2 as NSString).integerValue
+                self.pushToViewController(vc, animated: true, hideBottom: true)
             case "Coupon":
                 break
             default:
-                let vc = MyWebViewController()
-                vc.webUrl = linkUrl
-                vc.hidesBottomBarWhenPushed = true
-                self.navigationController?.pushViewController(vc, animated: false)
                 break
             }
-        } else {
-            let linkUrl = advertisement.LinkUrl ?? "" as String
-            let id = (linkUrl.stringByReplacingOccurrencesOfString("http://www.ksnongte.com/", withString: "") as NSString).integerValue
-            if id != 0 {
-                let vc = HomeBuyGoodsDetailViewController.CreateFromMainStoryboard() as! HomeBuyGoodsDetailViewController
-                vc.productId = id
-                self.pushToViewController(vc, animated: true, hideBottom: false)
-            }else if linkUrl != "" {
-                let vc = MyWebViewController()
-                vc.webUrl = linkUrl
-                self.pushToViewController(vc, animated: true, hideBottom: false)
-            }
+        }else{
+            return
         }
     }
+    
     // 下拉视窗
     class ViewForNextMenu: UIView {
         override init(frame: CGRect) {
@@ -1098,7 +1153,8 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
     func fetchData() {
         self.fetchTop()
         self.fetchDongTai()
-        self.fetchEnterprise()
+//        self.fetchEnterprise()
+        self.fetchMiniProducts()
         self.fetchRecommend()
         self.fetchSupplyDemand()
         self.fetchProducts()
@@ -1135,15 +1191,33 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
             }
         }
     }
-    
-    //MARK: 获取推荐
+    //MARK: 获取推荐(推荐的即为交易企业)
     func fetchRecommend() {
-        
+        QNNetworkTool.fetchHomeEnterprise { (success, enterprises, error) -> Void in
+            if success {
+                self.enterpriseArray.removeAllObjects()
+                self.enterpriseArray.addObjectsFromArray(enterprises as! [AnyObject])
+                self.userCenterData = [[UserCenterCellType.HomeContentTypeAd],[.HomeContentTypeMenu,.HomeContentTypeState],[.HomeContentTypeDoubleGood,.HomeContentTypeMulityGood,.HomeContentTypeRecommend],[.HomeContentTypeSupplyHead,.HomeContentTypeSupplyDetail,.HomeContentTypeSupplyFoot]]
+                self.currentTableView.reloadData()
+            }
+        }
     }
+
+    //MARK: 获取5个产品
+    func fetchMiniProducts() {
+        QNNetworkTool.fetchHomeMiniAd("company_top_five") { (success, products, error) -> Void in
+            if success! {
+                self.miniProductsArray.removeAllObjects()
+                self.miniProductsArray.addObjectsFromArray(products as! [AnyObject])
+                self.currentTableView.reloadData()
+            }
+        }
+    }
+
     
     //MARK: 获取供求大厅
     func fetchSupplyDemand() {
-        QNNetworkTool.supplyDemandSearch(nil, page: 1, pageSize: 8, check: 0, q: "", type: self.supplyType, orderBy: 16, fromPrice: nil, toPrice: nil) { (error, products) -> Void in
+        QNNetworkTool.supplyDemandSearch(nil, page: 1, pageSize: 8, check: 2, q: "", type: self.supplyType, orderBy: 16, fromPrice: nil, toPrice: nil) { (error, products) -> Void in
             if let products = products {
                 self.supplyDemandArray.removeAllObjects()
                 self.supplyDemandArray.addObjectsFromArray(products as [AnyObject])
@@ -1167,37 +1241,28 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
                     self.categories.removeAllObjects()
                     self.categories.addObjectsFromArray(categories as [AnyObject])
                     self.currentTableView.reloadData()
-                    self.userCenterData = [[UserCenterCellType.HomeContentTypeAd],[.HomeContentTypeMenu,.HomeContentTypeState],[.HomeContentTypeDoubleGood,.HomeContentTypeMulityGood,.HomeContentTypeRecommend],[.HomeContentTypeSupplyHead,.HomeContentTypeSupplyDetail,.HomeContentTypeSupplyFoot],[.HomeContentTypeFruitHead]]
+                    self.userCenterData = self.enterpriseArray.count == 0 ? [[UserCenterCellType.HomeContentTypeAd],[.HomeContentTypeMenu,.HomeContentTypeState],[.HomeContentTypeDoubleGood,.HomeContentTypeMulityGood/*,.HomeContentTypeRecommend*/],[.HomeContentTypeSupplyHead,.HomeContentTypeSupplyDetail,.HomeContentTypeSupplyFoot],[.HomeContentTypeFruitHead],[.HomeContentTypeFruitDetail]] : [[UserCenterCellType.HomeContentTypeAd],[.HomeContentTypeMenu,.HomeContentTypeState],[.HomeContentTypeDoubleGood,.HomeContentTypeMulityGood,.HomeContentTypeRecommend],[.HomeContentTypeSupplyHead,.HomeContentTypeSupplyDetail,.HomeContentTypeSupplyFoot],[.HomeContentTypeFruitHead],[.HomeContentTypeFruitDetail]]
+                    self.productsArray.removeAllObjects()
+                    self.currentTableView.reloadData()
                     self.fetchProducts(self.categories)
                 }else{
                     ZMDTool.showErrorPromptView(nil, error: error)
-                    
                 }
             }
         }
     }
     
     func fetchProducts(categories:NSArray) {
-        self.productsArray.removeAllObjects()
-        let group = dispatch_group_create()
         for category in categories {
             let category = category as! ZMDXHYCategory
-            dispatch_group_enter(group)
-            sleep(1)
             QNNetworkTool.fetchProductsInCategory(5, categoryId: category.Id.integerValue, completion: { (products, WidgetName, error) -> Void in
                 if let products = products {
-                    self.productsArray.removeAllObjects()
                     self.productsArray.addObject(products)
-                    self.userCenterData = [[UserCenterCellType.HomeContentTypeAd],[.HomeContentTypeMenu,.HomeContentTypeState],[.HomeContentTypeDoubleGood,.HomeContentTypeMulityGood,.HomeContentTypeRecommend],[.HomeContentTypeSupplyHead,.HomeContentTypeSupplyDetail,.HomeContentTypeSupplyFoot],[.HomeContentTypeFruitHead],[.HomeContentTypeFruitDetail]]
+                    self.userCenterData = self.enterpriseArray.count == 0 ? [[UserCenterCellType.HomeContentTypeAd],[.HomeContentTypeMenu,.HomeContentTypeState],[.HomeContentTypeDoubleGood,.HomeContentTypeMulityGood/*,.HomeContentTypeRecommend*/],[.HomeContentTypeSupplyHead,.HomeContentTypeSupplyDetail,.HomeContentTypeSupplyFoot],[.HomeContentTypeFruitHead],[.HomeContentTypeFruitDetail]] : [[UserCenterCellType.HomeContentTypeAd],[.HomeContentTypeMenu,.HomeContentTypeState],[.HomeContentTypeDoubleGood,.HomeContentTypeMulityGood,.HomeContentTypeRecommend],[.HomeContentTypeSupplyHead,.HomeContentTypeSupplyDetail,.HomeContentTypeSupplyFoot],[.HomeContentTypeFruitHead],[.HomeContentTypeFruitDetail]]
                     self.currentTableView.reloadData()
                 }
             })
             
-        }
-        
-        dispatch_group_notify(group, dispatch_get_main_queue()) { () -> Void in
-            ZMDTool.hiddenActivityView()
-            self.currentTableView.reloadData()
         }
     }
 

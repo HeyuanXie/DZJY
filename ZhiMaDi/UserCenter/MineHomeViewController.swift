@@ -23,6 +23,9 @@ class MineHomeViewController: UIViewController,UITableViewDataSource, UITableVie
         case UserSetting
         
         case UserOpenStore
+        
+        case UserPublishSupply
+        case UserPublishDemand
         init(){
             self = UserHead
         }
@@ -46,6 +49,11 @@ class MineHomeViewController: UIViewController,UITableViewDataSource, UITableVie
                 
             case UserOpenStore:
                 return "我要开店"
+                
+            case .UserPublishSupply:
+                return "发布供应"
+            case .UserPublishDemand:
+                return "发布求购"
             }
         }
         var image : UIImage?{
@@ -62,6 +70,10 @@ class MineHomeViewController: UIViewController,UITableViewDataSource, UITableVie
                 return UIImage(named: "账户设置")
             case UserOpenStore:
                 return UIImage(named: "我要开店")
+            case .UserPublishSupply:
+                return UIImage(named: "发布供应")
+            case .UserPublishDemand:
+                return UIImage(named: "发布求购")
             default :
                 return UIImage(named: "")
             }
@@ -86,6 +98,12 @@ class MineHomeViewController: UIViewController,UITableViewDataSource, UITableVie
                 viewController = MineOpenStoreFirstViewController.CreateFromStoreStoryboard() as! MineOpenStoreFirstViewController
             case .UserSetting:
                 viewController = PersonInfoViewController()
+            case .UserPublishSupply:
+                viewController = PublishSupplyViewController.CreateFromMainStoryboard() as! PublishSupplyViewController
+                (viewController as! PublishSupplyViewController).contentType = .Supply
+            case .UserPublishDemand:
+                viewController = PublishSupplyViewController.CreateFromMainStoryboard() as! PublishSupplyViewController
+                (viewController as! PublishSupplyViewController).contentType = .Demand
             default :
                 viewController = UIViewController()
             }
@@ -101,20 +119,11 @@ class MineHomeViewController: UIViewController,UITableViewDataSource, UITableVie
     
     @IBOutlet weak var currentTableView: UITableView!
     var userCenterData: [[UserCenterCellType]]!
-    var btn :UIButton!
     var orderMenuView : UIView!
     var orderNumberDic:NSMutableDictionary!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        self.btn = UIButton(frame: self.view.bounds)
-        self.btn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
-            let vc = LoginViewController.CreateFromLoginStoryboard() as! LoginViewController
-            self.pushToViewController(vc, animated: true, hideBottom: true)
-            return RACSignal.empty()
-        })
-        self.view.addSubview(self.btn)
         
         // 让导航栏支持右滑返回功能
         ZMDTool.addInteractive(self.navigationController)
@@ -123,11 +132,6 @@ class MineHomeViewController: UIViewController,UITableViewDataSource, UITableVie
     }
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(true)
-        if g_isLogin! {
-            self.btn.userInteractionEnabled = false
-        }else{
-            self.btn.userInteractionEnabled = true
-        }
         self.dataInit()
     }
     override func viewWillDisappear(animated: Bool) {
@@ -187,6 +191,11 @@ class MineHomeViewController: UIViewController,UITableViewDataSource, UITableVie
                 let width = kScreenWidth/5,height = CGFloat(55)
                 let x = CGFloat(i) * width
                 let btn = ZMDTool.getButton(CGRect(x: x, y: 0, width: width, height: height), textForNormal: title, fontSize: 13, backgroundColor: UIColor.clearColor(), blockForCli: { (sender) -> Void in
+                    if !g_isLogin {
+                        let vc = LoginViewController.CreateFromLoginStoryboard() as! LoginViewController
+                        self.pushToViewController(vc, animated: true, hideBottom: true)
+                        return
+                    }
                     //点击订单目录(待付款。。。。)
                     let index = Int(x/width)+1  //“+1”是跳过前面的 “全部”btn
                     if index == 5 {
@@ -224,9 +233,13 @@ class MineHomeViewController: UIViewController,UITableViewDataSource, UITableVie
             
             if let personImgV = cell!.viewWithTag(10001) as? UIImageView{
                 ZMDTool.configViewLayerWithSize(personImgV, size: 30)
-                if let urlStr = g_customer?.Avatar?.AvatarUrl,url = NSURL(string: urlStr) {
+                if let urlStr = g_customer?.Avatar?.AvatarUrl where urlStr != "" {
+                    let url = NSURL(string: urlStr)
                     personImgV.sd_setImageWithURL(url, placeholderImage: nil)
                 }else{
+                    personImgV.image = UIImage(named: "示例头像")
+                }
+                if !g_isLogin {
                     personImgV.image = UIImage(named: "示例头像")
                 }
             }
@@ -246,9 +259,12 @@ class MineHomeViewController: UIViewController,UITableViewDataSource, UITableVie
                 let numbers = [waitPay,waitDelivery,waitReceivce,waitReview,afterSale]
                 let status = ["待付款","待发货","待收货","待评价","退款"]
                 for index in 0..<numbers.count {
-                    let title = "\(numbers[index])\n\(status[index])"
+                    var titles = "\(numbers[index])\n\(status[index])"
+                    if !g_isLogin {
+                        titles = "0\n\(status[index])"
+                    }
                     let button = self.orderMenuView.viewWithTag(tag++) as! UIButton
-                    button.setTitle(title, forState: .Normal)
+                    button.setTitle(titles, forState: .Normal)
                 }
             }
             return cell!
@@ -270,6 +286,11 @@ class MineHomeViewController: UIViewController,UITableViewDataSource, UITableVie
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        if !g_isLogin {
+            let vc = LoginViewController.CreateFromLoginStoryboard() as! LoginViewController
+            self.pushToViewController(vc, animated: true, hideBottom: true)
+            return
+        }
         let cellType = self.userCenterData[indexPath.section][indexPath.row]
         switch cellType{
         case .UserHead :
@@ -290,8 +311,8 @@ class MineHomeViewController: UIViewController,UITableViewDataSource, UITableVie
     
     private func dataInit(){
         //目前功能
-        self.userCenterData = [[.UserHead,.UserMyOrder],[.UserSupply,.UserDemand,.UserCollect],[.UserOpenStore],[.UserSetting]]
-        
+        self.userCenterData = [[.UserHead,.UserMyOrder],[.UserSupply,.UserDemand,.UserCollect],/*[.UserOpenStore],*/[.UserPublishSupply,.UserPublishDemand],[.UserSetting]]
+        self.currentTableView.reloadData()
         if g_isLogin! {
             QNNetworkTool.fetchOrder(0, orderNo: "", pageIndex: 0, pageSize: 12) { (orders ,dic, Error) -> Void in
                 if let dictionary = dic, dict = dictionary["CustomerOrderStatusModel"] {

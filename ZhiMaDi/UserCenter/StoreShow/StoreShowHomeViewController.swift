@@ -28,7 +28,7 @@ class StoreShowHomeViewController: UIViewController, ZMDInterceptorProtocol,ZMDI
             case Coupon:
                 return 260/750 * kScreenWidth
             case Recommend:
-                return 325
+                return zoom(300)
             default:
                 return 0
             }
@@ -130,7 +130,7 @@ class StoreShowHomeViewController: UIViewController, ZMDInterceptorProtocol,ZMDI
             return 60
         }
         if self.celltypes[indexPath.section].first == .Recommend{
-            return 325
+            return zoom(315)
         }
         return self.celltypes[indexPath.section][indexPath.row].height
     }
@@ -176,27 +176,42 @@ class StoreShowHomeViewController: UIViewController, ZMDInterceptorProtocol,ZMDI
             followBtn.imageEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 12)
             followBtn.setImage(UIImage(named: "user_pingfen_selected.png"), forState: .Selected)
             followBtn.setTitle("已关注", forState: .Selected)
-            //关注btn临时
+            //关注btn
             followBtn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
-                let btn = sender as!UIButton
-                btn.selected = !btn.selected
-                btn.titleLabel?.font = btn.selected ? UIFont.systemFontOfSize(14) : UIFont.systemFontOfSize(17)
-                btn.titleEdgeInsets = btn.selected ? UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 8) : UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+                if !g_isLogin {
+                    ZMDTool.showPromptView("请先登录!")
+                    return RACSignal.empty()
+                }
+                ZMDTool.showActivityView(nil)
+                if (sender as! UIButton).selected {
+                    QNNetworkTool.cancelCollectStores(self.storeId.integerValue, completion: { (succeed, error, dictionary) -> Void in
+                        ZMDTool.hiddenActivityView()
+                        if succeed! {
+                            (sender as! UIButton).selected = !(sender as! UIButton).selected
+                            let btn = sender as! UIButton
+                            btn.titleLabel?.font = btn.selected ? UIFont.systemFontOfSize(14) : UIFont.systemFontOfSize(17)
+                            btn.titleEdgeInsets = btn.selected ? UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 8) : UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+                            ZMDTool.showPromptView("已取消关注")
+                        }else{
+                            ZMDTool.showPromptView("取消关注失败")
+                        }
+                    })
+                }else{
+                    QNNetworkTool.collectStores(self.storeId.integerValue, completion: { (succeed, error, dictionary) -> Void in
+                        ZMDTool.hiddenActivityView()
+                        if succeed! {
+                            (sender as! UIButton).selected = !(sender as! UIButton).selected
+                            let btn = sender as! UIButton
+                            btn.titleLabel?.font = btn.selected ? UIFont.systemFontOfSize(14) : UIFont.systemFontOfSize(17)
+                            btn.titleEdgeInsets = btn.selected ? UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 8) : UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+                            ZMDTool.showPromptView("关注成功")
+                        }else{
+                            ZMDTool.showPromptView("关注失败")
+                        }
+                    })
+                }
                 return RACSignal.empty()
             })
-            //关注btn
-            /*followBtn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
-                QNNetworkTool.collectStores(self.storeId.integerValue,collect:!(sender as!UIButton).selected, completion: { (succeed, error, dictionary) -> Void in
-                    if succeed! {
-                        (sender as! UIButton).selected = !(sender as! UIButton).selected
-                        (sender as!UIButton).selected == true ? ZMDTool.showPromptView("关注成功") : ZMDTool.showPromptView("已取消关注")
-                    }else{
-                        (sender as!UIButton).selected == true ? ZMDTool.showPromptView("取消关注失败") : ZMDTool.showPromptView("关注失败")
-                    }
-                })
-                print("关注店铺\((sender as! UIButton).selected)")
-                return RACSignal.empty()
-            })*/
             return cell!
         case .Notice :
             let cellId = "NoticeCell"
