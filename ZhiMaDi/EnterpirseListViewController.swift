@@ -61,6 +61,7 @@ class EnterpirseListViewController: UIViewController,ZMDInterceptorProtocol,UITa
         }
         ZMDTool.configViewLayer(confirmBtn)
         ZMDTool.configViewLayerFrameWithColor(confirmBtn, color: defaultLineColor)
+        bgView.addSubview(ZMDTool.getLine(CGRect(x: 0, y: 45.5, width: kScreenWidth, height: 0.5)))
         bgView.addSubview(confirmBtn)
         
         //删选View
@@ -69,7 +70,7 @@ class EnterpirseListViewController: UIViewController,ZMDInterceptorProtocol,UITa
         for i in 0..<2 {
             let view = UIView(frame: CGRect(x: CGFloat(i)*width, y: 0, width: width, height: 46))
             let label = ZMDTool.getLabel(CGRect(x: left, y: 0, width: width-zoom(35), height: 46), text: "行业 : 不限", fontSize: 14, textColor: defaultDetailTextColor, textAlignment: .Center)
-            label.attributedText = label.text?.AttributedText("行业 :", color: defaultTextColor)
+            label.attributedText = label.text?.AttributedText("行业 :", color: defaultDetailTextColor)
             let btn = ZMDTool.getButton(CGRectMake(width-zoom(35), 0, zoom(35), 46), textForNormal: "", fontSize: 0, backgroundColor: UIColor.clearColor(), blockForCli: { (sender) in
                 
                 //背景btn
@@ -117,12 +118,12 @@ class EnterpirseListViewController: UIViewController,ZMDInterceptorProtocol,UITa
                             if let title = (sender as! UIButton).titleLabel?.text {
                                 self.selectLbl1.text = "行业 : \(title)"
                             }
-                            self.selectLbl1.attributedText = self.selectLbl1.text!.AttributedText("行业 :", color: defaultTextColor)
+                            self.selectLbl1.attributedText = self.selectLbl1.text!.AttributedText("行业 :", color: defaultDetailTextColor)
                         }else{
                             if let title = (sender as! UIButton).titleLabel?.text {
                                 self.selectLbl2.text = "行业 : \(title)"
                             }
-                            self.selectLbl2.attributedText = self.selectLbl2.text!.AttributedText("行业 :", color: defaultTextColor)
+                            self.selectLbl2.attributedText = self.selectLbl2.text!.AttributedText("行业 :", color: defaultDetailTextColor)
                         }
                         return RACSignal.empty()
                     })

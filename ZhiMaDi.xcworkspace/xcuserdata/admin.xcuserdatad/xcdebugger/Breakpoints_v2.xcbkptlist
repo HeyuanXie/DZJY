@@ -45,53 +45,5 @@
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ZhiMaDi/Tools/QNNetworkTool.swift"
-            timestampString = "504410182.613812"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "448"
-            endingLineNumber = "448"
-            landmarkName = "supplyDemandPublish(_:completion:)"
-            landmarkType = "5">
-            <Locations>
-               <Location
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "static ZhiMaDi.QNNetworkTool.supplyDemandPublish (ZhiMaDi.QNNetworkTool.Type)(ZhiMaDi.ZMDSupplyProduct, completion : (success : Swift.Optional&lt;Swift.Bool&gt;, errorMsg : Swift.Optional&lt;Swift.String&gt;, supplyDemandsId : Swift.Optional&lt;Swift.Int&gt;) -&gt; ()) -&gt; ()"
-                  moduleName = "ZhiMaDi"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/admin/Desktop/DZJY/ZhiMaDi/Tools/QNNetworkTool.swift"
-                  timestampString = "504437986.360247"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "448"
-                  endingLineNumber = "448"
-                  offsetFromSymbolStart = "1292">
-               </Location>
-               <Location
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "static ZhiMaDi.QNNetworkTool.(supplyDemandPublish (ZhiMaDi.QNNetworkTool.Type) -&gt; (ZhiMaDi.ZMDSupplyProduct, completion : (success : Swift.Optional&lt;Swift.Bool&gt;, errorMsg : Swift.Optional&lt;Swift.String&gt;, supplyDemandsId : Swift.Optional&lt;Swift.Int&gt;) -&gt; ()) -&gt; ()).(closure #1)"
-                  moduleName = "ZhiMaDi"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/admin/Desktop/DZJY/ZhiMaDi/Tools/QNNetworkTool.swift"
-                  timestampString = "504437986.360482"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "449"
-                  endingLineNumber = "449"
-                  offsetFromSymbolStart = "44">
-               </Location>
-            </Locations>
-         </BreakpointContent>
-      </BreakpointProxy>
    </Breakpoints>
 </Bucket>

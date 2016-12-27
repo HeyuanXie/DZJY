@@ -399,12 +399,7 @@ class HomeBuyGoodsDetailViewController: UIViewController,UITableViewDataSource,U
             cell?.selectionStyle = .None
             cell?.contentView.backgroundColor = UIColor.whiteColor()
             
-            let height = kScreenHeight - 64 - 80 - 58
-            self.scoreTableView = UITableView(frame: CGRectMake(0, 0, kScreenWidth, height), style: UITableViewStyle.Plain)
             cell?.contentView.addSubview(self.scoreTableView)
-            
-            scoreTableView.delegate = self
-            scoreTableView.dataSource = self
         }
         return cell!
     }
@@ -889,7 +884,12 @@ class HomeBuyGoodsDetailViewController: UIViewController,UITableViewDataSource,U
         self.secondTableView.mj_header = header
         self.secondTableView.reloadData()
         
-        scoreTableView = UITableView(frame: CGRectZero)
+        
+        let height = kScreenHeight - 64 - 80 - 58
+        self.scoreTableView = UITableView(frame: CGRectMake(0, 0, kScreenWidth, height), style: UITableViewStyle.Plain)
+        self.scoreTableView.separatorStyle = .None
+        scoreTableView.delegate = self
+        scoreTableView.dataSource = self
         
         let titles = ["咨询","分享赚佣金","加入购物车"]
         var i = 0

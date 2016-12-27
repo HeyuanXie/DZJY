@@ -208,7 +208,7 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
     var userCenterData = [[UserCenterCellType.HomeContentTypeAd],[.HomeContentTypeMenu,.HomeContentTypeState],[.HomeContentTypeDoubleGood,.HomeContentTypeMulityGood/*,.HomeContentTypeRecommend*/],[.HomeContentTypeSupplyHead,.HomeContentTypeSupplyDetail,.HomeContentTypeSupplyFoot]]
     
     var searchTypes : [SearchType]!
-    var searchType : SearchType = .kSupply
+    var searchType : SearchType = .kGood
     var timer : NSTimer!
     var selectView : UIView!    //搜索下拉View
     let topAdName = "mb_index_top_banner"          //顶部轮播图广告名
@@ -1303,7 +1303,7 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
         leftViewBtn.backgroundColor = RGB(253,124,76,1.0)
         leftViewBtn.alpha = 1.0
         leftViewBtn.setImage(UIImage(named: "arrow-down"), forState: .Normal)
-        leftViewBtn.setTitle("供应", forState: .Normal)
+        leftViewBtn.setTitle("商品", forState: .Normal)
         leftViewBtn.setTitleColor(UIColor.whiteColor(), forState: .Normal)
         leftViewBtn.titleLabel?.font = UIFont.systemFontOfSize(15)
         leftViewBtn.imageEdgeInsets = UIEdgeInsets(top: 2, left: 38*kScreenWidth/375, bottom: 0, right: -38*kScreenWidth/375)

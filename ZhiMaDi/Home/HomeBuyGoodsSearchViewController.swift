@@ -14,8 +14,6 @@ class HomeBuyGoodsSearchViewController: UIViewController, ZMDInterceptorProtocol
     
     @IBOutlet weak var currentTableView: UITableView!
     
-    let kServerAddress = "http://www.xjnongte.com"
-    
     let goodses  = ["杀虫剂","钾肥","氯化钾","棉花种子","除草剂"]
     let storeses = ["葫芦宝","宝葫芦","江南Style","SONY","APPLE","Mi"]
     var goodsHistory = NSMutableArray()
@@ -482,11 +480,10 @@ class HomeBuyGoodsSearchViewController: UIViewController, ZMDInterceptorProtocol
                 }
                 let store = self.storeArray[indexPath.row] as!ZMDStoreDetail
                 var tag =  1000
-                (cell?.contentView.viewWithTag(tag++) as!UIImageView).sd_setImageWithURL(NSURL(string: kServerAddress + store.PictureUrl), placeholderImage: nil)   //image = UIImage(named: "")
+                (cell?.contentView.viewWithTag(tag++) as!UIImageView).sd_setImageWithURL(NSURL(string: kImageAddressMain + store.PictureUrl), placeholderImage: nil)   //image = UIImage(named: "")
                 (cell?.contentView.viewWithTag(tag++) as!UILabel).text = store.Name // "葫芦堡"
                 (cell?.contentView.viewWithTag(tag++) as!UILabel).text = store.Host //"主营:..."
                 return cell!
-                
             default :
                 return UITableViewCell()
             }

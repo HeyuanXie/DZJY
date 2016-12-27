@@ -64,7 +64,7 @@ class SupplyDemandListViewController: UIViewController ,ZMDInterceptorProtocol, 
         return self.dataArray.count
     }
     func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return section == 0 ? 52 + 10 : 10
+        return section == 0 ? 44 + 10 : 10
     }
     func tableView(tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         return 0
@@ -140,7 +140,7 @@ class SupplyDemandListViewController: UIViewController ,ZMDInterceptorProtocol, 
         self.filterView.backgroundColor = UIColor.clearColor()
         for var i=0;i<filterTitles.count;i++ {
             let index = i%filterTitles.count
-            let btn = UIButton(frame:  CGRectMake(CGFloat(index) * (kScreenWidth)/countForBtn , 0, (kScreenWidth)/countForBtn, 52))
+            let btn = UIButton(frame:  CGRectMake(CGFloat(index) * (kScreenWidth)/countForBtn , 0, (kScreenWidth)/countForBtn, 44))
             btn.backgroundColor = UIColor.whiteColor()
             btn.selected = i == self.IndexFilter ? true : false
             btn.setTitleColor(defaultTextColor, forState: .Normal)
@@ -184,7 +184,7 @@ class SupplyDemandListViewController: UIViewController ,ZMDInterceptorProtocol, 
             self.filterView.addSubview(btn)
             
             //btn间的分割线
-            let line = ZMDTool.getLine(CGRect(x: CGRectGetWidth(btn.frame)-1, y: 19, width: 1, height: 15))
+            let line = ZMDTool.getLine(CGRect(x: CGRectGetWidth(btn.frame)-1, y: 15, width: 1, height: 15))
             btn.addSubview(line)
             
             btn.rac_signalForControlEvents(.TouchUpInside).subscribeNext({ (sender) -> Void in
@@ -234,6 +234,7 @@ class SupplyDemandListViewController: UIViewController ,ZMDInterceptorProtocol, 
             })
             
         }
+        self.filterView.addSubview(ZMDTool.getLine(CGRect(x: 0, y: 43.5, width: kScreenWidth, height: 0.5)))
         self.view.addSubview(self.filterView)
     }
     

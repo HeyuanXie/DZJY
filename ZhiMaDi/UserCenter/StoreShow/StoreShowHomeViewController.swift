@@ -67,8 +67,6 @@ class StoreShowHomeViewController: UIViewController, ZMDInterceptorProtocol,ZMDI
     
     @IBOutlet weak var currentTableView: UITableView!
     
-    let kServerAddress = "http://www.xjnongte.com"
-    
     var isNoticeDetail = false  //noticeCell是否全部显示
     var storeId:NSNumber!
     var celltypes = [[StoreHomeCellType.Head/*,.Notice*//*,.Discount*/],/*[.Coupon],*/[.Recommend,.Recommend]]
@@ -162,7 +160,7 @@ class StoreShowHomeViewController: UIViewController, ZMDInterceptorProtocol,ZMDI
             ZMDTool.configViewLayerWithSize(followBtn, size: 17)
             
             if self.storeDetail != nil {
-                if let urlStr = self.storeDetail.PictureUrl,url = NSURL(string: kServerAddress + urlStr){
+                if let urlStr = self.storeDetail.PictureUrl,url = NSURL(string: kImageAddressMain + urlStr){
                     imgHead.sd_setImageWithURL(url, placeholderImage: nil)
                 }
                 if let text = self.storeDetail.Name {

@@ -44,12 +44,15 @@ class EnterpriseDetailViewController: UIViewController,ZMDInterceptorProtocol,UI
     }
     func initUI() {
         self.title = "企业详情"
+        self.view.backgroundColor = tableViewdefaultBackgroundColor
+        self.currentTableView.backgroundColor = tableViewdefaultBackgroundColor
         
     }
     
     //MARK: - UITableViewDelegate
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return g_isLogin! ? 5 : 3
+//        return g_isLogin! ? 5 : 3 带有联系方式
+        return 2
     }
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return section >= 2 ? 1 : 2
