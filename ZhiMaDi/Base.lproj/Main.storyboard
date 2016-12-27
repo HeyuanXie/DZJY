@@ -1704,13 +1704,22 @@
                                                     <color key="textColor" red="0.30588235294117649" green="0.30980392156862746" blue="0.31372549019607843" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <imageView userInteractionEnabled="NO" tag="10003" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="HLz-R7-c91">
+                                                    <rect key="frame" x="0.0" y="0.0" width="375" height="192"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="192" id="WWk-xq-2SI"/>
+                                                    </constraints>
+                                                </imageView>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstItem="orE-jH-e03" firstAttribute="top" secondItem="vhv-Qf-dcy" secondAttribute="topMargin" constant="18" id="26u-iy-jee"/>
+                                                <constraint firstItem="HLz-R7-c91" firstAttribute="top" secondItem="vhv-Qf-dcy" secondAttribute="top" id="Low-Af-v4Z"/>
                                                 <constraint firstItem="uib-rb-3BI" firstAttribute="leading" secondItem="vhv-Qf-dcy" secondAttribute="leading" id="NwV-7b-7or"/>
+                                                <constraint firstItem="HLz-R7-c91" firstAttribute="leading" secondItem="vhv-Qf-dcy" secondAttribute="leading" id="RLg-f9-w94"/>
                                                 <constraint firstItem="uib-rb-3BI" firstAttribute="top" secondItem="orE-jH-e03" secondAttribute="bottom" constant="10" id="SWA-Eg-cFA"/>
                                                 <constraint firstItem="orE-jH-e03" firstAttribute="centerX" secondItem="vhv-Qf-dcy" secondAttribute="centerX" id="beE-T9-b30"/>
                                                 <constraint firstAttribute="trailing" secondItem="uib-rb-3BI" secondAttribute="trailing" id="ctt-0O-aYE"/>
+                                                <constraint firstAttribute="trailing" secondItem="HLz-R7-c91" secondAttribute="trailing" id="oMg-Hw-bdv"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>

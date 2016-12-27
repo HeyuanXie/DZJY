@@ -231,16 +231,17 @@ class MineHomeViewController: UIViewController,UITableViewDataSource, UITableVie
             cell?.contentView.addSubview(self.orderMenuView)
             cell?.addLine()
             
+            if let backgroundV = cell?.viewWithTag(10003) as? UIImageView {
+                backgroundV.image = UIImage(named: "store_home_bg")
+                cell?.contentView.sendSubviewToBack(backgroundV)
+            }
             if let personImgV = cell!.viewWithTag(10001) as? UIImageView{
                 ZMDTool.configViewLayerWithSize(personImgV, size: 30)
-                if let urlStr = g_customer?.Avatar?.AvatarUrl where urlStr != "" {
-                    let url = NSURL(string: urlStr)
-                    personImgV.sd_setImageWithURL(url, placeholderImage: nil)
-                }else{
-                    personImgV.image = UIImage(named: "示例头像")
-                }
                 if !g_isLogin {
                     personImgV.image = UIImage(named: "示例头像")
+                }else if let urlStr = g_customer?.Avatar?.AvatarUrl where urlStr != "" {
+                    let url = NSURL(string: urlStr)
+                    personImgV.sd_setImageWithURL(url, placeholderImage: UIImage(named: "示例头像"))
                 }
             }
             //设置用户名Label.text
@@ -248,7 +249,8 @@ class MineHomeViewController: UIViewController,UITableViewDataSource, UITableVie
                 usrNameLbl.text = g_customer?.FirstName ?? ""
                 if g_isLogin! {
                     usrNameLbl.text = getObjectFromUserDefaults("realName") as? String
-                }else{
+                    usrNameLbl.font = UIFont.systemFontOfSize(15)
+//                }else{
                     usrNameLbl.text = "登陆 | 注册"
                     usrNameLbl.font = UIFont.boldSystemFontOfSize(17)
                 }
@@ -256,7 +258,7 @@ class MineHomeViewController: UIViewController,UITableViewDataSource, UITableVie
             
             tag = 10000
             if let orderNumber = self.orderNumberDic,waitPay = orderNumber["WaitPay"],waitDelivery = orderNumber["WaitDelivery"],waitReceivce = orderNumber["WaitReceivce"],waitReview = orderNumber["WaitReview"],afterSale = orderNumber["AfterSale"],complete = orderNumber["Complete"] {
-                let numbers = [waitPay,waitDelivery,waitReceivce,waitReview,afterSale]
+                let numbers = !g_isLogin ? ["0","0","0","0","0"] : [waitPay,waitDelivery,waitReceivce,waitReview,afterSale]
                 let status = ["待付款","待发货","待收货","待评价","退款"]
                 for index in 0..<numbers.count {
                     var titles = "\(numbers[index])\n\(status[index])"
