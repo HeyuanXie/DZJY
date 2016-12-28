@@ -25,6 +25,7 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
         case PayPassword
         
         case Address
+        case Version
         
         case Clean
         
@@ -59,6 +60,8 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
                 
             case .Address:
                 return "管理收货地址"
+            case .Version:
+                return "版本号"
                 
             case Clean:
                 return "清理缓存"
@@ -217,11 +220,11 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
                 rightLbl.textColor = defaultDetailTextColor
                 rightLbl.tag = 10000
                 cell!.contentView.addSubview(rightLbl)
-                if content != .Address && content != .PayPassword && content != .Address && content != .Phone {
+                if content != .Location && content != .PayPassword && content != .Version && content != .Phone {
                     cell?.addLine()
                 }
             }
-            if content == .Name || content == .WeiXin || content == .Email {
+            if content == .Name || content == .WeiXin || content == .Email || content == .Version {
                 cell?.accessoryType = .None
             }else{
                 cell?.accessoryView = ZMDTool.getDefaultAccessoryDisclosureIndicator()
@@ -248,6 +251,8 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
                 rightLbl.text = getObjectFromUserDefaults("phone") as? String
             case .Email:
                 rightLbl.text = getObjectFromUserDefaults("email") as? String
+            case .Version:
+                rightLbl.text = "V "+APP_VERSION_BUILD
             default:
                 break
             }
@@ -355,6 +360,8 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
             type.didSelect(self.navigationController!)
         case .PayPassword:
             type.didSelect(self.navigationController!)
+        case .Version:
+            return
         default:
             let cell = tableView.cellForRowAtIndexPath(indexPath)
             let vc = InputTextViewController()
@@ -475,7 +482,7 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
         self.tableView.tableFooterView = footV
     }
     private func dataInit(){
-        self.userCenterData = [[.Head,.Name,.Gender,.BirthDay,.Location],[.WeiXin,.Email,.Phone]/*,[.PayPassword]*/,[.Address]]
+        self.userCenterData = [[.Head,.Name,.Gender,.BirthDay,.Location],[.WeiXin,.Email,.Phone]/*,[.PayPassword]*/,[.Address,.Version]]
     }
     //MARK:创建moreView
     func moreViewUpdate() {

@@ -1688,6 +1688,12 @@
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="206"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
+                                                <imageView userInteractionEnabled="NO" tag="10003" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="store_home_bg.png" translatesAutoresizingMaskIntoConstraints="NO" id="HLz-R7-c91">
+                                                    <rect key="frame" x="0.0" y="0.0" width="375" height="192"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="192" id="WWk-xq-2SI"/>
+                                                    </constraints>
+                                                </imageView>
                                                 <imageView userInteractionEnabled="NO" tag="10001" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="orE-jH-e03">
                                                     <rect key="frame" x="158" y="26" width="60" height="60"/>
                                                     <constraints>
@@ -1701,15 +1707,9 @@
                                                         <constraint firstAttribute="height" constant="15" id="Bgh-c8-2FU"/>
                                                     </constraints>
                                                     <fontDescription key="fontDescription" type="system" pointSize="15"/>
-                                                    <color key="textColor" red="0.30588235294117649" green="0.30980392156862746" blue="0.31372549019607843" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <imageView userInteractionEnabled="NO" tag="10003" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="HLz-R7-c91">
-                                                    <rect key="frame" x="0.0" y="0.0" width="375" height="192"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="height" constant="192" id="WWk-xq-2SI"/>
-                                                    </constraints>
-                                                </imageView>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstItem="orE-jH-e03" firstAttribute="top" secondItem="vhv-Qf-dcy" secondAttribute="topMargin" constant="18" id="26u-iy-jee"/>
@@ -7252,6 +7252,7 @@
         <image name="product_pic.png" width="375" height="375"/>
         <image name="product_shopping-cart.png" width="50" height="50"/>
         <image name="shop_add_product.png" width="25" height="25"/>
+        <image name="store_home_bg.png" width="750" height="360"/>
         <image name="user_interview_QRcode.png" width="175" height="175"/>
         <image name="user_interview_download.png" width="25" height="25"/>
         <image name="user_interview_iphone.png" width="261" height="464"/>

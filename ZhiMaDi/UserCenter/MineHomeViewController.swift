@@ -223,6 +223,7 @@ class MineHomeViewController: UIViewController,UITableViewDataSource, UITableVie
                 btn.tag = tag++
                 btn.titleLabel?.numberOfLines = 2
                 btn.titleLabel?.textAlignment = .Center
+                btn.setTitleColor(UIColor.whiteColor(), forState: .Normal)
                 let line = ZMDTool.getLine(CGRect(x: CGRectGetMaxX(btn.frame), y: 30, width: 1, height: 15), backgroundColor: defaultLineColor)
                 orderMenuView.addSubview(line)
                 orderMenuView.addSubview(btn)
@@ -246,13 +247,12 @@ class MineHomeViewController: UIViewController,UITableViewDataSource, UITableVie
             }
             //设置用户名Label.text
             if let usrNameLbl = cell?.viewWithTag(10002) as? UILabel {
-                usrNameLbl.text = g_customer?.FirstName ?? ""
-                if g_isLogin! {
-                    usrNameLbl.text = getObjectFromUserDefaults("realName") as? String
-                    usrNameLbl.font = UIFont.systemFontOfSize(15)
-//                }else{
+                if !g_isLogin {
                     usrNameLbl.text = "登陆 | 注册"
                     usrNameLbl.font = UIFont.boldSystemFontOfSize(17)
+                }else{
+                    usrNameLbl.text = getObjectFromUserDefaults("realName") as? String
+                    usrNameLbl.font = UIFont.systemFontOfSize(15)
                 }
             }
             
