@@ -159,7 +159,7 @@ class ZMDShareSDKTool: NSObject {
             shareParams.SSDKSetupShareParamsByText(content, images: [image], url: NSURL(string: url), title: title, type: SSDKContentType.Auto)
             
             //分享(可以弹出我们的分享菜单和编辑按钮)
-            let sheet : SSUIShareActionSheetController = ShareSDK.showShareActionSheet(view, items: nil /*[SSDKPlatformType.SubTypeWechatTimeline,SSDKPlatformType.SubTypeWechatSession,SSDKPlatformType.SubTypeQQFriend,SSDKPlatformType.SubTypeQZone,SSDKPlatformType.TypeSinaWeibo]*/, shareParams: shareParams, onShareStateChanged: { (state, platformType, userData, contentEntity, error, end) -> Void in
+            ShareSDK.showShareActionSheet(view, items: nil /*[SSDKPlatformType.SubTypeWechatTimeline,SSDKPlatformType.SubTypeWechatSession,SSDKPlatformType.SubTypeQQFriend,SSDKPlatformType.SubTypeQZone,SSDKPlatformType.TypeSinaWeibo]*/, shareParams: shareParams, onShareStateChanged: { (state, platformType, userData, contentEntity, error, end) -> Void in
                 
                 switch state {
                 case SSDKResponseState.Success:
@@ -200,7 +200,7 @@ class ZMDShareSDKTool: NSObject {
         shareParams.SSDKSetupShareParamsByText(model.Description, images: [image], url: NSURL(string: "http://ksnongpi.com/Plugins/SmartStore.SupplyDemand/Detail?id="+"\(model.Id.integerValue)"), title: model.Title, type: SSDKContentType.Auto)
         
         //分享(可以弹出我们的分享菜单和编辑按钮)
-        let sheet : SSUIShareActionSheetController = ShareSDK.showShareActionSheet(view, items: nil /*[SSDKPlatformType.SubTypeWechatTimeline,SSDKPlatformType.SubTypeWechatSession,SSDKPlatformType.SubTypeQQFriend,SSDKPlatformType.SubTypeQZone,SSDKPlatformType.TypeSinaWeibo]*/, shareParams: shareParams, onShareStateChanged: { (state, platformType, userData, contentEntity, error, end) -> Void in
+        ShareSDK.showShareActionSheet(view, items: nil /*[SSDKPlatformType.SubTypeWechatTimeline,SSDKPlatformType.SubTypeWechatSession,SSDKPlatformType.SubTypeQQFriend,SSDKPlatformType.SubTypeQZone,SSDKPlatformType.TypeSinaWeibo]*/, shareParams: shareParams, onShareStateChanged: { (state, platformType, userData, contentEntity, error, end) -> Void in
             
             switch state {
             case SSDKResponseState.Success:
