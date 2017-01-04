@@ -93,6 +93,7 @@ class MyOrderViewController: UIViewController,UITableViewDataSource,UITableViewD
     var currentOrderStatu = OrderStatu.All
     var orderStatuId = 0
     var skip = 0
+    var pageSize = 10
     var hasNext = true
     var orderStatusIndex: Int!
     var isAfterSale = false     //区分 售后/退货
@@ -306,11 +307,11 @@ class MyOrderViewController: UIViewController,UITableViewDataSource,UITableViewD
     
     func updateData1() {
         ZMDTool.showActivityView(nil)
-        QNNetworkTool.fetchOrder(self.orderStatuId, orderNo: "", pageIndex: self.skip, pageSize: 10) { (orders ,dic, Error) -> Void in
+        QNNetworkTool.fetchOrder(self.orderStatuId, orderNo: "", pageIndex: self.skip, pageSize: self.pageSize) { (orders ,dic, Error) -> Void in
             ZMDTool.hiddenActivityView()
             self.hasNext = false
             if let orders = orders {
-                if orders.count == 10 {
+                if orders.count == self.pageSize {
                     self.hasNext = true
                 }
                 if self.skip == 0 {
