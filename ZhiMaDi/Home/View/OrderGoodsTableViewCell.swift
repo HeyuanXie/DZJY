@@ -120,7 +120,7 @@ class OrderGoodsTableViewCell: UITableViewCell {
                             self.editFinish(productDetail: productDetail!,item: item)
                         })
                     }else{
-                        ZMDTool.showErrorPromptView(nil, error: nil, errorMsg: error)
+                        ZMDTool.showErrorPromptView(nil, error: error)
                     }
                 }
             })

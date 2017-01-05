@@ -75,4 +75,7 @@
 #import "HZQDatePickerView.h"
 #import "AddressSelectViewController.h"
 
+//网路数据请求本地缓存
+#import "HYNetworkCache.h"
+
 #endif /* SleepCare_Bridging_Header_h */

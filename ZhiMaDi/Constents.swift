@@ -16,7 +16,7 @@ let PATH_DOCUMENTS = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.D
 
 // MARK: - Application information
 /// App ID (必须与 iTunes Connect 上设置的一致)
-let APP_ID  = "1182284278" //当前App(农批)的ID
+let APP_ID = "1182284278" //当前App(农批)的ID
 let APP_ID_NT = "1164015233"          //农特App的ID
 let APP_ID_NZ = "1182283898"          //农资App的ID
 /// App SKU码 (必须与 iTunes Connect 上设置的一致)

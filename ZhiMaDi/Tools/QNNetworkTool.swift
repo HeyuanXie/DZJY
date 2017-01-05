@@ -419,6 +419,7 @@ extension QNNetworkTool {
                         return
                     }
                     completion(error: nil, products: products)
+                    HYNetworkCache.save_asyncJsonResponseToCacheFile(array, andURL: "HomeSupplyDemand\(type)", completed: nil)
                 } catch {
                     println("Json解析过程出错")
                 }
@@ -522,6 +523,7 @@ extension QNNetworkTool {
                     }
                     let categories = ZMDXHYCategory.mj_objectArrayWithKeyValuesArray(array)
                     completion(categories: categories, error: nil)
+                    HYNetworkCache.save_asyncJsonResponseToCacheFile(array, andURL: "MainCategories", completed: nil)
                 }catch{
                     println("JSON解析失败")
                 }
@@ -539,6 +541,7 @@ extension QNNetworkTool {
                 return
             }
             completion(products: products, WidgetName: WidgetName, error: nil)
+            HYNetworkCache.save_asyncJsonResponseToCacheFile(dic, andURL: "ProductsInCategory\(categoryId)", completed: nil)
         }
     }
     
@@ -671,11 +674,11 @@ extension QNNetworkTool {
      - parameter Id:         Id description
      - parameter completion: completion description
      */
-    class func fetchProductDetail(Id:Int,completion: (productDetail: ZMDProductDetail?,error:String?,dictionary:NSDictionary?) -> Void){
+    class func fetchProductDetail(Id:Int,completion: (productDetail: ZMDProductDetail?,error:NSError?,dictionary:NSDictionary?) -> Void){
         
         requestPOST(kServerAddress + "/api/v1/extend/Product/ProductDetails", parameters: ["Id":Id,"customerId":g_customerId ?? 0]) { (_,response, _, dictionary, error) -> Void in
             guard let dic = dictionary ,let productDetail = ZMDProductDetail.mj_objectWithKeyValues(dic["product"]) else {
-                completion(productDetail:nil,error: dictionary!["error"] as! String,dictionary:nil)
+                completion(productDetail:nil,error: error,dictionary:nil)
                 return
             }
             completion(productDetail:productDetail,error: nil,dictionary:dictionary)
@@ -712,6 +715,7 @@ extension QNNetworkTool {
         requestGET(url, parameters: nil) { (request, response, data, dictionary, error) -> Void in
             if let dic = dictionary ,array = ZMDAdvertisement.mj_objectArrayWithKeyValuesArray(dic["zones"]) {
                 completion(success: true, products: array, error: nil)
+                HYNetworkCache.save_asyncJsonResponseToCacheFile(dic["zones"], andURL: "MiniAd\(adName)", completed: nil)
             }else{
                 completion(success: false, products: nil, error: error)
             }
@@ -731,6 +735,7 @@ extension QNNetworkTool {
                     }
                     let arr = ZMDEnterprise.mj_objectArrayWithKeyValuesArray(array)
                     completion(success: true, enterprises: arr, error: nil)
+                    HYNetworkCache.save_asyncJsonResponseToCacheFile(array, andURL: "HomeEnterprise", completed: nil)
                 }
                 catch{
                     
@@ -752,6 +757,7 @@ extension QNNetworkTool {
                     }
                     let history = ZMDTradeProduct.mj_objectArrayWithKeyValuesArray(array)
                     completion(history: history, dictionary: dictionary, error: nil)
+                    HYNetworkCache.save_asyncJsonResponseToCacheFile(array, andURL: "HomeDongTai", completed: nil)
                 }
                 catch{
                     

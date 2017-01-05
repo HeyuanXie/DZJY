@@ -239,6 +239,10 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
     
     var navBackView : UIView!
     var navLine : UIView!
+    
+    var networkObserver : Reachability!
+    
+    //MARK: - LifeCircle
     override func viewDidLoad() {
         super.viewDidLoad()
         // 让导航栏支持右滑返回功能
@@ -253,7 +257,6 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
         if APP_LAUNCHEDTIME == 1 {
             self.checkUpdate()
         }
-        //        self.fetchData()
         if let timer = self.timer {
             timer.fireDate = NSDate.distantPast()
         }
@@ -307,7 +310,8 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         let cellType = self.userCenterData[section][0]
         if cellType == .HomeContentTypeFruitDetail {
-            return self.productsArray.count == 0 ? 0 : self.productsArray[0].count
+            return self.productsArray.count
+//            return self.productsArray.count == 0 ? 0 : self.productsArray[self.friutIndex].count
         }
         return self.userCenterData[section].count
     }
@@ -331,9 +335,10 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
             return self.specialHeights["fruitDetailCell"]!
         }
         let cellType = self.userCenterData[indexPath.section][indexPath.row]
-        if cellType == .HomeContentTypeMenu {
-            return self.menuDatas.count < 5 ? zoom(210) : zoom(105)
-        }
+        //使用AutoMenuCell时的高度
+//        if cellType == .HomeContentTypeMenu {
+//            return self.menuDatas.count < 5 ? zoom(210) : zoom(105)
+//        }
         if cellType == .HomeContentTypeSupplyDetail {
             return self.supplyDemandArray.count == 0 ? 0 : CGFloat(self.supplyDemandArray.count)*38+20
         }
@@ -377,7 +382,7 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         //点击底部商品cell
         if self.userCenterData[indexPath.section][0] == .HomeContentTypeFruitDetail {
-            let product = self.productsArray[self.friutIndex][indexPath.row] as! ZMDProduct
+            let product = self.productsArray[indexPath.row] as! ZMDProduct
             let vc = HomeBuyGoodsDetailViewController.CreateFromMainStoryboard() as! HomeBuyGoodsDetailViewController
             vc.productId = product.Id.integerValue
             self.pushToViewController(vc, animated: true, hideBottom: true)
@@ -976,7 +981,9 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
             let customJumpBtn = CustomJumpBtns(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 44*kScreenWidth/375), menuTitle: titles as! [String], textColorForNormal: defaultTextColor, textColorForSelect: appThemeColorNew, IsLineAdaptText: true)
             customJumpBtn.finished = {(index:Int) -> Void in
                 self.friutIndex = index
-                self.currentTableView.reloadSections(NSIndexSet(index: 5), withRowAnimation: .None)
+                self.fetchProductsAtIndex()
+//                                    self.userCenterData = self.enterpriseArray.count == 0 ? [[UserCenterCellType.HomeContentTypeAd],[.HomeContentTypeMenu,.HomeContentTypeState],[.HomeContentTypeDoubleGood,.HomeContentTypeMulityGood/*,.HomeContentTypeRecommend*/],[.HomeContentTypeSupplyHead,.HomeContentTypeSupplyDetail,.HomeContentTypeSupplyFoot],[.HomeContentTypeFruitHead],[.HomeContentTypeFruitDetail]] : [[UserCenterCellType.HomeContentTypeAd],[.HomeContentTypeMenu,.HomeContentTypeState],[.HomeContentTypeDoubleGood,.HomeContentTypeMulityGood,.HomeContentTypeRecommend],[.HomeContentTypeSupplyHead,.HomeContentTypeSupplyDetail,.HomeContentTypeSupplyFoot],[.HomeContentTypeFruitHead],[.HomeContentTypeFruitDetail]]
+//                self.currentTableView.reloadSections(NSIndexSet(index: 5), withRowAnimation: .None)
             }
             cell?.contentView.addSubview(customJumpBtn)
             cell?.addLine()
@@ -1080,7 +1087,8 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
         let cell = tableView.dequeueReusableCellWithIdentifier(cellId)
         cell?.addLine()
         ZMDTool.configTableViewCellDefault(cell!)
-        let product = self.productsArray[self.friutIndex][indexPath.row] as! ZMDProduct
+        let product = self.productsArray[indexPath.row] as! ZMDProduct
+//        let product = self.productsArray[self.friutIndex][indexPath.row] as! ZMDProduct
         let imgView = cell?.contentView.viewWithTag(10000) as! UIImageView
         let titleLbl = cell?.contentView.viewWithTag(10001) as! UILabel
         let priceLbl = cell?.contentView.viewWithTag(10002) as! UILabel
@@ -1203,7 +1211,56 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
     }
     
     //MARK: NetWork
+    func getCache() {
+        if let topDatas = HYNetworkCache.cacheJsonWithURL("MiniAd\(self.topAdName)"),ads = ZMDAdvertisement.mj_objectArrayWithKeyValuesArray(topDatas) {
+            self.topAdArray.removeAllObjects()
+            self.topAdArray.addObjectsFromArray(ads as [AnyObject])
+            self.currentTableView.reloadData()
+        }
+        if let dongTaiDatas = HYNetworkCache.cacheJsonWithURL("HomeDongTai"),arr = ZMDTradeProduct.mj_objectArrayWithKeyValuesArray(dongTaiDatas) {
+            self.dongTaiArray.removeAllObjects()
+            self.dongTaiArray.addObjectsFromArray(arr as [AnyObject])
+            self.currentTableView.reloadData()
+        }
+        if let topFiveDatas = HYNetworkCache.cacheJsonWithURL("MiniAdcompany_top_five"),ads = ZMDAdvertisement.mj_objectArrayWithKeyValuesArray(topFiveDatas) {
+            self.miniProductsArray.removeAllObjects()
+            self.miniProductsArray.addObjectsFromArray(ads as [AnyObject])
+            self.currentTableView.reloadData()
+        }
+        if let enterpriseDatas = HYNetworkCache.cacheJsonWithURL("HomeEnterprise"),arr = ZMDEnterprise.mj_objectArrayWithKeyValuesArray(enterpriseDatas) {
+            self.enterpriseArray.removeAllObjects()
+            self.enterpriseArray.addObjectsFromArray(arr as [AnyObject])
+            self.userCenterData = [[UserCenterCellType.HomeContentTypeAd],[.HomeContentTypeMenu,.HomeContentTypeState],[.HomeContentTypeDoubleGood,.HomeContentTypeMulityGood,.HomeContentTypeRecommend],[.HomeContentTypeSupplyHead,.HomeContentTypeSupplyDetail,.HomeContentTypeSupplyFoot]]
+            self.currentTableView.reloadData()
+        }
+        if let supplyDemandDatas = HYNetworkCache.cacheJsonWithURL("HomeSupplyDemand\(self.supplyType)"),supplys = ZMDSupplyProduct.mj_objectArrayWithKeyValuesArray(supplyDemandDatas) {
+            self.supplyDemandArray.removeAllObjects()
+            self.supplyDemandArray.addObjectsFromArray(supplys as [AnyObject])
+            self.currentTableView.reloadData()
+        }
+        if let mainCategoriesData = HYNetworkCache.cacheJsonWithURL("MainCategories"),categories = ZMDXHYCategory.mj_objectArrayWithKeyValuesArray(mainCategoriesData) {
+            self.categories.removeAllObjects()
+            self.categories.addObjectsFromArray(categories as [AnyObject])
+            self.currentTableView.reloadData()
+            self.userCenterData = self.enterpriseArray.count == 0 ? [[UserCenterCellType.HomeContentTypeAd],[.HomeContentTypeMenu,.HomeContentTypeState],[.HomeContentTypeDoubleGood,.HomeContentTypeMulityGood/*,.HomeContentTypeRecommend*/],[.HomeContentTypeSupplyHead,.HomeContentTypeSupplyDetail,.HomeContentTypeSupplyFoot],[.HomeContentTypeFruitHead],[.HomeContentTypeFruitDetail]] : [[UserCenterCellType.HomeContentTypeAd],[.HomeContentTypeMenu,.HomeContentTypeState],[.HomeContentTypeDoubleGood,.HomeContentTypeMulityGood,.HomeContentTypeRecommend],[.HomeContentTypeSupplyHead,.HomeContentTypeSupplyDetail,.HomeContentTypeSupplyFoot],[.HomeContentTypeFruitHead],[.HomeContentTypeFruitDetail]]
+            self.productsArray.removeAllObjects()
+            self.currentTableView.reloadData()
+            for item in categories {
+                let category = item as! ZMDXHYCategory
+                if let productsData = HYNetworkCache.cacheJsonWithURL("ProductsInCategory\(category.Id)"),arr = ZMDProduct.mj_objectArrayWithKeyValuesArray(productsData) {
+                    self.productsArray.addObject(arr)
+                    self.userCenterData = self.enterpriseArray.count == 0 ? [[UserCenterCellType.HomeContentTypeAd],[.HomeContentTypeMenu,.HomeContentTypeState],[.HomeContentTypeDoubleGood,.HomeContentTypeMulityGood/*,.HomeContentTypeRecommend*/],[.HomeContentTypeSupplyHead,.HomeContentTypeSupplyDetail,.HomeContentTypeSupplyFoot],[.HomeContentTypeFruitHead],[.HomeContentTypeFruitDetail]] : [[UserCenterCellType.HomeContentTypeAd],[.HomeContentTypeMenu,.HomeContentTypeState],[.HomeContentTypeDoubleGood,.HomeContentTypeMulityGood,.HomeContentTypeRecommend],[.HomeContentTypeSupplyHead,.HomeContentTypeSupplyDetail,.HomeContentTypeSupplyFoot],[.HomeContentTypeFruitHead],[.HomeContentTypeFruitDetail]]
+                    self.currentTableView.reloadData()
+                }
+            }
+        }
+    }
+    
     func fetchData() {
+        self.getCache()
+        if self.networkObserver.currentReachabilityStatus() == .NotReachable {
+            return
+        }
         self.fetchTop()
         self.fetchDongTai()
         //        self.fetchEnterprise()
@@ -1295,9 +1352,8 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
                     self.categories.addObjectsFromArray(categories as [AnyObject])
                     self.currentTableView.reloadData()
                     self.userCenterData = self.enterpriseArray.count == 0 ? [[UserCenterCellType.HomeContentTypeAd],[.HomeContentTypeMenu,.HomeContentTypeState],[.HomeContentTypeDoubleGood,.HomeContentTypeMulityGood/*,.HomeContentTypeRecommend*/],[.HomeContentTypeSupplyHead,.HomeContentTypeSupplyDetail,.HomeContentTypeSupplyFoot],[.HomeContentTypeFruitHead],[.HomeContentTypeFruitDetail]] : [[UserCenterCellType.HomeContentTypeAd],[.HomeContentTypeMenu,.HomeContentTypeState],[.HomeContentTypeDoubleGood,.HomeContentTypeMulityGood,.HomeContentTypeRecommend],[.HomeContentTypeSupplyHead,.HomeContentTypeSupplyDetail,.HomeContentTypeSupplyFoot],[.HomeContentTypeFruitHead],[.HomeContentTypeFruitDetail]]
-                    self.productsArray.removeAllObjects()
                     self.currentTableView.reloadData()
-                    self.fetchProducts(self.categories)
+                    self.fetchProductsAtIndex()
                 }else{
                     ZMDTool.showErrorPromptView(nil, error: error)
                 }
@@ -1305,27 +1361,39 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
         }
     }
     
-    func fetchProducts(categories:NSArray) {
-        for category in categories {
-            let category = category as! ZMDXHYCategory
-            QNNetworkTool.fetchProductsInCategory(5, categoryId: category.Id.integerValue, completion: { (products, WidgetName, error) -> Void in
-                if let products = products {
-                    self.productsArray.addObject(products)
-                    self.userCenterData = self.enterpriseArray.count == 0 ? [[UserCenterCellType.HomeContentTypeAd],[.HomeContentTypeMenu,.HomeContentTypeState],[.HomeContentTypeDoubleGood,.HomeContentTypeMulityGood/*,.HomeContentTypeRecommend*/],[.HomeContentTypeSupplyHead,.HomeContentTypeSupplyDetail,.HomeContentTypeSupplyFoot],[.HomeContentTypeFruitHead],[.HomeContentTypeFruitDetail]] : [[UserCenterCellType.HomeContentTypeAd],[.HomeContentTypeMenu,.HomeContentTypeState],[.HomeContentTypeDoubleGood,.HomeContentTypeMulityGood,.HomeContentTypeRecommend],[.HomeContentTypeSupplyHead,.HomeContentTypeSupplyDetail,.HomeContentTypeSupplyFoot],[.HomeContentTypeFruitHead],[.HomeContentTypeFruitDetail]]
-                    self.currentTableView.reloadData()
-                }
-            })
-            
+    func fetchProductsAtIndex() {
+        if self.categories.count <= self.friutIndex {
+            return
+        }
+        let category = self.categories[self.friutIndex] as! ZMDXHYCategory
+        QNNetworkTool.fetchProductsInCategory(5, categoryId: category.Id.integerValue) { (products, WidgetName, error) -> Void in
+            if let products = products {
+                self.productsArray.removeAllObjects()
+                self.productsArray.addObjectsFromArray(products as [AnyObject])
+                self.userCenterData = self.enterpriseArray.count == 0 ? [[UserCenterCellType.HomeContentTypeAd],[.HomeContentTypeMenu,.HomeContentTypeState],[.HomeContentTypeDoubleGood,.HomeContentTypeMulityGood/*,.HomeContentTypeRecommend*/],[.HomeContentTypeSupplyHead,.HomeContentTypeSupplyDetail,.HomeContentTypeSupplyFoot],[.HomeContentTypeFruitHead],[.HomeContentTypeFruitDetail]] : [[UserCenterCellType.HomeContentTypeAd],[.HomeContentTypeMenu,.HomeContentTypeState],[.HomeContentTypeDoubleGood,.HomeContentTypeMulityGood,.HomeContentTypeRecommend],[.HomeContentTypeSupplyHead,.HomeContentTypeSupplyDetail,.HomeContentTypeSupplyFoot],[.HomeContentTypeFruitHead],[.HomeContentTypeFruitDetail]]
+                self.currentTableView.reloadSections(NSIndexSet(index: 5), withRowAnimation: .None)
+            }
         }
     }
     
-    
-    func fetchData2(){
-        QNNetworkTool.fetchMainPageInto { (advertisementAll, error, dictionary) -> Void in
-            if advertisementAll != nil {
-                self.advertisementAll = advertisementAll
-                self.currentTableView.reloadData()
-            }
+    func fetchProducts(categories:NSArray) {
+        self.productsArray.removeAllObjects()
+        let group = dispatch_group_create()
+        let queue = dispatch_get_global_queue(0, 0)
+        for category in categories {
+            let category = category as! ZMDXHYCategory
+            dispatch_group_async(group, queue, { () -> Void in
+                QNNetworkTool.fetchProductsInCategory(5, categoryId: category.Id.integerValue, completion: { (products, WidgetName, error) -> Void in
+                    if let products = products {
+                        self.productsArray.addObject(products)
+                        //                    self.userCenterData = self.enterpriseArray.count == 0 ? [[UserCenterCellType.HomeContentTypeAd],[.HomeContentTypeMenu,.HomeContentTypeState],[.HomeContentTypeDoubleGood,.HomeContentTypeMulityGood/*,.HomeContentTypeRecommend*/],[.HomeContentTypeSupplyHead,.HomeContentTypeSupplyDetail,.HomeContentTypeSupplyFoot],[.HomeContentTypeFruitHead],[.HomeContentTypeFruitDetail]] : [[UserCenterCellType.HomeContentTypeAd],[.HomeContentTypeMenu,.HomeContentTypeState],[.HomeContentTypeDoubleGood,.HomeContentTypeMulityGood,.HomeContentTypeRecommend],[.HomeContentTypeSupplyHead,.HomeContentTypeSupplyDetail,.HomeContentTypeSupplyFoot],[.HomeContentTypeFruitHead],[.HomeContentTypeFruitDetail]]
+//                        self.currentTableView.reloadData()
+                    }
+                })
+            })
+        }
+        dispatch_group_notify(group, queue) { () -> Void in
+            self.currentTableView.reloadData()
         }
     }
     
@@ -1333,6 +1401,7 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
         self.menuType = [.kFeature,.kECommerce,.kSupply,.kDemand,.kEnterprise]
         self.searchTypes = [.kSupply,.kDemand,.kGood,.kStore]
         self.timer = NSTimer.scheduledTimerWithTimeInterval(1.5, target: self, selector: Selector("changeDongTai"), userInfo: nil, repeats: true)
+        self.networkObserver = Reachability.reachabilityForInternetConnection()
     }
     
     func updateUI() {

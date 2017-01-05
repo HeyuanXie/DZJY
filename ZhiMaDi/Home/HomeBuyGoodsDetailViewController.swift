@@ -79,7 +79,6 @@ class HomeBuyGoodsDetailViewController: UIViewController,UITableViewDataSource,U
     //MARK: - LifeCircle
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.getResponsitoryNubmer()
         self.updateUI()
     }
     override func viewWillAppear(animated: Bool) {
@@ -794,7 +793,7 @@ class HomeBuyGoodsDetailViewController: UIViewController,UITableViewDataSource,U
                     self.editViewShow(self.productDetail, SciId: 0)
                 }
             } else {
-                ZMDTool.showErrorPromptView(nil, error: nil, errorMsg: error)
+                ZMDTool.showErrorPromptView(nil, error: error)
             }
         }
     }
@@ -836,14 +835,6 @@ class HomeBuyGoodsDetailViewController: UIViewController,UITableViewDataSource,U
                 self.currentTableView.mj_footer.hidden = true
         })
         self.isSecondTableView = false
-    }
-    
-    func getResponsitoryNubmer() {
-        QNNetworkTool.fetchRepositoryNumber(self.productId) { (number, error) in
-            if let number = number {
-                self.responsitoryNumber = number
-            }
-        }
     }
     
     //MARK: 获取购物车数量
