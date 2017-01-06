@@ -78,4 +78,5 @@
 //网路数据请求本地缓存
 #import "HYNetworkCache.h"
 
+#import <BlocksKit/BlocksKit.h>
 #endif /* SleepCare_Bridging_Header_h */

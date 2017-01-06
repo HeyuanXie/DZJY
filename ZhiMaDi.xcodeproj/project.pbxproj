@@ -710,6 +710,9 @@
 		84B35E991DF3C9AF00699EEF /* SupplyDemandListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B35E981DF3C9AF00699EEF /* SupplyDemandListViewController.swift */; };
 		84B35E9B1DF3C9C900699EEF /* SupplyDemandDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B35E9A1DF3C9C900699EEF /* SupplyDemandDetailViewController.swift */; };
 		84B35E9F1DF3D98200699EEF /* SupplyDemandListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B35E9E1DF3D98200699EEF /* SupplyDemandListCell.swift */; };
+		84B49A8C1E1F3E5E00E45338 /* BlocksKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84B49A851E1F3E4900E45338 /* BlocksKit.framework */; };
+		84B49A8D1E1F3E5E00E45338 /* BlocksKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 84B49A851E1F3E4900E45338 /* BlocksKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		84B49A921E1F425E00E45338 /* TestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B49A911E1F425E00E45338 /* TestViewController.swift */; };
 		84B54A4C1D81670500356BBA /* MyWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B54A4B1D81670500356BBA /* MyWebViewController.swift */; };
 		84B6B5531DE6DFB300A20396 /* OrderCommentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B6B5521DE6DFB300A20396 /* OrderCommentViewController.swift */; };
 		84B6B5551DE6E06500A20396 /* ZMDProductComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B6B5541DE6E06500A20396 /* ZMDProductComment.swift */; };
@@ -782,7 +785,70 @@
 			remoteGlobalIDString = 3C9098531C76A482006B7D2C;
 			remoteInfo = ZhiMaDi;
 		};
+		84B49A801E1F3E4900E45338 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 84B49A771E1F3E4800E45338 /* BlocksKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = DB9B96371B3A52E500940D20;
+			remoteInfo = BlocksKit;
+		};
+		84B49A821E1F3E4900E45338 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 84B49A771E1F3E4800E45338 /* BlocksKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = DB9B96401B3A52E500940D20;
+			remoteInfo = BlocksKitTests;
+		};
+		84B49A841E1F3E4900E45338 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 84B49A771E1F3E4800E45338 /* BlocksKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = DB9B96181B3A52A700940D20;
+			remoteInfo = MobileBlocksKit;
+		};
+		84B49A861E1F3E4900E45338 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 84B49A771E1F3E4800E45338 /* BlocksKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = DB9B96221B3A52A700940D20;
+			remoteInfo = MobileBlocksKitTests;
+		};
+		84B49A881E1F3E4900E45338 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 84B49A771E1F3E4800E45338 /* BlocksKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = DB9B96521B3A531F00940D20;
+			remoteInfo = MobileBlocksKitLegacy;
+		};
+		84B49A8A1E1F3E4900E45338 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 84B49A771E1F3E4800E45338 /* BlocksKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = DBBDD1E51B3A553E008909B0;
+			remoteInfo = "BlocksKit Mac Demo";
+		};
+		84B49A8E1E1F3E5E00E45338 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 84B49A771E1F3E4800E45338 /* BlocksKit.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = DB9B96171B3A52A700940D20;
+			remoteInfo = MobileBlocksKit;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		84B49A901E1F3E5E00E45338 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				84B49A8D1E1F3E5E00E45338 /* BlocksKit.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		2B02B4AC1CAA62FA0064B47C /* HomeLeaseDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeLeaseDetailViewController.swift; sourceTree = "<group>"; };
@@ -1531,6 +1597,8 @@
 		84B35E981DF3C9AF00699EEF /* SupplyDemandListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SupplyDemandListViewController.swift; sourceTree = "<group>"; };
 		84B35E9A1DF3C9C900699EEF /* SupplyDemandDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SupplyDemandDetailViewController.swift; sourceTree = "<group>"; };
 		84B35E9E1DF3D98200699EEF /* SupplyDemandListCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SupplyDemandListCell.swift; sourceTree = "<group>"; };
+		84B49A771E1F3E4800E45338 /* BlocksKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = BlocksKit.xcodeproj; path = "../BlocksKit-master/BlocksKit.xcodeproj"; sourceTree = "<group>"; };
+		84B49A911E1F425E00E45338 /* TestViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestViewController.swift; sourceTree = "<group>"; };
 		84B54A4B1D81670500356BBA /* MyWebViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyWebViewController.swift; sourceTree = "<group>"; };
 		84B6B5521DE6DFB300A20396 /* OrderCommentViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OrderCommentViewController.swift; sourceTree = "<group>"; };
 		84B6B5541DE6E06500A20396 /* ZMDProductComment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZMDProductComment.swift; sourceTree = "<group>"; };
@@ -1635,6 +1703,7 @@
 				2B539AC51C99514200FFE6CD /* UIKit.framework in Frameworks */,
 				2BA222FE1CE96E00006BC426 /* libcrypto.a in Frameworks */,
 				2B539AC31C99513A00FFE6CD /* Foundation.framework in Frameworks */,
+				84B49A8C1E1F3E5E00E45338 /* BlocksKit.framework in Frameworks */,
 				2B539AC11C99513300FFE6CD /* CoreGraphics.framework in Frameworks */,
 				2BA222FD1CE96E00006BC426 /* AlipaySDK.framework in Frameworks */,
 				2B539ABB1C9950F400FFE6CD /* CoreFoundation.framework in Frameworks */,
@@ -2660,6 +2729,7 @@
 		3C90984B1C76A482006B7D2C = {
 			isa = PBXGroup;
 			children = (
+				84B49A771E1F3E4800E45338 /* BlocksKit.xcodeproj */,
 				3C9098691C76A687006B7D2C /* readme */,
 				840A66CF1D5180A80074DE49 /* MyChange */,
 				3C9098561C76A482006B7D2C /* ZhiMaDi */,
@@ -2703,6 +2773,7 @@
 				3C9099651C76A6FD006B7D2C /* Resources */,
 				3C9098571C76A482006B7D2C /* AppDelegate.swift */,
 				3C9098591C76A482006B7D2C /* ViewController.swift */,
+				84B49A911E1F425E00E45338 /* TestViewController.swift */,
 				3C90985B1C76A482006B7D2C /* Main.storyboard */,
 				2BF8E6711CCF57FB00091F33 /* Store.storyboard */,
 				2B197DA71C8424F2006494CF /* Login.storyboard */,
@@ -3256,6 +3327,19 @@
 			name = VC;
 			sourceTree = "<group>";
 		};
+		84B49A781E1F3E4800E45338 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				84B49A811E1F3E4900E45338 /* BlocksKit.framework */,
+				84B49A831E1F3E4900E45338 /* BlocksKitTests.xctest */,
+				84B49A851E1F3E4900E45338 /* BlocksKit.framework */,
+				84B49A871E1F3E4900E45338 /* BlocksKitTests.xctest */,
+				84B49A891E1F3E4900E45338 /* libMobileBlocksKitLegacy.a */,
+				84B49A8B1E1F3E4900E45338 /* BlocksKit Mac Demo.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		84C9AD771DF51D30008E2BC7 /* CardStyleScrollView */ = {
 			isa = PBXGroup;
 			children = (
@@ -3383,10 +3467,12 @@
 				3C9098521C76A482006B7D2C /* Resources */,
 				FA432B32FAF5165E2EF98BBF /* Embed Pods Frameworks */,
 				00D1E107D7FA0FA0DDC522A9 /* Copy Pods Resources */,
+				84B49A901E1F3E5E00E45338 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				84B49A8F1E1F3E5E00E45338 /* PBXTargetDependency */,
 			);
 			name = ZhiMaDi;
 			productName = ZhiMaDi;
@@ -3430,6 +3516,12 @@
 			mainGroup = 3C90984B1C76A482006B7D2C;
 			productRefGroup = 3C9098551C76A482006B7D2C /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 84B49A781E1F3E4800E45338 /* Products */;
+					ProjectRef = 84B49A771E1F3E4800E45338 /* BlocksKit.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				3C9098531C76A482006B7D2C /* ZhiMaDi */,
@@ -3437,6 +3529,51 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		84B49A811E1F3E4900E45338 /* BlocksKit.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = BlocksKit.framework;
+			remoteRef = 84B49A801E1F3E4900E45338 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		84B49A831E1F3E4900E45338 /* BlocksKitTests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = BlocksKitTests.xctest;
+			remoteRef = 84B49A821E1F3E4900E45338 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		84B49A851E1F3E4900E45338 /* BlocksKit.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = BlocksKit.framework;
+			remoteRef = 84B49A841E1F3E4900E45338 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		84B49A871E1F3E4900E45338 /* BlocksKitTests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = BlocksKitTests.xctest;
+			remoteRef = 84B49A861E1F3E4900E45338 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		84B49A891E1F3E4900E45338 /* libMobileBlocksKitLegacy.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libMobileBlocksKitLegacy.a;
+			remoteRef = 84B49A881E1F3E4900E45338 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		84B49A8B1E1F3E4900E45338 /* BlocksKit Mac Demo.app */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.application;
+			path = "BlocksKit Mac Demo.app";
+			remoteRef = 84B49A8A1E1F3E4900E45338 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		2B9A57081D06B6B9007A6D43 /* Resources */ = {
@@ -4100,6 +4237,7 @@
 				2B0ACCB31C858E31000EC299 /* PersonInfoViewController.swift in Sources */,
 				3C90990A1C76A6E9006B7D2C /* PieRadarChartViewBase.swift in Sources */,
 				3C9099251C76A6E9006B7D2C /* LineRadarChartDataSet.swift in Sources */,
+				84B49A921E1F425E00E45338 /* TestViewController.swift in Sources */,
 				3C9099411C76A6E9006B7D2C /* CandleStickChartRenderer.swift in Sources */,
 				841B86D81DC1FEDC0038F689 /* ZMDNewPrice.swift in Sources */,
 				3C9099441C76A6E9006B7D2C /* ChartLegendRenderer.swift in Sources */,
@@ -4261,6 +4399,11 @@
 			target = 3C9098531C76A482006B7D2C /* ZhiMaDi */;
 			targetProxy = 2B9A570F1D06B6BA007A6D43 /* PBXContainerItemProxy */;
 		};
+		84B49A8F1E1F3E5E00E45338 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = MobileBlocksKit;
+			targetProxy = 84B49A8E1E1F3E5E00E45338 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
@@ -4418,6 +4561,7 @@
 					3/Support/Required,
 					"$(PROJECT_DIR)/ZhiMaDi/Librarys/AlipaySDK",
 				);
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../Downloads/BlocksKit-master/BlocksKit.xcodeproj\"";
 				INFOPLIST_FILE = ZhiMaDi/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -4490,6 +4634,7 @@
 					3/Support/Required,
 					"$(PROJECT_DIR)/ZhiMaDi/Librarys/AlipaySDK",
 				);
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../Downloads/BlocksKit-master/BlocksKit.xcodeproj\"";
 				INFOPLIST_FILE = ZhiMaDi/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";

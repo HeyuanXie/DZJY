@@ -192,11 +192,17 @@ class EnterpriseDetailViewController: UIViewController,ZMDInterceptorProtocol,UI
             let product = data.Products[i]
             let view = UIView(frame: CGRect(x: 10+CGFloat(i)*(110+10), y: 0, width: 110, height: 140))
             let imgView = UIImageView(frame: CGRect(x: 0, y: 5, width: 110, height: 110))
-            let lbl = ZMDTool.getLabel(CGRect(x: 0, y: 120, width: 110, height: 18), text: "", fontSize: 14, textColor: appThemeColor, textAlignment: .Left)
             imgView.sd_setImageWithURL(NSURL(string: kImageAddressMain+product.ImgUrl), placeholderImage: nil)
+            let lbl = ZMDTool.getLabel(CGRect(x: 0, y: 120, width: 110, height: 18), text: "", fontSize: 14, textColor: appThemeColor, textAlignment: .Left)
             lbl.text = "¥ " + product.Price
+            let btn = ZMDTool.getButton(view.bounds, textForNormal: "", fontSize: 0, backgroundColor: UIColor.clearColor(), blockForCli: { (sender) -> Void in
+                let vc = HomeBuyGoodsDetailViewController.CreateFromMainStoryboard() as! HomeBuyGoodsDetailViewController
+                vc.productId = product.Id.integerValue
+                self.pushToViewController(vc, animated: true, hideBottom: true)
+            })
             view.addSubview(imgView)
             view.addSubview(lbl)
+            view.addSubview(btn)
             scrollView.addSubview(view)
             scrollView.contentSize = CGSizeMake(CGFloat(data.Products.count*120), 0)
         }

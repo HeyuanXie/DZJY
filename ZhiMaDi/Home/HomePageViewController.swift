@@ -220,13 +220,13 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
     var pageIndex = 1              //水果蔬菜section 数据请求页数
     
     var menuType: [MenuType]!
-    var menuDatas = NSMutableArray() //menuCell部分临时数据，var menuDatas = NSMutableArray()
     var 下拉视窗 : UIView!
     var categories = NSMutableArray()
     var advertisementAll : ZMDAdvertisementAll! //top、icon、guess、topic。。。
     var textInput: UITextField!
     
     var topAdArray = NSMutableArray()   //顶部轮播图
+    var menus = NSMutableArray() //menuCell部分临时数据，
     var dongTaiIndex = 0    //用于取得交易动态当前动态
     var dongTaiArray = NSMutableArray()    //交易动态
     var enterpriseArray = NSMutableArray() //5个企业部分
@@ -336,9 +336,9 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
         }
         let cellType = self.userCenterData[indexPath.section][indexPath.row]
         //使用AutoMenuCell时的高度
-//        if cellType == .HomeContentTypeMenu {
-//            return self.menuDatas.count < 5 ? zoom(210) : zoom(105)
-//        }
+        if cellType == .HomeContentTypeMenu {
+            return self.menus.count > 5 ? zoom(235) : zoom(124)
+        }
         if cellType == .HomeContentTypeSupplyDetail {
             return self.supplyDemandArray.count == 0 ? 0 : CGFloat(self.supplyDemandArray.count)*38+20
         }
@@ -352,8 +352,7 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
         case .HomeContentTypeAd :
             return self.cellForHomeAd(tableView, indexPath: indexPath)
         case .HomeContentTypeMenu :
-            return self.cellForHomeMenu(tableView, indexPath: indexPath)
-            //            return self.cellForHomeAutoMenu(tableView, indexPath: indexPath)
+            return self.cellForHomeAutoMenu(tableView, indexPath: indexPath)
         case .HomeContentTypeState :
             return self.cellForHomeState(tableView, IndexPath: indexPath)
         case .HomeContentTypeDoubleGood :
@@ -578,112 +577,45 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
             cell = UITableViewCell(style: .Default, reuseIdentifier: cellId)
             ZMDTool.configTableViewCellDefault(cell!)
             
-            for var i=0;i<self.menuDatas.count;i++ {
-                let btnHeight = zoom(105)
-                let btnWidth = self.menuDatas.count >= 5 ? kScreenWidth/5 : kScreenWidth/CGFloat(self.menuDatas.count)
+            for var i=0;i<self.menus.count;i++ {
+                let btnHeight = zoom(124)
+                let btnWidth = self.menus.count >= 5 ? kScreenWidth/5 : kScreenWidth/CGFloat(self.menus.count)
                 let btnX = CGFloat(i%5)*btnWidth
-                let btnY = i >= 5 ? zoom(100) : 0
+                let btnY = i >= 5 ? zoom(110) : 0
                 let btn = UIButton(frame: CGRect(x: btnX, y: btnY, width: btnWidth, height: btnHeight))
                 btn.tag = 10000 + i
                 btn.backgroundColor = UIColor.whiteColor()
                 
-                let label = UILabel(frame: CGRectMake(0, btnHeight/2 + zoom(25), btnWidth, 14))
+                let label = UILabel(frame: CGRectMake(0, zoom(90), btnWidth, zoom(14)))
                 label.font = UIFont.systemFontOfSize(14)
                 label.textColor = defaultTextColor
                 label.textAlignment =  .Center
                 label.tag = 10010 + i
                 btn.addSubview(label)
                 
-                let imgV = UIImageView(frame: CGRectMake(btnWidth/2-25, btnHeight/2 - zoom(40), 50,50))
+                let imgV = UIImageView(frame: CGRectMake(btnWidth/2-zoom(28.5), zoom(20), zoom(57),zoom(57)))
                 imgV.tag = 10020 + i
                 btn.addSubview(imgV)
                 cell!.contentView.addSubview(btn)
             }
             
-            for var i=0;i<self.menuDatas.count;i++ {
+            for var i=0;i<self.menus.count;i++ {
                 let btn = cell?.contentView.viewWithTag(10000 + i) as! UIButton
                 let label = cell?.contentView.viewWithTag(10010 + i) as! UILabel
                 let imgV = cell?.contentView.viewWithTag(10020 + i) as! UIImageView
-                if self.menuDatas.count != 0 {
-                    let ad = self.menuDatas[i] as! ZMDAdvertisement
-                    label.text = ad.Title
-                    imgV.sd_setImageWithURL(NSURL(string: kImageAddressMain+ad.ResourcesCDNPath!))
-                    btn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
-                        self.advertisementClick(ad)
-                        return RACSignal.empty()
-                    })
-                }
+                let ad = self.menus[i] as! ZMDAdvertisement
+                label.text = ad.Title
+                imgV.sd_setImageWithURL(NSURL(string: kImageAddressMain+ad.ResourcesCDNPath!))
+                btn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
+                    self.advertisementClick(ad)
+                    return RACSignal.empty()
+                })
             }
-        }
-        return cell!
-    }
-
-    
-    /// 菜单cell
-    func cellForHomeMenu(tableView: UITableView,indexPath: NSIndexPath)-> UITableViewCell {
-        let cellId = "MenuCell"
-        var cell = tableView.dequeueReusableCellWithIdentifier(cellId)
-        if cell == nil {
-            cell = UITableViewCell(style: .Default, reuseIdentifier: cellId)
-            cell?.accessoryType = UITableViewCellAccessoryType.None
-            cell!.selectionStyle = .None
-            ZMDTool.configTableViewCellDefault(cell!)
-            cell!.contentView.backgroundColor = UIColor.whiteColor()
-            
-            for var i=0;i<self.menuType.count;i++ {
-                _ = 0
-                let btnHeight = kScreenWidth * 210 / 750
-                let width = kScreenWidth/CGFloat(self.menuType.count)
-                let btn = UIButton(frame: CGRectMake(kScreenWidth/5*CGFloat(i), 0 ,width, btnHeight))
-                btn.tag = 10000 + i
-                btn.backgroundColor = UIColor.whiteColor()
-                
-                let label = UILabel(frame: CGRectMake(0, btnHeight/2 + 20, width, 14))
-                label.font = UIFont.systemFontOfSize(14)
-                label.textColor = defaultTextColor
-                label.textAlignment =  .Center
-                label.tag = 10010 + i
-                btn.addSubview(label)
-                
-                let imgV = UIImageView(frame: CGRectMake(width/2-25, btnHeight/2 - 25 - 15, 50,50))
-                imgV.tag = 10020 + i
-                btn.addSubview(imgV)
-                cell!.contentView.addSubview(btn)
-            }
-        }
-        
-        for var i=0;i<5;i++ {
-            let menuType = self.menuType[i]
-            let btn = cell?.contentView.viewWithTag(10000 + i) as! UIButton
-            let label = cell?.contentView.viewWithTag(10010 + i) as! UILabel
-            let imgV = cell?.contentView.viewWithTag(10020 + i) as! UIImageView
-            btn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
-                switch menuType {
-                case .kFeature :
-                    if let url = NSURL(string: "appJNNT://") {
-                        UIApplication.sharedApplication().openURL(url)
-                    }else{
-                        ZMDTool.showPromptView("您还未安装“疆南农特”App")
-                    }
-                    break
-                case .kECommerce :
-                    if let url = NSURL(string: "appJNNZ://") {
-                        UIApplication.sharedApplication().openURL(url)
-                    }else{
-                        ZMDTool.showPromptView("您还未安装“咔村网”App")
-                    }
-                    break
-                default :
-                    menuType.didSelect(self.navigationController!)
-                }
-                return RACSignal.empty()
-            })
-            label.text = menuType.title
-            imgV.image = menuType.image
         }
         cell?.addLine()
         return cell!
     }
+    
     /// 交易动态cell
     func changeDongTai() {
         if self.dongTaiArray.count == 0 {
@@ -1115,22 +1047,33 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
             case "Topic":
                 let vc = HomeBuyListViewController.CreateFromMainStoryboard() as! HomeBuyListViewController
                 vc.Cid = other2
+                vc.As = "true"
+                vc.title = advertisement.Title ?? ""
                 self.pushToViewController(vc, animated: true, hideBottom: true)
                 break
             case "Supply":
-                let vc = SupplyDemandDetailViewController.CreateFromMainStoryboard() as! SupplyDemandDetailViewController
-                vc.supplyProductId = (other2 as NSString).integerValue
+                let vc = SupplyDemandListViewController.CreateFromMainStoryboard() as! SupplyDemandListViewController
                 vc.type = 1
                 self.pushToViewController(vc, animated: true, hideBottom: true)
             case "Demand":
-                let vc = SupplyDemandDetailViewController.CreateFromMainStoryboard() as! SupplyDemandDetailViewController
-                vc.supplyProductId = (other2 as NSString).integerValue
+                let vc = SupplyDemandListViewController.CreateFromMainStoryboard() as! SupplyDemandListViewController
                 vc.type = 2
                 self.pushToViewController(vc, animated: true, hideBottom: true)
-            case "Enterprise":
+            case "EnterpriseList":
+                let vc = EnterpirseListViewController.CreateFromMainStoryboard() as! EnterpirseListViewController
+                self.pushToViewController(vc, animated: true, hideBottom: true)
+            case "EnterpriseDetail":
                 let vc = EnterpriseDetailViewController.CreateFromMainStoryboard() as! EnterpriseDetailViewController
                 vc.enterpriseId = (other2 as NSString).integerValue
                 self.pushToViewController(vc, animated: true, hideBottom: true)
+            case "Web":
+                let vc = MyWebViewController()
+                vc.webUrl = other2
+                self.pushToViewController(vc, animated: true, hideBottom: true)
+            case "App":
+                if UIApplication.sharedApplication().canOpenURL(NSURL(string: other2)!) {
+                    UIApplication.sharedApplication().openURL(NSURL(string: other2)!)
+                }
             case "Coupon":
                 break
             default:
@@ -1217,6 +1160,11 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
             self.topAdArray.addObjectsFromArray(ads as [AnyObject])
             self.currentTableView.reloadData()
         }
+        if let daoHangsData = HYNetworkCache.cacheJsonWithURL("MiniAdmbdz_index_nav"),arr = ZMDAdvertisement.mj_objectArrayWithKeyValuesArray(daoHangsData) {
+            self.menus.removeAllObjects()
+            self.menus.addObjectsFromArray(arr as [AnyObject])
+            self.currentTableView.reloadData()
+        }
         if let dongTaiDatas = HYNetworkCache.cacheJsonWithURL("HomeDongTai"),arr = ZMDTradeProduct.mj_objectArrayWithKeyValuesArray(dongTaiDatas) {
             self.dongTaiArray.removeAllObjects()
             self.dongTaiArray.addObjectsFromArray(arr as [AnyObject])
@@ -1262,8 +1210,8 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
             return
         }
         self.fetchTop()
+        self.fetchDaoHang()
         self.fetchDongTai()
-        //        self.fetchEnterprise()
         self.fetchMiniProducts()
         self.fetchRecommend()
         self.fetchSupplyDemand()
@@ -1276,6 +1224,16 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
             if success! {
                 self.topAdArray.removeAllObjects()
                 self.topAdArray.addObjectsFromArray(products as! [AnyObject])
+                self.currentTableView.reloadData()
+            }
+        }
+    }
+    //MARK: 获取导航
+    func fetchDaoHang() {
+        QNNetworkTool.fetchHomeMiniAd("mbdz_index_nav") { (success, products, error) -> Void in
+            if success! {
+                self.menus.removeAllObjects()
+                self.menus.addObjectsFromArray(products as! [AnyObject])
                 self.currentTableView.reloadData()
             }
         }

@@ -112,6 +112,8 @@
 		<string>mqqzone</string>
 		<string>alipay</string>
 		<string>alipayshare</string>
+		<string>appJNNT</string>
+		<string>appJNNZ</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
