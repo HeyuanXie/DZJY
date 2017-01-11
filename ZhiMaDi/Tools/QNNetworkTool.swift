@@ -556,150 +556,10 @@ extension QNNetworkTool {
         }
     }
     
-}
-
-//MARK:- 交易企业相关
-extension QNNetworkTool {
-    ///获取企业详情
-    class func fetchEnterpriseDetail(id:Int,completion:(success:Bool?,data:ZMDEnterprise?,error:NSError?)->Void) {
-        requestPOST(kServerAddress+"/api/v1/extend/StoreExtend/BusinessEnterpriseDetailsPage", parameters: ["id":id]) { (request, response, data, dictionary, error) -> Void in
-            if let dic = dictionary,data = dic["data"] {
-                let data = ZMDEnterprise.mj_objectWithKeyValues(data)
-                completion(success: true, data: data, error: nil)
-            }else{
-                completion(success: false, data: nil, error: error)
-            }
-        }
-    }
-}
-
-
-//MARK:- 产品相关
-extension QNNetworkTool {
-    /**
-     商品列表(可通过Cid（类目Id）查询)
-     
-     */
-    class func products(As:String,pageSize:Int,pageNumber:Int,storeId:Int,Q:String,orderBy:Int,isNew:String,Cid:Int,completion:(products:NSArray?,error:NSError?,dic:NSDictionary?)->Void) {
-        let params = ["PageSize":pageSize,"PageNumber":pageNumber,"StoreId":storeId,"As":As,"Q":Q,"OrderBy":orderBy,"IsNew":isNew,"Cid":Cid]
-        requestPOST(kServerAddress+"/api/v1/extend/StoreExtend/StoreIndex", parameters: params as? [String:AnyObject]) { (request, response, data, dictionary, error) -> Void in
-            if dictionary != nil {
-                let productData = dictionary!["Products"]
-                let products = ZMDProduct.mj_objectArrayWithKeyValuesArray(productData)
-                completion(products: products, error: nil, dic: dictionary)
-            }else{
-                completion(products: nil, error: error, dic: dictionary)
-            }
-        }
-    }
-    /**
-     产品列表
-     
-     - parameter Q:          关键词
-     - parameter pagenumber: 页码
-     - parameter orderby:    orderby description
-     - parameter Cid:        Cid description
-     - parameter completion: completion description
-     */
-    class func products(Q:String,pagenumber:String,orderby:Int?,Cid : String?,completion: (products : NSArray?,error:NSError?,dictionary:NSDictionary?) -> Void) {
-        var urlStr = kServerAddress + "/catalog/searchajax?as=true&pagenumber=\(pagenumber)&q=\(Q)"
-        if  orderby != nil {
-            urlStr.appendContentsOf("&orderby=\(orderby!)")
-        }
-        if Cid != nil && Cid != "" {
-            urlStr.appendContentsOf("&Cid="+"\(Cid!)")
-        }
-        requestGET(urlStr.stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLQueryAllowedCharacterSet())!, parameters: nil) { (_, _, _, dictionary, error) -> Void in //
-            if dictionary != nil{
-                let productsData = dictionary!["Products"]
-                let products = ZMDProduct.mj_objectArrayWithKeyValuesArray(productsData)
-                completion(products:products,error: nil,dictionary:dictionary)
-            }else {
-                completion(products:nil,error: error,dictionary:nil)
-            }
-        }
-    }
-    
-    class func products(skip:Int,order : String?,isAsc : Bool? = true,completion: (products : NSArray?,error:NSError?,dictionary:NSDictionary?) -> Void) {
-        let ascTmp = (isAsc == nil || isAsc!) ? "desc" : "asc"
-        let urlTmp = order == nil ? "/Products?$top=20&$skip=\(skip*20)"  : "/Products?&$orderby=\(order!)+\(ascTmp)&$top=20&$skip=\(skip*20)"
-        requestGET(kServerAddress + urlTmp, parameters: nil) { (_, _, _, dictionary, error) -> Void in
-            if dictionary != nil{
-                let value = dictionary!["value"]
-                let products = ZMDProduct.mj_objectArrayWithKeyValuesArray(value)
-                completion(products:products,error: nil,dictionary:dictionary)
-            }else {
-                completion(products:nil,error: error,dictionary:nil)
-            }
-        }
-    }
-    
-    class func categories(completion: (categories : NSArray?,error:NSError?,dictionary:NSDictionary?) -> Void) {
-        //        "/Categories?$top=10"
-        requestGET(kOdataAddress + "/Categories?$top=6", parameters: nil) { (_, _, _, dictionary, error) -> Void in
-            if dictionary != nil{
-                let values = dictionary!["value"]
-                let categories = ZMDCategory.mj_objectArrayWithKeyValuesArray(values)
-                completion(categories:categories,error: nil,dictionary:dictionary)
-            }else {
-                completion(categories:nil,error: error,dictionary:nil)
-            }
-        }
-    }
-    
-    //MARK:分类页面的数据
-    class func sortCategories(completion: (categories:NSArray?,error:NSError?,dictionary:NSDictionary?) -> Void) {
-        requestGET(kServerAddress + "/api/v1/extend/Product/HomepageCategories", parameters: nil) { (_, _, data, _, error) -> Void in
-            if data != nil{
-                do {
-                    let jsonObject: AnyObject? = try NSJSONSerialization.JSONObjectWithData(data as! NSData, options: NSJSONReadingOptions.MutableContainers)
-                    guard let array = jsonObject as? NSArray else {
-                        completion(categories:nil,error: error,dictionary:nil)
-                        return
-                    }
-                    let categories = ZMDSortCategory.mj_objectArrayWithKeyValuesArray(array)
-                    completion(categories:categories,error: nil,dictionary:nil)
-                } catch {
-                    println("Json解析过程出错")
-                }
-            }else {
-                completion(categories:nil,error: error,dictionary:nil)
-            }
-        }
-    }
-
-    /**
-     获取详情页
-     
-     - parameter Id:         Id description
-     - parameter completion: completion description
-     */
-    class func fetchProductDetail(Id:Int,completion: (productDetail: ZMDProductDetail?,error:NSError?,dictionary:NSDictionary?) -> Void){
-        
-        requestPOST(kServerAddress + "/api/v1/extend/Product/ProductDetails", parameters: ["Id":Id,"customerId":g_customerId ?? 0]) { (_,response, _, dictionary, error) -> Void in
-            guard let dic = dictionary ,let productDetail = ZMDProductDetail.mj_objectWithKeyValues(dic["product"]) else {
-                completion(productDetail:nil,error: error,dictionary:nil)
-                return
-            }
-            completion(productDetail:productDetail,error: nil,dictionary:dictionary)
-        }
-    }
-    //MARK:产品详情信息View(WebView)
-    // 产品详情信息 html(WebView)
-    class func fetchProductDetailView(productId:Int,completion: (succeed : Bool!,data:String?,error: NSError?) -> Void){
-        let url = NSURL(string: kServerAddress + "/product/ProductDetailview?productId=\(productId)")
-        request(ParameterEncoding.URL.encode(self.productRequest(url, method: "POST"), parameters: nil).0).responseString { (response) -> Void in
-            guard let data = response.result.value else {
-                completion(succeed:false,data: nil, error: response.result.error)
-                return
-            }
-            completion(succeed:true,data: data, error: nil)
-        }
-    }
     //MARK: 首页广告数据
     class func fetchMainPageInto(completion: (advertisementAll: ZMDAdvertisementAll?,error:NSError?,dictionary:NSDictionary?) -> Void){
         //http://xw.ccw.cn/api/v1/extend/Advertisement/IndexAds/
-//        kServerAddress + "/api/v1/extend/Advertisement/IndexAds"
+        //        kServerAddress + "/api/v1/extend/Advertisement/IndexAds"
         requestPOST(kServerAddress + "/api/v1/extend/Advertisement/IndexAds", parameters: nil) { (_,response, _, dictionary, error) -> Void in
             guard let dic = dictionary ,let advertisementAll = ZMDAdvertisementAll.mj_objectWithKeyValues(dic) else {
                 completion(advertisementAll:nil,error: error,dictionary:nil)
@@ -801,6 +661,150 @@ extension QNNetworkTool {
             }else{
                 completion(products: nil, dictionary: nil, error: error)
             }
+        }
+    }
+
+    
+}
+
+//MARK:- 交易企业相关
+extension QNNetworkTool {
+    ///获取企业详情
+    class func fetchEnterpriseDetail(id:Int,completion:(success:Bool?,data:ZMDEnterprise?,error:NSError?)->Void) {
+        requestPOST(kServerAddress+"/api/v1/extend/StoreExtend/BusinessEnterpriseDetailsPage", parameters: ["id":id]) { (request, response, data, dictionary, error) -> Void in
+            if let dic = dictionary,data = dic["data"] {
+                let data = ZMDEnterprise.mj_objectWithKeyValues(data)
+                completion(success: true, data: data, error: nil)
+            }else{
+                completion(success: false, data: nil, error: error)
+            }
+        }
+    }
+}
+
+//MARK:- 分类页面 
+extension QNNetworkTool {
+    class func sortCategories(completion: (categories:NSArray?,error:NSError?,dictionary:NSDictionary?) -> Void) {
+        requestGET(kServerAddress + "/api/v1/extend/product/Categories", parameters: nil) { (_, _, data, _, error) -> Void in
+            if data != nil{
+                do {
+                    let jsonObject: AnyObject? = try NSJSONSerialization.JSONObjectWithData(data as! NSData, options: NSJSONReadingOptions.MutableContainers)
+                    guard let array = jsonObject as? NSArray else {
+                        completion(categories:nil,error: error,dictionary:nil)
+                        return
+                    }
+                    let categories = ZMDSortCategory.mj_objectArrayWithKeyValuesArray(array)
+                    completion(categories:categories,error: nil,dictionary:nil)
+                } catch {
+                    println("Json解析过程出错")
+                }
+            }else {
+                completion(categories:nil,error: error,dictionary:nil)
+            }
+        }
+    }
+    
+    class func categories(completion: (categories : NSArray?,error:NSError?,dictionary:NSDictionary?) -> Void) {
+        //        "/Categories?$top=10"
+        requestGET(kOdataAddress + "/Categories?$top=6", parameters: nil) { (_, _, _, dictionary, error) -> Void in
+            if dictionary != nil{
+                let values = dictionary!["value"]
+                let categories = ZMDCategory.mj_objectArrayWithKeyValuesArray(values)
+                completion(categories:categories,error: nil,dictionary:dictionary)
+            }else {
+                completion(categories:nil,error: error,dictionary:nil)
+            }
+        }
+    }
+}
+
+
+//MARK:- 产品相关
+extension QNNetworkTool {
+    /**
+     商品列表(可通过Cid（类目Id）查询)
+     
+     */
+    class func products(As:String,pageSize:Int,pageNumber:Int,storeId:Int,Q:String,orderBy:Int,isNew:String,Cid:Int,completion:(products:NSArray?,error:NSError?,dic:NSDictionary?)->Void) {
+        let params = ["PageSize":pageSize,"PageNumber":pageNumber,"StoreId":storeId,"As":As,"Q":Q,"OrderBy":orderBy,"IsNew":isNew,"Cid":Cid]
+        requestPOST(kServerAddress+"/api/v1/extend/StoreExtend/StoreIndex", parameters: params as? [String:AnyObject]) { (request, response, data, dictionary, error) -> Void in
+            if dictionary != nil {
+                let productData = dictionary!["Products"]
+                let products = ZMDProduct.mj_objectArrayWithKeyValuesArray(productData)
+                completion(products: products, error: nil, dic: dictionary)
+            }else{
+                completion(products: nil, error: error, dic: dictionary)
+            }
+        }
+    }
+    /**
+     产品列表
+     
+     - parameter Q:          关键词
+     - parameter pagenumber: 页码
+     - parameter orderby:    orderby description
+     - parameter Cid:        Cid description
+     - parameter completion: completion description
+     */
+    class func products(Q:String,pagenumber:String,orderby:Int?,Cid : String?,completion: (products : NSArray?,error:NSError?,dictionary:NSDictionary?) -> Void) {
+        var urlStr = kServerAddress + "/catalog/searchajax?as=true&pagenumber=\(pagenumber)&q=\(Q)"
+        if  orderby != nil {
+            urlStr.appendContentsOf("&orderby=\(orderby!)")
+        }
+        if Cid != nil && Cid != "" {
+            urlStr.appendContentsOf("&Cid="+"\(Cid!)")
+        }
+        requestGET(urlStr.stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLQueryAllowedCharacterSet())!, parameters: nil) { (_, _, _, dictionary, error) -> Void in //
+            if dictionary != nil{
+                let productsData = dictionary!["Products"]
+                let products = ZMDProduct.mj_objectArrayWithKeyValuesArray(productsData)
+                completion(products:products,error: nil,dictionary:dictionary)
+            }else {
+                completion(products:nil,error: error,dictionary:nil)
+            }
+        }
+    }
+    
+    class func products(skip:Int,order : String?,isAsc : Bool? = true,completion: (products : NSArray?,error:NSError?,dictionary:NSDictionary?) -> Void) {
+        let ascTmp = (isAsc == nil || isAsc!) ? "desc" : "asc"
+        let urlTmp = order == nil ? "/Products?$top=20&$skip=\(skip*20)"  : "/Products?&$orderby=\(order!)+\(ascTmp)&$top=20&$skip=\(skip*20)"
+        requestGET(kServerAddress + urlTmp, parameters: nil) { (_, _, _, dictionary, error) -> Void in
+            if dictionary != nil{
+                let value = dictionary!["value"]
+                let products = ZMDProduct.mj_objectArrayWithKeyValuesArray(value)
+                completion(products:products,error: nil,dictionary:dictionary)
+            }else {
+                completion(products:nil,error: error,dictionary:nil)
+            }
+        }
+    }
+
+    /**
+     获取详情页
+     
+     - parameter Id:         Id description
+     - parameter completion: completion description
+     */
+    class func fetchProductDetail(Id:Int,completion: (productDetail: ZMDProductDetail?,error:NSError?,dictionary:NSDictionary?) -> Void){
+        
+        requestPOST(kServerAddress + "/api/v1/extend/Product/ProductDetails", parameters: ["Id":Id,"customerId":g_customerId ?? 0]) { (_,response, _, dictionary, error) -> Void in
+            guard let dic = dictionary ,let productDetail = ZMDProductDetail.mj_objectWithKeyValues(dic["product"]) else {
+                completion(productDetail:nil,error: error,dictionary:nil)
+                return
+            }
+            completion(productDetail:productDetail,error: nil,dictionary:dictionary)
+        }
+    }
+    //MARK:产品详情信息View(WebView)
+    // 产品详情信息 html(WebView)
+    class func fetchProductDetailView(productId:Int,completion: (succeed : Bool!,data:String?,error: NSError?) -> Void){
+        let url = NSURL(string: kServerAddress + "/product/ProductDetailview?productId=\(productId)")
+        request(ParameterEncoding.URL.encode(self.productRequest(url, method: "POST"), parameters: nil).0).responseString { (response) -> Void in
+            guard let data = response.result.value else {
+                completion(succeed:false,data: nil, error: response.result.error)
+                return
+            }
+            completion(succeed:true,data: data, error: nil)
         }
     }
     

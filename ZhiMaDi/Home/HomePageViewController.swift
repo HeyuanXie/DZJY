@@ -576,41 +576,38 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
         if cell == nil {
             cell = UITableViewCell(style: .Default, reuseIdentifier: cellId)
             ZMDTool.configTableViewCellDefault(cell!)
+        }
+        for subView in cell!.contentView.subviews {
+            subView.removeFromSuperview()
+        }
+        
+        for var i=0;i<self.menus.count;i++ {
+            let ad = self.menus[i] as! ZMDAdvertisement
+            let btnHeight = zoom(124)
+            let btnWidth = self.menus.count >= 5 ? kScreenWidth/5 : kScreenWidth/CGFloat(self.menus.count)
+            let btnX = CGFloat(i%5)*btnWidth
+            let btnY = i >= 5 ? zoom(110) : 0
+            let btn = UIButton(frame: CGRect(x: btnX, y: btnY, width: btnWidth, height: btnHeight))
+            btn.tag = 10000 + i
+            btn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
+                self.advertisementClick(ad)
+                return RACSignal.empty()
+            })
+            btn.backgroundColor = UIColor.whiteColor()
             
-            for var i=0;i<self.menus.count;i++ {
-                let btnHeight = zoom(124)
-                let btnWidth = self.menus.count >= 5 ? kScreenWidth/5 : kScreenWidth/CGFloat(self.menus.count)
-                let btnX = CGFloat(i%5)*btnWidth
-                let btnY = i >= 5 ? zoom(110) : 0
-                let btn = UIButton(frame: CGRect(x: btnX, y: btnY, width: btnWidth, height: btnHeight))
-                btn.tag = 10000 + i
-                btn.backgroundColor = UIColor.whiteColor()
-                
-                let label = UILabel(frame: CGRectMake(0, zoom(90), btnWidth, zoom(14)))
-                label.font = UIFont.systemFontOfSize(14)
-                label.textColor = defaultTextColor
-                label.textAlignment =  .Center
-                label.tag = 10010 + i
-                btn.addSubview(label)
-                
-                let imgV = UIImageView(frame: CGRectMake(btnWidth/2-zoom(28.5), zoom(20), zoom(57),zoom(57)))
-                imgV.tag = 10020 + i
-                btn.addSubview(imgV)
-                cell!.contentView.addSubview(btn)
-            }
+            let label = UILabel(frame: CGRectMake(0, zoom(90), btnWidth, zoom(14)))
+            label.font = UIFont.systemFontOfSize(14)
+            label.textColor = defaultTextColor
+            label.textAlignment =  .Center
+            label.tag = 10010 + i
+            label.text = ad.Title
+            btn.addSubview(label)
             
-            for var i=0;i<self.menus.count;i++ {
-                let btn = cell?.contentView.viewWithTag(10000 + i) as! UIButton
-                let label = cell?.contentView.viewWithTag(10010 + i) as! UILabel
-                let imgV = cell?.contentView.viewWithTag(10020 + i) as! UIImageView
-                let ad = self.menus[i] as! ZMDAdvertisement
-                label.text = ad.Title
-                imgV.sd_setImageWithURL(NSURL(string: kImageAddressMain+ad.ResourcesCDNPath!))
-                btn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
-                    self.advertisementClick(ad)
-                    return RACSignal.empty()
-                })
-            }
+            let imgV = UIImageView(frame: CGRectMake(btnWidth/2-zoom(28.5), zoom(20), zoom(57),zoom(57)))
+            imgV.tag = 10020 + i
+            imgV.sd_setImageWithURL(NSURL(string: kImageAddressMain+ad.ResourcesCDNPath!))
+            btn.addSubview(imgV)
+            cell!.contentView.addSubview(btn)
         }
         cell?.addLine()
         return cell!
