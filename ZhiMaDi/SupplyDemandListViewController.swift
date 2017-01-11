@@ -97,6 +97,9 @@ class SupplyDemandListViewController: UIViewController ,ZMDInterceptorProtocol, 
         }else{
             SupplyDemandListCell.configSupplyCell(cell, product: product)
         }
+        if indexPath.section == self.dataArray.count-1 && self.isHasNext == true {
+            self.fetchData(self.orderBy)
+        }
         return cell
     }
     
@@ -240,9 +243,9 @@ class SupplyDemandListViewController: UIViewController ,ZMDInterceptorProtocol, 
     
     func subViewInit() {
         // 底部刷新
-        footer = MJRefreshAutoNormalFooter()
-        footer.setRefreshingTarget(self, refreshingAction: Selector("footerRefresh"))
-        self.currentTableView.mj_footer = footer
+//        footer = MJRefreshAutoNormalFooter()
+//        footer.setRefreshingTarget(self, refreshingAction: Selector("footerRefresh"))
+//        self.currentTableView.mj_footer = footer
         self.currentTableView.backgroundColor = tableViewdefaultBackgroundColor
         
         // 创建筛选View
@@ -274,21 +277,16 @@ class SupplyDemandListViewController: UIViewController ,ZMDInterceptorProtocol, 
     
     func fetchData(orderBy:Int!) {
         ZMDTool.showActivityView(nil)
-        QNNetworkTool.supplyDemandSearch(0, page: self.page, pageSize: 12, check: self.check, q: self.q, type: self.type, orderBy: orderBy, fromPrice: self.fromPrice?.floatValue, toPrice: self.toPrice?.floatValue) { (error, products) -> Void in
+        QNNetworkTool.supplyDemandSearch(self.customerId?.integerValue, page: self.page, pageSize: 12, check: self.check, q: self.q, type: self.type, orderBy: orderBy, fromPrice: self.fromPrice?.floatValue, toPrice: self.toPrice?.floatValue) { (error, products) -> Void in
             ZMDTool.hiddenActivityView()
             if let productsArr = products {
                 if self.page == 1 {
                     self.dataArray.removeAllObjects()
                 }
                 self.page = self.page + 1
+                self.isHasNext = productsArr.count == 12
                 self.dataArray.addObjectsFromArray(productsArr as [AnyObject])
                 self.currentTableView.reloadData()
-                if productsArr.count == 12 {
-                    self.isHasNext = true
-                }else{
-                    self.isHasNext = false
-                    self.footer.endRefreshingWithNoMoreData()
-                }
             }else{
                 ZMDTool.showErrorPromptView(nil, error: error)
             }
@@ -301,7 +299,7 @@ class SupplyDemandListViewController: UIViewController ,ZMDInterceptorProtocol, 
         if self.isHasNext {
             self.fetchData(self.orderBy)
         }else{
-            self.footer.endRefreshingWithNoMoreData()
+            self.footer.endRefreshing()
         }
     }
     

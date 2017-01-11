@@ -419,9 +419,11 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
             case .kSupply:
                 (viewController as! SupplyDemandListViewController).type = 1
                 (viewController as! SupplyDemandListViewController).q = text
+                (viewController as! SupplyDemandListViewController).check = 2
             default :
                 (viewController as! SupplyDemandListViewController).type = 2
                 (viewController as! SupplyDemandListViewController).q = text
+                (viewController as! SupplyDemandListViewController).check = 2
             }
             self.pushToViewController(viewController, animated: true, hideBottom: true)
         }
@@ -1051,10 +1053,12 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
             case "Supply":
                 let vc = SupplyDemandListViewController.CreateFromMainStoryboard() as! SupplyDemandListViewController
                 vc.type = 1
+                vc.check = 2
                 self.pushToViewController(vc, animated: true, hideBottom: true)
             case "Demand":
                 let vc = SupplyDemandListViewController.CreateFromMainStoryboard() as! SupplyDemandListViewController
                 vc.type = 2
+                vc.check = 2
                 self.pushToViewController(vc, animated: true, hideBottom: true)
             case "EnterpriseList":
                 let vc = EnterpirseListViewController.CreateFromMainStoryboard() as! EnterpirseListViewController
