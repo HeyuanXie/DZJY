@@ -9,10 +9,10 @@
 import UIKit
 import SDWebImage
 //账户设置
-class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableViewDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate,ZMDInterceptorProtocol,ZMDInterceptorNavigationBarShowProtocol,ZMDInterceptorMoreProtocol,HZQDatePickerViewDelegate {
+class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableViewDelegate,ZMDInterceptorProtocol,ZMDInterceptorNavigationBarShowProtocol,ZMDInterceptorMoreProtocol,UIImagePickerControllerDelegate,UINavigationControllerDelegate,HZQDatePickerViewDelegate {
     enum UserCenterCellType : String {
-        case Head = "Head"
-        case Name = "Name"
+        case Head
+        case Name
         case Gender
         case BirthDay
         case Location
@@ -252,14 +252,14 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
             case .Email:
                 rightLbl.text = getObjectFromUserDefaults("email") as? String
             case .Version:
-                rightLbl.text = "V "+APP_VERSION_BUILD
+                rightLbl.text = "V "+APP_VERSION
             default:
                 break
             }
             return cell!
         }
     }
-        
+
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath){
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
         let type = self.userCenterData[indexPath.section][indexPath.row]
@@ -269,30 +269,21 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
                 self.commonAlertShow(true, title: "提示:未登录!", message: "是否立即登录?", preferredStyle: UIAlertControllerStyle.Alert)
                 return
             }
-            let actionSheet = UIActionSheet(title: nil, delegate: nil, cancelButtonTitle: "取消", destructiveButtonTitle: nil)
-            actionSheet.addButtonWithTitle("从手机相册选择")
-            actionSheet.addButtonWithTitle("拍照")
-            actionSheet.rac_buttonClickedSignal().subscribeNext({ (index) -> Void in
-                if let indexInt = index as? Int {
-                    switch indexInt {
-                    case 1, 2:
-                        if self.picker == nil {
-                            self.picker = UIImagePickerController()
-                            self.picker!.delegate = self
-                        }
-                        
-                        self.picker!.sourceType = (indexInt == 1) ? .SavedPhotosAlbum : .Camera
-                        self.picker!.allowsEditing = true
-                        self.presentViewController(self.picker!, animated: true, completion: nil)
-                    default: break
-                    }
-                }
-            })
-            actionSheet.showInView(self.view)
+            let actionSheet = UIAlertController(title: nil, message: "操作选项", preferredStyle: .ActionSheet)
+            let titles = [("从手机相册选择",UIImagePickerControllerSourceType.SavedPhotosAlbum),("拍照",UIImagePickerControllerSourceType.Camera)]
+            for item in titles {
+                let action = UIAlertAction(title: item.0, style: .Default, handler: { (action) -> Void in
+                    self.picker?.sourceType = item.1
+                    self.presentViewController(self.picker!, animated: true, completion: { () -> Void in
+                        self.picker?.delegate = self
+                    })
+                })
+                actionSheet.addAction(action)
+            }
+            actionSheet.addAction(UIAlertAction(title: "取消", style: .Cancel, handler: nil))
+            self.presentViewController(actionSheet, animated: true, completion: nil)
             break
         case .Clean:
-            //计算缓存，计算完成菊花消失，显示alertView
-            //            ZMDTool.showActivityView("请稍候")
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), { () -> Void in
                 //计算缓存
                 let size = self.fileSizeOfCache()
@@ -331,7 +322,7 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
             self.pickerView = HZQDatePickerView.instanceDatePickerView()
             self.pickerView.frame = CGRectMake(0, 0, kScreenWidth, kScreenHeight + 20)
             self.pickerView.backgroundColor = UIColor.clearColor()
-            self.pickerView.delegate = self
+//            self.pickerView.delegate = self
             self.pickerView.type = DateType.init(0)
             self.pickerView.datePickerView?.maximumDate = NSDate()
             self.view.addSubview(self.pickerView)
@@ -394,9 +385,20 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
         rightLbl.text = date
         saveObjectToUserDefaults("birthDay", value: date)
     }
-
+    
     //MARK: - UIImagePickerControllerDelegate
-    func imagePickerController(picker: UIImagePickerController, didFinishPickingImage image: UIImage!, editingInfo: [NSObject : AnyObject]!) {
+    func imagePickerController(picker: UIImagePickerController, didFinishPickingImage image: UIImage, editingInfo: [String : AnyObject]?) {
+        // 存储图片
+        let size = CGSizeMake(image.size.width, image.size.height)
+        let headImageData = UIImageJPEGRepresentation(self.imageWithImageSimple(image, scaledSize: size), 0.125) //压缩
+        self.uploadUserFace(headImageData)
+        self.picker?.dismissViewControllerAnimated(true, completion: nil)
+    }
+    func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]) {
+        if self.picker?.sourceType == .Camera {
+            return
+        }
+        let image = info["UIImagePickerControllerEditedImage"] as! UIImage
         // 存储图片
         let size = CGSizeMake(image.size.width, image.size.height)
         let headImageData = UIImageJPEGRepresentation(self.imageWithImageSimple(image, scaledSize: size), 0.125) //压缩
@@ -432,19 +434,6 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
         let  newImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         return newImage;
-    }
-    
-    func updateGroupPhoto(fileName : String,url : String) {
-//        QNNetworkTool.updateGroupPhoto(fileName, userId: self.user.id) { (dictionary, error) -> Void in
-//            if dictionary != nil ,let errorCode = dictionary?["errorCode"] as? String where errorCode == "0"{
-//                var familys = g_currentGroup!.users
-//                familys[self.userIndex].photoURL = url
-//                g_currentGroup?.users = familys
-//                QNTool.showPromptView( "头像修改成功", nil)
-//            }else {
-//                QNTool.showErrorPromptView(dictionary, error: error, errorMsg: nil)
-//            }
-//        }
     }
 
     //MARK:- Private Method
@@ -483,6 +472,9 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
     }
     private func dataInit(){
         self.userCenterData = [[.Head,.Name,.Gender,.BirthDay,.Location],[.WeiXin,.Email,.Phone]/*,[.PayPassword]*/,[.Address,.Version]]
+        self.picker = UIImagePickerController()
+//        self.picker?.allowsEditing = true
+        self.picker?.delegate = self
     }
     //MARK:创建moreView
     func moreViewUpdate() {

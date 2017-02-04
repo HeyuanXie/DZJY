@@ -328,8 +328,9 @@ class SupplyDetailCell : UITableViewCell {
         cell.priceLbl.text = "\(data.Price.floatValue)/\(data.PriceUnit)"
         cell.beginLbl.text = data.CreatedOn
         let endTime = data.EndTime.componentsSeparatedByString("T").first
-        let days = QNFormatTool.getDaysWithDateString(endTime!)
-        cell.endLbl.text = days == "0" ? endTime!+"(已过期)" : endTime! + "(剩余\(days)天)"
+        let daysStr = QNFormatTool.getDaysWithDateString(endTime!)
+        let days = (daysStr as NSString).integerValue
+        cell.endLbl.text = days <= 0 ? endTime!+"(已过期)" : endTime! + "(剩余\(days)天)"
         
         if let pictures = data.SupplyDemandPictures {
             cell.scrollView.contentSize = CGSizeMake(12+CGFloat(pictures.count)*(115+10), 0)

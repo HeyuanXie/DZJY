@@ -239,7 +239,7 @@ class OrderCommentViewController: UIViewController,UITableViewDelegate,UITableVi
     func photoBrowser(photoBrowser: MWPhotoBrowser!, photoAtIndex index: UInt) -> MWPhotoProtocol! {
         let photos = self.photos[self.photoIndex]
         if Int(index) < photos.count {
-            let photo:MWPhoto = MWPhoto(image: photos[index] as! UIImage)
+            let photo:MWPhoto = MWPhoto(image: photos[Int(index)] as! UIImage)
             return photo
         }
         return nil

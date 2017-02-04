@@ -350,6 +350,7 @@ class PublishSupplyViewController: UIViewController,ZMDInterceptorProtocol,UITab
     func cellForUploadImage(tableView:UITableView,indexPath:NSIndexPath) -> UITableViewCell {
         let cellId = "uploadImageCell"
         let cell = tableView.dequeueReusableCellWithIdentifier(cellId)
+        cell?.selectionStyle = .None
         let scrollView = cell?.contentView.viewWithTag(10000) as! UIScrollView
         scrollView.showsHorizontalScrollIndicator = false
         let addBtn = cell?.contentView.viewWithTag(10001) as! UIButton
@@ -410,23 +411,23 @@ class PublishSupplyViewController: UIViewController,ZMDInterceptorProtocol,UITab
         
         addBtn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
             let actionSheet = UIActionSheet(title: nil, delegate: nil, cancelButtonTitle: "取消", destructiveButtonTitle: nil)
-            actionSheet.addButtonWithTitle("从手机相册选择")
-            actionSheet.addButtonWithTitle("拍照")
-            actionSheet.rac_buttonClickedSignal().subscribeNext({ (index) -> Void in
-                if let indexInt = index as? Int {
-                    switch indexInt {
-                    case 1, 2:
-                        if self.picker == nil {
-                            self.picker = UIImagePickerController()
-                            self.picker!.delegate = self
-                        }
-                        
-                        self.picker!.sourceType = (indexInt == 1) ? .SavedPhotosAlbum : .Camera
-                        self.picker!.allowsEditing = true
-                        self.presentViewController(self.picker!, animated: true, completion: nil)
-                    default: break
-                    }
+            actionSheet.bk_addButtonWithTitle("从手机相册选择", handler: { () -> Void in
+                if self.picker == nil {
+                    self.picker = UIImagePickerController()
+                    self.picker!.delegate = self
+                    self.picker!.allowsEditing = true
                 }
+                self.picker?.sourceType = .SavedPhotosAlbum
+                self.presentViewController(self.picker!, animated: true, completion: nil)
+            })
+            actionSheet.bk_addButtonWithTitle("拍照", handler: { () -> Void in
+                if self.picker == nil {
+                    self.picker = UIImagePickerController()
+                    self.picker!.delegate = self
+                    self.picker!.allowsEditing = true
+                }
+                self.picker?.sourceType = .Camera
+                self.presentViewController(self.picker!, animated: true, completion: nil)
             })
             actionSheet.showInView(self.view)
             return RACSignal.empty()
@@ -497,12 +498,15 @@ class PublishSupplyViewController: UIViewController,ZMDInterceptorProtocol,UITab
                     cell.unitLbl.text = title
                     if cellType == .kSupplyQuantity || cellType == .kDemandQuantity {
                         self.quantityUnit = cell.unitLbl.text!
+                        self.data.QuantityUnit = self.quantityUnit
                     }
                     if cellType == .kSupplyPrice || cellType == .kDemandPrice {
                         self.priceUnit = cell.unitLbl.text!
+                        self.data.PriceUnit = self.priceUnit
                     }
                     if cellType == .kMiniQuantity {
                         self.minQuantityUnit = cell.unitLbl.text!
+                        self.data.MinQuantityUnit = self.minQuantityUnit
                     }
                 }))
             }

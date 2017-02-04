@@ -58,9 +58,9 @@ class AddressEditOrAddViewController: UIViewController,UITableViewDataSource,UIT
         return section == self.titles.count-1 ? zoom(55) : 0
     }
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-        if self.titles[indexPath.section] == "详细地址 : " {
-            return 50
-        }
+//        if self.titles[indexPath.section] == "详细地址 : " {
+//            return 50
+//        }
         return zoom(50)
     }
     func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
@@ -75,8 +75,8 @@ class AddressEditOrAddViewController: UIViewController,UITableViewDataSource,UIT
         if section == self.titles.count-1 {
             let view = UIView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: zoom(55)))
             self.defaultBtn = UIButton(frame: CGRect.zero)
-            self.defaultBtn.setImage(UIImage.imageWithColor(RGB(239,67,70,1.0), size: CGSize(width: zoom(15), height: zoom(15))), forState: .Selected)
-            self.defaultBtn.setImage(UIImage.imageWithColor(UIColor.whiteColor(), size: CGSize(width: zoom(15), height: zoom(15))), forState: .Normal)
+            self.defaultBtn.setImage(UIImage(named: "cb_glossy_off"), forState: .Normal)
+            self.defaultBtn.setImage(UIImage(named: "cb_glossy_on"), forState: .Selected)
             self.defaultBtn.rac_command = RACCommand(signalBlock: { (sender) -> RACSignal! in
                 (sender as! UIButton).selected = !(sender as! UIButton).selected
                 return RACSignal.empty()
@@ -90,7 +90,7 @@ class AddressEditOrAddViewController: UIViewController,UITableViewDataSource,UIT
                 make.top.equalTo(0)
                 make.right.equalTo(-(zoom(10)))
                 make.height.equalTo(zoom(55))
-                make.width.equalTo(zoom(120))
+                make.width.equalTo(zoom(100))
             })
             self.defaultBtn.snp_makeConstraints(closure: { (make) -> Void in
                 make.top.equalTo(zoom(20))

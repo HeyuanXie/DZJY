@@ -72,6 +72,7 @@ class AddressViewController: UIViewController,UITableViewDataSource, UITableView
         headView.backgroundColor = UIColor.clearColor()
         return headView
     }
+    
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
         if self.contentType == .Choose {
