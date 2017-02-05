@@ -209,7 +209,7 @@ class MyOrderViewController: UIViewController,UITableViewDataSource,UITableViewD
                             let vc = MyOrderDetailViewController.CreateFromMainStoryboard() as! MyOrderDetailViewController
                             self.navigationController?.pushViewController(vc, animated: true)
                         }else if titles[sender.tag-1000] == "评价" {
-                            let vc = OrderGoodsScoreViewController()
+                            let vc = OrderCommentViewController()
                             self.navigationController?.pushViewController(vc, animated: true)
                         }
                     })
@@ -574,6 +574,7 @@ class MyOrderViewController: UIViewController,UITableViewDataSource,UITableViewD
                         ZMDTool.hiddenActivityView()
                         if succeed! {
                             let vc = TradeSuccessedViewController()
+                            vc.orderId = orderId
                             vc.hidesBottomBarWhenPushed = true
                             self.navigationController?.pushViewController(vc, animated: true)
                         }else{

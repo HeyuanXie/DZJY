@@ -16,6 +16,8 @@ class TradeSuccessedViewController: UIViewController, UITableViewDataSource, UIT
     }
     
     var currentTableView :UITableView!
+    
+    var orderId : NSNumber!
     override func viewDidLoad() {
         super.viewDidLoad()
         self.updateUI()
@@ -90,11 +92,12 @@ class TradeSuccessedViewController: UIViewController, UITableViewDataSource, UIT
                         if sender.tag == 1000 {
                             //立即评价
                             let vc = OrderCommentViewController()
+                            vc.orderId = self.orderId
                             vc.hidesBottomBarWhenPushed = true
                             self.navigationController?.pushViewController(vc, animated: true)
                         } else {
                             //继续购物
-                            ZMDTool.enterHomePageViewController()
+                            self.navigationController?.popToRootViewControllerAnimated(true)
                         }
                         return RACSignal.empty()
                     })

@@ -119,6 +119,13 @@ extension UIViewController {
 
 //MARK: 导航控制器Push
 extension UIViewController {
+    /**
+     自定义navigationController的push
+     
+     - parameter vc:         目标VC
+     - parameter animated:   是否带有动画效果
+     - parameter hideBottom: 是否隐藏tabbar
+     */
     public func pushToViewController(vc:UIViewController,animated:Bool,hideBottom:Bool){
         vc.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(vc, animated: animated)

@@ -475,7 +475,7 @@ class MyOrderDetailViewController: UIViewController,ZMDInterceptorProtocol {
                 })
             } else if orderStatu == .UnComment {
                 //评价
-                let vc = OrderGoodsScoreViewController()
+                let vc = OrderCommentViewController()
                 self.pushToViewController(vc, animated: true, hideBottom: true)
             } else if orderStatu == .Completed {
                 

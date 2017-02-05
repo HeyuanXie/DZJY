@@ -8,6 +8,7 @@
 
 import UIKit
 import ReactiveCocoa
+import SDWebImage
 
 //我的
 class MineHomeViewController: UIViewController,UITableViewDataSource, UITableViewDelegate,ZMDInterceptorProtocol,ZMDInterceptorMoreProtocol {
@@ -236,13 +237,13 @@ class MineHomeViewController: UIViewController,UITableViewDataSource, UITableVie
                 backgroundV.image = UIImage(named: "store_home_bg")
                 cell?.contentView.sendSubviewToBack(backgroundV)
             }
-            if let personImgV = cell!.viewWithTag(10001) as? UIImageView{
+            if let personImgV = cell!.viewWithTag(10001) as? UIImageView {
                 ZMDTool.configViewLayerWithSize(personImgV, size: 30)
                 if !g_isLogin {
                     personImgV.image = UIImage(named: "示例头像")
-                }else if let urlStr = g_customer?.Avatar?.AvatarUrl where urlStr != "" {
+                } else if let urlStr = g_customer?.Avatar?.AvatarUrl where urlStr != "" {
                     let url = NSURL(string: urlStr)
-                    personImgV.sd_setImageWithURL(url, placeholderImage: UIImage(named: "示例头像"))
+                    personImgV.sd_setImageWithURL(url)
                 }
             }
             //设置用户名Label.text

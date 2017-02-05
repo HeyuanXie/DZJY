@@ -188,7 +188,6 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
                 cell = UITableViewCell(style: UITableViewCellStyle.Default, reuseIdentifier: cellId)
                 ZMDTool.configTableViewCellDefault(cell)
                 cell.accessoryView = ZMDTool.getDefaultAccessoryDisclosureIndicator()
-//                cell.accessoryType = UITableViewCellAccessoryType.DisclosureIndicator
                 
                 if self.headerView == nil {
                     self.headerView = UIImageView(frame: CGRectMake(kScreenWidth - zoom(60 + 38), 0, zoom(50), zoom(50)))
@@ -200,8 +199,7 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
                 }
                 cell.addLine()
             }
-            //如果headerView.iamge == nil刷新，避免每次拖动table都从ulr取图片
-            if self.headerView.image == nil ,let urlStr = g_customer?.Avatar?.AvatarUrl,url = NSURL(string:urlStr) {
+            if let urlStr = g_customer?.Avatar?.AvatarUrl,url = NSURL(string: urlStr) {
                 self.headerView.sd_setImageWithURL(url, placeholderImage: nil)
             }
             cell.textLabel?.text = content.title
@@ -273,10 +271,19 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
             let titles = [("从手机相册选择",UIImagePickerControllerSourceType.SavedPhotosAlbum),("拍照",UIImagePickerControllerSourceType.Camera)]
             for item in titles {
                 let action = UIAlertAction(title: item.0, style: .Default, handler: { (action) -> Void in
-                    self.picker?.sourceType = item.1
-                    self.presentViewController(self.picker!, animated: true, completion: { () -> Void in
-                        self.picker?.delegate = self
-                    })
+                    if self.picker == nil {
+                        self.picker = UIImagePickerController()
+                        self.picker!.allowsEditing = true
+                        self.picker!.delegate = self
+                    }
+                    if UIImagePickerController.isSourceTypeAvailable(item.1) {
+                        self.picker?.sourceType = item.1
+                        self.presentViewController(self.picker!, animated: true, completion: { () -> Void in
+                            
+                        })
+                    }else{
+                        ZMDTool.showPromptView("设备不支持此操作")
+                    }
                 })
                 actionSheet.addAction(action)
             }
@@ -387,23 +394,14 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
     }
     
     //MARK: - UIImagePickerControllerDelegate
-    func imagePickerController(picker: UIImagePickerController, didFinishPickingImage image: UIImage, editingInfo: [String : AnyObject]?) {
-        // 存储图片
-        let size = CGSizeMake(image.size.width, image.size.height)
-        let headImageData = UIImageJPEGRepresentation(self.imageWithImageSimple(image, scaledSize: size), 0.125) //压缩
-        self.uploadUserFace(headImageData)
-        self.picker?.dismissViewControllerAnimated(true, completion: nil)
-    }
     func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]) {
-        if self.picker?.sourceType == .Camera {
-            return
-        }
         let image = info["UIImagePickerControllerEditedImage"] as! UIImage
         // 存储图片
         let size = CGSizeMake(image.size.width, image.size.height)
         let headImageData = UIImageJPEGRepresentation(self.imageWithImageSimple(image, scaledSize: size), 0.125) //压缩
         self.uploadUserFace(headImageData)
         self.picker?.dismissViewControllerAnimated(true, completion: nil)
+
     }
     
     func imagePickerControllerDidCancel(picker: UIImagePickerController) {
@@ -421,7 +419,10 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
             ZMDTool.hiddenActivityView()
             if succeed {
                 self.headerView.image = UIImage(data: imageData)
-//                self.postHeadImage(imageData: imageData)
+                if let dict = dic,url = dict["ImageUrl"] as? String {
+                    //如果更换头像后url没变，需要清除上一个头像的缓存
+                    SDImageCache.sharedImageCache().removeImageForKey(url.hasPrefix("http") ? url : kImageAddressMain + url)
+                }
             }else {
                 ZMDTool.showPromptView( "上传失败,点击重试或者重新选择图片", nil)
             }
@@ -472,9 +473,9 @@ class PersonInfoViewController:UIViewController,UITableViewDataSource, UITableVi
     }
     private func dataInit(){
         self.userCenterData = [[.Head,.Name,.Gender,.BirthDay,.Location],[.WeiXin,.Email,.Phone]/*,[.PayPassword]*/,[.Address,.Version]]
-        self.picker = UIImagePickerController()
+//        self.picker = UIImagePickerController()
 //        self.picker?.allowsEditing = true
-        self.picker?.delegate = self
+//        self.picker?.delegate = self
     }
     //MARK:创建moreView
     func moreViewUpdate() {

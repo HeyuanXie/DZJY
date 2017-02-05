@@ -122,12 +122,6 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
-	<key>NSCameraUsageDescription</key>
-	<string>是否允许此App使用您的相机?</string>
-	<key>NSLocationUsageDescription</key>
-	<string>是否允许此App进行定位?</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>是否允许此App访问您的相册?</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
