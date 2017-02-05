@@ -17,7 +17,6 @@
 #import <SDWebImage/SDWebImageManager.h>
 #import <SDWebImage/UIImageView+WebCache.h>
 #import <SDWebImage/UIView+WebCacheOperation.h>
-#import <SDWebImage/SDImageCache.h>
 
 //#import <Reachability/Reachability.h>   // 判断网络状况
 #import "Aspects.h"        // 拦截器
