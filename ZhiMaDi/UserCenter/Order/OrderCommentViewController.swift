@@ -22,9 +22,9 @@ class OrderCommentViewController: UIViewController,UITableViewDelegate,UITableVi
     var canSubmit = false
     var IsAnonymous = false     //匿名评价
     
-    var descriptionPoint : Int! //描述相符
-    var servicePoint : Int!     //服务态度
-    var logisticsPoint : Int!   //物流态度
+    var descriptionPoint = 1//描述相符
+    var servicePoint = 1    //服务态度
+    var logisticsPoint = 1  //物流态度
     
     //MARK:--
     var orderId : NSNumber!         //当前订单id
@@ -196,6 +196,10 @@ class OrderCommentViewController: UIViewController,UITableViewDelegate,UITableVi
                 ZMDTool.showErrorPromptView(nil, error: nil, errorMsg: error)
             }
         }
+    }
+    //MARK: -Override Method
+    override func alertCancelAction() {
+        self.navigationController?.popViewControllerAnimated(true)
     }
     
     //MARK: -UITextViewDelegate
