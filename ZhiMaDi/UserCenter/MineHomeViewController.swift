@@ -167,7 +167,7 @@ class MineHomeViewController: UIViewController,UITableViewDataSource, UITableVie
         let cellType = self.userCenterData[indexPath.section][indexPath.row]
         switch cellType {
         case .UserHead:
-            return zoom(206)
+            return zoom(180)
         default :
             return zoom(52)
         }
@@ -238,7 +238,8 @@ class MineHomeViewController: UIViewController,UITableViewDataSource, UITableVie
                 cell?.contentView.sendSubviewToBack(backgroundV)
             }
             if let personImgV = cell!.viewWithTag(10001) as? UIImageView {
-                ZMDTool.configViewLayerWithSize(personImgV, size: 30)
+                ZMDTool.configViewLayerWithSize(personImgV, size: zoom(32))
+//                ZMDTool.config
                 if !g_isLogin {
                     personImgV.image = UIImage(named: "示例头像")
                 } else if let urlStr = g_customer?.Avatar?.AvatarUrl where urlStr != "" {
@@ -304,9 +305,6 @@ class MineHomeViewController: UIViewController,UITableViewDataSource, UITableVie
         }
     }
     //MARK:Private Method
-    func configHead() {
-        
-    }
     func updateUI() {
         self.currentTableView.backgroundColor = tableViewdefaultBackgroundColor
         self.configMoreButton()

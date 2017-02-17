@@ -1681,28 +1681,24 @@
                                 <rect key="frame" x="0.0" y="64" width="375" height="603"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" reuseIdentifier="HeadCell" rowHeight="206" id="m58-bw-ovB">
-                                        <rect key="frame" x="0.0" y="92" width="375" height="206"/>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" reuseIdentifier="HeadCell" rowHeight="180" id="m58-bw-ovB">
+                                        <rect key="frame" x="0.0" y="92" width="375" height="180"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="m58-bw-ovB" id="vhv-Qf-dcy">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="206"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="180"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <imageView userInteractionEnabled="NO" tag="10003" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="store_home_bg.png" translatesAutoresizingMaskIntoConstraints="NO" id="HLz-R7-c91">
-                                                    <rect key="frame" x="0.0" y="0.0" width="375" height="192"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="height" constant="192" id="WWk-xq-2SI"/>
-                                                    </constraints>
+                                                    <rect key="frame" x="0.0" y="0.0" width="375" height="180"/>
                                                 </imageView>
                                                 <imageView userInteractionEnabled="NO" tag="10001" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="orE-jH-e03">
-                                                    <rect key="frame" x="158" y="26" width="60" height="60"/>
+                                                    <rect key="frame" x="156" y="26" width="64" height="64"/>
                                                     <constraints>
-                                                        <constraint firstAttribute="height" constant="60" id="Qfl-qE-672"/>
-                                                        <constraint firstAttribute="width" constant="60" id="aeV-PI-A3g"/>
+                                                        <constraint firstAttribute="width" secondItem="orE-jH-e03" secondAttribute="height" multiplier="1:1" id="ItG-a1-z8M"/>
                                                     </constraints>
                                                 </imageView>
                                                 <label opaque="NO" userInteractionEnabled="NO" tag="10002" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="张三" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uib-rb-3BI">
-                                                    <rect key="frame" x="0.0" y="96" width="375" height="15"/>
+                                                    <rect key="frame" x="0.0" y="100" width="375" height="15"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="15" id="Bgh-c8-2FU"/>
                                                     </constraints>
@@ -1717,14 +1713,16 @@
                                                 <constraint firstItem="uib-rb-3BI" firstAttribute="leading" secondItem="vhv-Qf-dcy" secondAttribute="leading" id="NwV-7b-7or"/>
                                                 <constraint firstItem="HLz-R7-c91" firstAttribute="leading" secondItem="vhv-Qf-dcy" secondAttribute="leading" id="RLg-f9-w94"/>
                                                 <constraint firstItem="uib-rb-3BI" firstAttribute="top" secondItem="orE-jH-e03" secondAttribute="bottom" constant="10" id="SWA-Eg-cFA"/>
+                                                <constraint firstAttribute="bottom" secondItem="HLz-R7-c91" secondAttribute="bottom" id="Xfz-ZD-he9"/>
                                                 <constraint firstItem="orE-jH-e03" firstAttribute="centerX" secondItem="vhv-Qf-dcy" secondAttribute="centerX" id="beE-T9-b30"/>
                                                 <constraint firstAttribute="trailing" secondItem="uib-rb-3BI" secondAttribute="trailing" id="ctt-0O-aYE"/>
                                                 <constraint firstAttribute="trailing" secondItem="HLz-R7-c91" secondAttribute="trailing" id="oMg-Hw-bdv"/>
+                                                <constraint firstItem="orE-jH-e03" firstAttribute="width" secondItem="vhv-Qf-dcy" secondAttribute="width" multiplier="0.173" id="tTe-Hd-ZTb"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="MyOrderCell" rowHeight="55" id="cuP-CF-8Ni">
-                                        <rect key="frame" x="0.0" y="298" width="375" height="55"/>
+                                        <rect key="frame" x="0.0" y="272" width="375" height="55"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="cuP-CF-8Ni" id="Eh4-ts-lft">
                                             <rect key="frame" x="0.0" y="0.0" width="342" height="55"/>

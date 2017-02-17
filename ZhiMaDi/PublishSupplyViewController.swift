@@ -687,13 +687,14 @@ class PublishSupplyViewController: UIViewController,ZMDInterceptorProtocol,UITab
     }
     
     //MARK: - UIImagePickerControllerDelegate
-    func imagePickerController(picker: UIImagePickerController, didFinishPickingImage image: UIImage!, editingInfo: [NSObject : AnyObject]!) {
+    func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]) {
+        let image = info["UIImagePickerControllerEditedImage"] as! UIImage
         // 存储图片
         self.images.addObject(image)
         self.currentTableView.reloadSections(NSIndexSet(index: 0), withRowAnimation: .None)
         self.picker?.dismissViewControllerAnimated(true, completion: nil)
     }
-    
+
     func imagePickerControllerDidCancel(picker: UIImagePickerController) {
         self.picker?.dismissViewControllerAnimated(true, completion: nil)
     }

@@ -420,7 +420,7 @@ class HomePageViewController: UIViewController,UITableViewDataSource,UITableView
                 (viewController as! SupplyDemandListViewController).type = 1
                 (viewController as! SupplyDemandListViewController).q = text
                 (viewController as! SupplyDemandListViewController).check = 2
-            default :
+            case .kDemand :
                 (viewController as! SupplyDemandListViewController).type = 2
                 (viewController as! SupplyDemandListViewController).q = text
                 (viewController as! SupplyDemandListViewController).check = 2

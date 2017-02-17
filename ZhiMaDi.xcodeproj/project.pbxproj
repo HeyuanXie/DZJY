@@ -654,6 +654,8 @@
 		846426B31E0BDEC5005B2AB8 /* ZMDEnterprise.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846426B21E0BDEC5005B2AB8 /* ZMDEnterprise.swift */; };
 		84683B071D63F9AF003C848F /* Navi_Msg_50*50@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 84683B061D63F9AF003C848F /* Navi_Msg_50*50@2x.png */; };
 		84765FAD1DA8C9A1002F4F80 /* default-image-100.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 84765FAC1DA8C9A1002F4F80 /* default-image-100.jpg */; };
+		847F8B371E52A948007097F4 /* BlocksKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 847F8B301E52A91B007097F4 /* BlocksKit.framework */; };
+		847F8B381E52A948007097F4 /* BlocksKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 847F8B301E52A91B007097F4 /* BlocksKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		84A8504E1D79536800F93768 /* SortViewController2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A8504D1D79536800F93768 /* SortViewController2.swift */; };
 		84A93EEC1DACDF4F00532D4F /* tm.png in Resources */ = {isa = PBXBuildFile; fileRef = 84A93EEB1DACDF4F00532D4F /* tm.png */; };
 		84AFD42E1DF9358E00E03E56 /* MineSupplyOrDemandViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84AFD42D1DF9358E00E03E56 /* MineSupplyOrDemandViewController.swift */; };
@@ -699,8 +701,6 @@
 		84B35E991DF3C9AF00699EEF /* SupplyDemandListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B35E981DF3C9AF00699EEF /* SupplyDemandListViewController.swift */; };
 		84B35E9B1DF3C9C900699EEF /* SupplyDemandDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B35E9A1DF3C9C900699EEF /* SupplyDemandDetailViewController.swift */; };
 		84B35E9F1DF3D98200699EEF /* SupplyDemandListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B35E9E1DF3D98200699EEF /* SupplyDemandListCell.swift */; };
-		84B49A8C1E1F3E5E00E45338 /* BlocksKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84B49A851E1F3E4900E45338 /* BlocksKit.framework */; };
-		84B49A8D1E1F3E5E00E45338 /* BlocksKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 84B49A851E1F3E4900E45338 /* BlocksKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		84B49A921E1F425E00E45338 /* TestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B49A911E1F425E00E45338 /* TestViewController.swift */; };
 		84B54A4C1D81670500356BBA /* MyWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B54A4B1D81670500356BBA /* MyWebViewController.swift */; };
 		84B6B5531DE6DFB300A20396 /* OrderCommentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B6B5521DE6DFB300A20396 /* OrderCommentViewController.swift */; };
@@ -786,51 +786,51 @@
 			remoteGlobalIDString = 3C9098531C76A482006B7D2C;
 			remoteInfo = ZhiMaDi;
 		};
-		84B49A801E1F3E4900E45338 /* PBXContainerItemProxy */ = {
+		847F8B2B1E52A91B007097F4 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 84B49A771E1F3E4800E45338 /* BlocksKit.xcodeproj */;
+			containerPortal = 847F8B221E52A91B007097F4 /* BlocksKit.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = DB9B96371B3A52E500940D20;
 			remoteInfo = BlocksKit;
 		};
-		84B49A821E1F3E4900E45338 /* PBXContainerItemProxy */ = {
+		847F8B2D1E52A91B007097F4 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 84B49A771E1F3E4800E45338 /* BlocksKit.xcodeproj */;
+			containerPortal = 847F8B221E52A91B007097F4 /* BlocksKit.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = DB9B96401B3A52E500940D20;
 			remoteInfo = BlocksKitTests;
 		};
-		84B49A841E1F3E4900E45338 /* PBXContainerItemProxy */ = {
+		847F8B2F1E52A91B007097F4 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 84B49A771E1F3E4800E45338 /* BlocksKit.xcodeproj */;
+			containerPortal = 847F8B221E52A91B007097F4 /* BlocksKit.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = DB9B96181B3A52A700940D20;
 			remoteInfo = MobileBlocksKit;
 		};
-		84B49A861E1F3E4900E45338 /* PBXContainerItemProxy */ = {
+		847F8B311E52A91B007097F4 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 84B49A771E1F3E4800E45338 /* BlocksKit.xcodeproj */;
+			containerPortal = 847F8B221E52A91B007097F4 /* BlocksKit.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = DB9B96221B3A52A700940D20;
 			remoteInfo = MobileBlocksKitTests;
 		};
-		84B49A881E1F3E4900E45338 /* PBXContainerItemProxy */ = {
+		847F8B331E52A91B007097F4 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 84B49A771E1F3E4800E45338 /* BlocksKit.xcodeproj */;
+			containerPortal = 847F8B221E52A91B007097F4 /* BlocksKit.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = DB9B96521B3A531F00940D20;
 			remoteInfo = MobileBlocksKitLegacy;
 		};
-		84B49A8A1E1F3E4900E45338 /* PBXContainerItemProxy */ = {
+		847F8B351E52A91B007097F4 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 84B49A771E1F3E4800E45338 /* BlocksKit.xcodeproj */;
+			containerPortal = 847F8B221E52A91B007097F4 /* BlocksKit.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = DBBDD1E51B3A553E008909B0;
 			remoteInfo = "BlocksKit Mac Demo";
 		};
-		84B49A8E1E1F3E5E00E45338 /* PBXContainerItemProxy */ = {
+		847F8B391E52A948007097F4 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 84B49A771E1F3E4800E45338 /* BlocksKit.xcodeproj */;
+			containerPortal = 847F8B221E52A91B007097F4 /* BlocksKit.xcodeproj */;
 			proxyType = 1;
 			remoteGlobalIDString = DB9B96171B3A52A700940D20;
 			remoteInfo = MobileBlocksKit;
@@ -844,7 +844,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				84B49A8D1E1F3E5E00E45338 /* BlocksKit.framework in Embed Frameworks */,
+				847F8B381E52A948007097F4 /* BlocksKit.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1540,6 +1540,7 @@
 		846426B21E0BDEC5005B2AB8 /* ZMDEnterprise.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZMDEnterprise.swift; sourceTree = "<group>"; };
 		84683B061D63F9AF003C848F /* Navi_Msg_50*50@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Navi_Msg_50*50@2x.png"; sourceTree = "<group>"; };
 		84765FAC1DA8C9A1002F4F80 /* default-image-100.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "default-image-100.jpg"; sourceTree = "<group>"; };
+		847F8B221E52A91B007097F4 /* BlocksKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = BlocksKit.xcodeproj; path = "BlocksKit-master/BlocksKit.xcodeproj"; sourceTree = "<group>"; };
 		84A8504D1D79536800F93768 /* SortViewController2.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SortViewController2.swift; sourceTree = "<group>"; };
 		84A93EEB1DACDF4F00532D4F /* tm.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tm.png; sourceTree = "<group>"; };
 		84AFD42D1DF9358E00E03E56 /* MineSupplyOrDemandViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MineSupplyOrDemandViewController.swift; sourceTree = "<group>"; };
@@ -1587,7 +1588,6 @@
 		84B35E981DF3C9AF00699EEF /* SupplyDemandListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SupplyDemandListViewController.swift; sourceTree = "<group>"; };
 		84B35E9A1DF3C9C900699EEF /* SupplyDemandDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SupplyDemandDetailViewController.swift; sourceTree = "<group>"; };
 		84B35E9E1DF3D98200699EEF /* SupplyDemandListCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SupplyDemandListCell.swift; sourceTree = "<group>"; };
-		84B49A771E1F3E4800E45338 /* BlocksKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = BlocksKit.xcodeproj; path = "../BlocksKit-master/BlocksKit.xcodeproj"; sourceTree = "<group>"; };
 		84B49A911E1F425E00E45338 /* TestViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestViewController.swift; sourceTree = "<group>"; };
 		84B54A4B1D81670500356BBA /* MyWebViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyWebViewController.swift; sourceTree = "<group>"; };
 		84B6B5521DE6DFB300A20396 /* OrderCommentViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OrderCommentViewController.swift; sourceTree = "<group>"; };
@@ -1705,7 +1705,7 @@
 				2B539AC51C99514200FFE6CD /* UIKit.framework in Frameworks */,
 				2BA222FE1CE96E00006BC426 /* libcrypto.a in Frameworks */,
 				2B539AC31C99513A00FFE6CD /* Foundation.framework in Frameworks */,
-				84B49A8C1E1F3E5E00E45338 /* BlocksKit.framework in Frameworks */,
+				847F8B371E52A948007097F4 /* BlocksKit.framework in Frameworks */,
 				2B539AC11C99513300FFE6CD /* CoreGraphics.framework in Frameworks */,
 				2BA222FD1CE96E00006BC426 /* AlipaySDK.framework in Frameworks */,
 				2B539ABB1C9950F400FFE6CD /* CoreFoundation.framework in Frameworks */,
@@ -2742,7 +2742,7 @@
 		3C90984B1C76A482006B7D2C = {
 			isa = PBXGroup;
 			children = (
-				84B49A771E1F3E4800E45338 /* BlocksKit.xcodeproj */,
+				847F8B221E52A91B007097F4 /* BlocksKit.xcodeproj */,
 				3C9098691C76A687006B7D2C /* readme */,
 				840A66CF1D5180A80074DE49 /* MyChange */,
 				3C9098561C76A482006B7D2C /* ZhiMaDi */,
@@ -3190,6 +3190,19 @@
 			path = XGPush;
 			sourceTree = "<group>";
 		};
+		847F8B231E52A91B007097F4 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				847F8B2C1E52A91B007097F4 /* BlocksKit.framework */,
+				847F8B2E1E52A91B007097F4 /* BlocksKitTests.xctest */,
+				847F8B301E52A91B007097F4 /* BlocksKit.framework */,
+				847F8B321E52A91B007097F4 /* BlocksKitTests.xctest */,
+				847F8B341E52A91B007097F4 /* libMobileBlocksKitLegacy.a */,
+				847F8B361E52A91B007097F4 /* BlocksKit Mac Demo.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		84AFD3F61DF92B4D00E03E56 /* 切图 */ = {
 			isa = PBXGroup;
 			children = (
@@ -3330,19 +3343,6 @@
 			name = VC;
 			sourceTree = "<group>";
 		};
-		84B49A781E1F3E4800E45338 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				84B49A811E1F3E4900E45338 /* BlocksKit.framework */,
-				84B49A831E1F3E4900E45338 /* BlocksKitTests.xctest */,
-				84B49A851E1F3E4900E45338 /* BlocksKit.framework */,
-				84B49A871E1F3E4900E45338 /* BlocksKitTests.xctest */,
-				84B49A891E1F3E4900E45338 /* libMobileBlocksKitLegacy.a */,
-				84B49A8B1E1F3E4900E45338 /* BlocksKit Mac Demo.app */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		84C9AD771DF51D30008E2BC7 /* CardStyleScrollView */ = {
 			isa = PBXGroup;
 			children = (
@@ -3475,7 +3475,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				84B49A8F1E1F3E5E00E45338 /* PBXTargetDependency */,
+				847F8B3A1E52A948007097F4 /* PBXTargetDependency */,
 			);
 			name = ZhiMaDi;
 			productName = ZhiMaDi;
@@ -3521,8 +3521,8 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = 84B49A781E1F3E4800E45338 /* Products */;
-					ProjectRef = 84B49A771E1F3E4800E45338 /* BlocksKit.xcodeproj */;
+					ProductGroup = 847F8B231E52A91B007097F4 /* Products */;
+					ProjectRef = 847F8B221E52A91B007097F4 /* BlocksKit.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -3534,46 +3534,46 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		84B49A811E1F3E4900E45338 /* BlocksKit.framework */ = {
+		847F8B2C1E52A91B007097F4 /* BlocksKit.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
 			path = BlocksKit.framework;
-			remoteRef = 84B49A801E1F3E4900E45338 /* PBXContainerItemProxy */;
+			remoteRef = 847F8B2B1E52A91B007097F4 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		84B49A831E1F3E4900E45338 /* BlocksKitTests.xctest */ = {
+		847F8B2E1E52A91B007097F4 /* BlocksKitTests.xctest */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
 			path = BlocksKitTests.xctest;
-			remoteRef = 84B49A821E1F3E4900E45338 /* PBXContainerItemProxy */;
+			remoteRef = 847F8B2D1E52A91B007097F4 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		84B49A851E1F3E4900E45338 /* BlocksKit.framework */ = {
+		847F8B301E52A91B007097F4 /* BlocksKit.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
 			path = BlocksKit.framework;
-			remoteRef = 84B49A841E1F3E4900E45338 /* PBXContainerItemProxy */;
+			remoteRef = 847F8B2F1E52A91B007097F4 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		84B49A871E1F3E4900E45338 /* BlocksKitTests.xctest */ = {
+		847F8B321E52A91B007097F4 /* BlocksKitTests.xctest */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
 			path = BlocksKitTests.xctest;
-			remoteRef = 84B49A861E1F3E4900E45338 /* PBXContainerItemProxy */;
+			remoteRef = 847F8B311E52A91B007097F4 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		84B49A891E1F3E4900E45338 /* libMobileBlocksKitLegacy.a */ = {
+		847F8B341E52A91B007097F4 /* libMobileBlocksKitLegacy.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libMobileBlocksKitLegacy.a;
-			remoteRef = 84B49A881E1F3E4900E45338 /* PBXContainerItemProxy */;
+			remoteRef = 847F8B331E52A91B007097F4 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		84B49A8B1E1F3E4900E45338 /* BlocksKit Mac Demo.app */ = {
+		847F8B361E52A91B007097F4 /* BlocksKit Mac Demo.app */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.application;
 			path = "BlocksKit Mac Demo.app";
-			remoteRef = 84B49A8A1E1F3E4900E45338 /* PBXContainerItemProxy */;
+			remoteRef = 847F8B351E52A91B007097F4 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -4403,10 +4403,10 @@
 			target = 3C9098531C76A482006B7D2C /* ZhiMaDi */;
 			targetProxy = 2B9A570F1D06B6BA007A6D43 /* PBXContainerItemProxy */;
 		};
-		84B49A8F1E1F3E5E00E45338 /* PBXTargetDependency */ = {
+		847F8B3A1E52A948007097F4 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = MobileBlocksKit;
-			targetProxy = 84B49A8E1E1F3E5E00E45338 /* PBXContainerItemProxy */;
+			targetProxy = 847F8B391E52A948007097F4 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -4619,7 +4619,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: The Wholesale Of Agricultural Commodities Of Jiangnan Kashi Bulk Agricultural Prod (JQV37Q32C9)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: The Wholesale Of Agricultural Commodities Of Jiangnan Kashi Bulk Agricultural Prod (JQV37Q32C9)";
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
