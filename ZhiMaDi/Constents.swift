@@ -165,8 +165,6 @@ func compareVersion(version1: String, version2: String) -> NSComparisonResult? {
 // MARK: - 在 Relase 模式下，关闭后台打印
 #if DEBUG
     func print(object: Any) {}
-    func println(object: Any) {}
-    func println() {}
     func NSLog(format: String, args: CVarArgType...) {}
     #else
 #endif

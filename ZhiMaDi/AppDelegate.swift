@@ -128,7 +128,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         application.registerForRemoteNotifications()
     }
     func application(application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: NSError) {
-        println("DeviceToken 获取失败，原因：\(error)")
+        print("DeviceToken 获取失败，原因：\(error)")
     }
     //客户端支付
     func application(application: UIApplication, openURL url: NSURL, sourceApplication: String?, annotation: AnyObject) -> Bool {

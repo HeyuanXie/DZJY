@@ -26,10 +26,10 @@ class NetworkTest: NSObject {
         let session = NSURLSession.sharedSession()
         let dataTask = session.dataTaskWithRequest(request, completionHandler: { (data, response, error) -> Void in
             if (error != nil) {
-                println(error)
+                print(error)
             } else {
                 let httpResponse = response as? NSHTTPURLResponse
-                println(httpResponse)
+                print(httpResponse)
             }
         })
         dataTask.resume()

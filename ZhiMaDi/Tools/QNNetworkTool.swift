@@ -154,7 +154,7 @@ private extension QNNetworkTool {
             }
             catch {
                 completionHandler(request: $0!, response: $1, data: $2, dictionary: nil, error: NSError(domain: "JSON解析错误", code: 10086, userInfo: nil));
-                println("Json解析过程出错")
+                print("Json解析过程出错")
             }
         }
     }
@@ -421,7 +421,7 @@ extension QNNetworkTool {
                     completion(error: nil, products: products)
                     HYNetworkCache.save_asyncJsonResponseToCacheFile(array, andURL: "HomeSupplyDemand\(type)", completed: nil)
                 } catch {
-                    println("Json解析过程出错")
+                    print("Json解析过程出错")
                 }
             }
         }
@@ -481,7 +481,7 @@ extension QNNetworkTool {
                     return
                 }
                 if let dic = data[0] as? NSDictionary,url = dic["ImageUrl"] {
-                    println(url)
+                    print(url)
                 }
                 completion(success: true, error: $3)
             } catch {}
@@ -501,7 +501,7 @@ extension QNNetworkTool {
                     }
                     completion(success: true, error: nil)
                 } catch {
-                    println("Json解析过程出错")
+                    print("Json解析过程出错")
                 }
             }else {
                 completion(success: false, error: error)
@@ -528,7 +528,7 @@ extension QNNetworkTool {
                     completion(categories: categories, error: nil)
                     HYNetworkCache.save_asyncJsonResponseToCacheFile(array, andURL: "MainCategories", completed: nil)
                 }catch{
-                    println("JSON解析失败")
+                    print("JSON解析失败")
                 }
             }else{
                 completion(categories: nil, error: error)
@@ -699,7 +699,7 @@ extension QNNetworkTool {
                     let categories = ZMDSortCategory.mj_objectArrayWithKeyValuesArray(array)
                     completion(categories:categories,error: nil,dictionary:nil)
                 } catch {
-                    println("Json解析过程出错")
+                    print("Json解析过程出错")
                 }
             }else {
                 completion(categories:nil,error: error,dictionary:nil)
@@ -1437,7 +1437,7 @@ extension QNNetworkTool {
                     let areas = ZMDArea.mj_objectArrayWithKeyValuesArray(array)
                     completion(areas:areas,error: nil,dictionary:nil)
                 } catch {
-                    println("Json解析过程出错")
+                    print("Json解析过程出错")
                 }
             }else {
                 completion(areas:nil,error: error,dictionary:nil)

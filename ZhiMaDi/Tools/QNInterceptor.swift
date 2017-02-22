@@ -180,7 +180,7 @@ class ZMDInterceptor : NSObject {
 //        do {
 //            let block : @objc_block (aspectInfo: AspectInfo) -> Void = { [weak self](aspectInfo: AspectInfo) -> Void in
 //                if let strongSelf = self, let viewController = aspectInfo.instance() as? UIViewController {
-//                    println("控制器被释放:\(viewController.debugDescription)")
+//                    print("控制器被释放:\(viewController.debugDescription)")
 //                }
 //            }
 //            UIViewController.aspect_hookSelector(Selector("dealloc"), withOptions: AspectOptions.PositionBefore, usingBlock: unsafeBitCast(block, AnyObject.self), error: nil)
