@@ -474,7 +474,7 @@ class ConfirmOrderViewController: UIViewController,UITableViewDataSource,UITable
         ZMDTool.configViewLayerWithSize(confirmBtn, size: 15)
         view.addSubview(confirmBtn)
         
-        self.payLbl = ZMDTool.getLabel(CGRect(x: 12, y: 12, width: 200, height: 15), text: "实付: ¥ \(self.total)", fontSize: 16,textColor: defaultTextColor)
+        self.payLbl = ZMDTool.getLabel(CGRect(x: 12, y: 12, width: CGRectGetMinX(confirmBtn.frame)-12, height: 15), text: "实付: ¥ \(self.total)", fontSize: 16,textColor: defaultTextColor)
         self.payLbl.attributedText = self.payLbl.text?.AttributedText("¥ \(self.total)", color: defaultSelectColor)
         view.addSubview(self.payLbl)
         

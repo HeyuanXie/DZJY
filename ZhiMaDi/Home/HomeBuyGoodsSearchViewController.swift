@@ -595,6 +595,7 @@ class HomeBuyGoodsSearchViewController: UIViewController, ZMDInterceptorProtocol
 
         let searchView = UIView(frame: CGRect(x: 0, y: 0, width: kScreenWidth-120, height: 44))
         self.textInput = UITextField(frame: CGRect(x: 60, y: 4, width: kScreenWidth - 120 - 60, height: 36))
+        self.textInput.returnKeyType = .Search
         self.textInput.tag = 100
         textInput.placeholder = "  商品关键字"
         textInput.backgroundColor = defaultBackgroundColor

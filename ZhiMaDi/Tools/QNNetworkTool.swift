@@ -300,10 +300,10 @@ extension QNNetworkTool {
         }
     }
     // 用户登录  /api/v1/extend/Login/
-    class func loginAjax(Username:String,Password:String,completion: (success: Bool!,error:NSError?,dictionary:NSDictionary?) -> Void){
+    class func loginAjax(Username:String,Password:String,completion: (success: Bool!,errorMsg:String?,dictionary:NSDictionary?) -> Void){
         requestPOST(kServerAddress + "/api/v1/extend/Login/LoginAjax", parameters: ["Username" : Username,"Password" : Password]) { (_,response, _, dictionary, error) -> Void in
             guard let dic = dictionary,success = dic["success"] as? Bool where success else {
-                completion(success:false,error: error,dictionary:nil)
+                completion(success:false,errorMsg:dictionary!["error"] as? String,dictionary:nil)
                 return
             }
             if let customerId = dic["customerId"] as? Int {
@@ -316,7 +316,7 @@ extension QNNetworkTool {
                     g_customer?.FirstName = Username
                 }
             }
-            completion(success:true,error: nil,dictionary:nil)
+            completion(success:true,errorMsg: nil,dictionary:nil)
         }
     }
     // 手机验证码登录

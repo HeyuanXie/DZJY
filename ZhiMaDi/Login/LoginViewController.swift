@@ -121,7 +121,7 @@ class LoginViewController: UIViewController , ZMDInterceptorNavigationBarHiddenP
     func login() {
         if !self.checkAccountPassWord() {return}
         if let usrN = self.accountTextField.text, let ps = self.verificationTextField.text {
-            QNNetworkTool.loginAjax(usrN, Password: ps, completion: { (success, error, dictionary) -> Void in
+            QNNetworkTool.loginAjax(usrN, Password: ps, completion: { (success, errorMsg, dictionary) -> Void in
                 if success! {
                     saveAccountAndPassword(usrN, password: ps)
                     if self.loginSucceed != nil {
@@ -129,7 +129,7 @@ class LoginViewController: UIViewController , ZMDInterceptorNavigationBarHiddenP
                     }
                     self.back()
                 } else {
-                    ZMDTool.showErrorPromptView(nil, error: error, errorMsg: "失败")
+                    ZMDTool.showPromptView(errorMsg ?? "登陆失败,请稍后再试")
                 }
             })
         }
