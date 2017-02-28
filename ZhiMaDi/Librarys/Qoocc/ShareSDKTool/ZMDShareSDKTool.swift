@@ -18,7 +18,7 @@ class ZMDShareSDKTool: NSObject {
     override init() {
         super.init()
         
-        ShareSDK.registerApp("c46314899f04",
+        ShareSDK.registerApp("1ba684cb6a602",
             activePlatforms: [
                 SSDKPlatformType.TypeSinaWeibo.rawValue,
                 SSDKPlatformType.TypeWechat.rawValue,
@@ -50,8 +50,8 @@ class ZMDShareSDKTool: NSObject {
                     appInfo.SSDKSetupWeChatByAppId("wxc59280c42692603a", appSecret: "3cfd85fd1dd235f1ec572bb885d8c271")
                 case SSDKPlatformType.TypeQQ:
                     //设置QQ应用信息
-                    appInfo.SSDKSetupQQByAppId("1105808222",
-                        appKey : "VFJy9m4n5zXj4tIF",
+                    appInfo.SSDKSetupQQByAppId("1106011660",
+                        appKey : "75anFwbxnl4gavPP",
                         authType : SSDKAuthTypeBoth)
                 default:
                     break
